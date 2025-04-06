@@ -16,8 +16,6 @@ export default function DashboardLayout({
   const router = useRouter();
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
 
-  console.log("Dashboard layout loaded");
-
   useEffect(() => {
     if (!user) {
       router.push("/login");

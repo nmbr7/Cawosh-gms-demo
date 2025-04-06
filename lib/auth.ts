@@ -1,6 +1,6 @@
+// /lib/auth.ts
 import type { User } from "@/types/user";
 
-// 1. Mock admin user
 export const MOCK_ADMIN: User = {
   id: 1,
   name: "Admin User",
@@ -8,7 +8,6 @@ export const MOCK_ADMIN: User = {
   role: "admin",
 };
 
-// 2. Validate login credentials
 export function validateCredentials(
   email: string,
   password: string
