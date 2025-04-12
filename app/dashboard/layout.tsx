@@ -1,39 +1,52 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
+import { useUIStore } from "@/store/ui";
 import Sidebar from "@/components/Sidebar";
 import { cn } from "@/lib/utils";
-import { useUIStore } from "@/store/ui";
+import Header from "@/components/Header";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [isLoading, setIsLoading] = useState(true);
   const user = useAuthStore((state) => state.user);
-  const router = useRouter();
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
+  const router = useRouter();
 
   useEffect(() => {
     if (!user) {
-      router.push("/login");
+      router.replace("/login");
+    } else {
+      setIsLoading(false);
     }
   }, [user, router]);
 
-  if (!user) return null; // Prevent flash
+  // Prevent any rendering until we know the auth state
+  if (isLoading || !user) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar />
-      <main
-        className={cn(
-          "transition-all p-6 flex-1",
-          sidebarOpen ? "ml-64" : "ml-16"
-        )}
-      >
-        {children}
+      <div className={cn(
+        "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
+        sidebarOpen ? "w-64" : "w-16"
+      )}>
+        <Sidebar />
+      </div>
+      <main className={cn(
+        "flex-1 transition-all duration-300 ease-in-out",
+        sidebarOpen ? "ml-64" : "ml-16"
+      )}>
+        <Header />
+        <div className="p-6">
+          {children}
+        </div>
       </main>
     </div>
   );

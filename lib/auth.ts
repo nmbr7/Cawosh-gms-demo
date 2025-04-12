@@ -17,3 +17,12 @@ export function validateCredentials(
   }
   return null;
 }
+
+export function validateEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+export function checkEmailExists(email: string): boolean {
+  return email === MOCK_ADMIN.email;
+}

@@ -1,10 +1,15 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User } from "@/types/user";
+
+type User = {
+  id: number;
+  email: string;
+  name: string;
+};
 
 type AuthState = {
   user: User | null;
-  login: (user: User) => void;
+  setUser: (user: User | null) => void;
   logout: () => void;
 };
 
@@ -12,11 +17,17 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      login: (user) => set({ user }),
-      logout: () => set({ user: null }),
+      setUser: (user) => set({ user }),
+      logout: () => {
+        set({ user: null });
+        // Clear any stored data
+        localStorage.removeItem("auth-storage");
+        // Force a hard navigation to login to prevent back button issues
+        window.location.href = "/login";
+      },
     }),
     {
-      name: "auth-storage", // LocalStorage key
+      name: "auth-storage",
     }
   )
 );
