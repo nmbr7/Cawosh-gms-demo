@@ -43,16 +43,7 @@ export function MonthView({ selectedDate, selectedBay, bookings }: MonthViewProp
     
     const dayBookings = bookings.filter((booking: Booking) => {
       const matches = booking.date === dayStr && booking.bay === selectedBay;
-      if (matches) {
-        console.log("MonthView - Found matching booking:", {
-          bookingId: booking.id,
-          bookingDate: booking.date,
-          bookingDescription: booking.description,
-          dayStr,
-          bay: booking.bay,
-          selectedBay
-        });
-      }
+
       return matches;
     });
     
@@ -72,49 +63,54 @@ export function MonthView({ selectedDate, selectedBay, bookings }: MonthViewProp
           </div>
         ))}
 
-        {/* Calendar days */}
-        {allDays.map((day: Date | null, index: number) => {
-          const dayBookings: Booking[] = getBookingsForDay(day);
-          const isCurrentMonth: boolean = day ? isSameMonth(day, selectedDate) : false;
-          const isCurrentDay: boolean = day ? isToday(day) : false;
-          const isSelectedDay: boolean = day ? isSameDay(day, selectedDate) : false;
+        {/* Calendar weeks */}
+        {weeks.map((week: (Date | null)[], weekIndex: number) => (
+          <React.Fragment key={weekIndex}>
+            {week.map((day: Date | null, dayIndex: number) => {
+              const dayBookings: Booking[] = getBookingsForDay(day);
+              const isCurrentMonth: boolean = day ? isSameMonth(day, selectedDate) : false;
+              const isCurrentDay: boolean = day ? isToday(day) : false;
+              const isSelectedDay: boolean = day ? isSameDay(day, selectedDate) : false;
 
-          return (
-            <div
-              key={index}
-              className={cn(
-                "bg-white p-2 min-h-[100px]",
-                !isCurrentMonth && "text-gray-400",
-                isCurrentDay ? 'border-blue-500' : 'border-gray-200',
-                isSelectedDay ? 'bg-blue-50' : ''
-              )}
-            >
-              {day && (
-                <>
-                  <div className="text-sm font-medium mb-1">
-                    {format(day, 'd')}
-                  </div>
-                  <div className="space-y-1">
-                    {dayBookings.map((booking: Booking) => (
-                      <div
-                        key={booking.id}
-                        className={cn(
-                          "text-xs p-1 mb-1 rounded truncate",
-                          booking.status === 'completed' ? 'bg-green-100 text-green-700' :
-                          booking.status === 'ongoing' ? 'bg-amber-100 text-amber-700' :
-                          'bg-blue-100 text-blue-700'
-                        )}
-                        title={`${booking.description} - ${booking.startTime} to ${booking.endTime}`}
-                      >
-                        {booking.description}
+              return (
+                <div
+                  key={`${weekIndex}-${dayIndex}`}
+                  className={cn(
+                    "bg-white p-2 min-h-[100px]",
+                    !isCurrentMonth && "text-gray-400",
+                    isCurrentDay ? 'border-blue-500' : 'border-gray-200',
+                    isSelectedDay ? 'bg-blue-50' : '',
+                    weekIndex === weeks.length - 1 && "border-b border-gray-200"
+                  )}
+                >
+                  {day && (
+                    <>
+                      <div className="text-sm font-medium mb-1">
+                        {format(day, 'd')}
                       </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          );
-        })}
+                      <div className="space-y-1">
+                        {dayBookings.map((booking: Booking) => (
+                          <div
+                            key={booking.id}
+                            className={cn(
+                              "text-xs p-1 mb-1 rounded truncate",
+                              booking.status === 'completed' ? 'bg-green-100 text-green-700' :
+                              booking.status === 'ongoing' ? 'bg-amber-100 text-amber-700' :
+                              'bg-blue-100 text-blue-700'
+                            )}
+                            title={`${booking.description} - ${booking.startTime} to ${booking.endTime}`}
+                          >
+                            {booking.description}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );
