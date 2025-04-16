@@ -101,17 +101,6 @@ export function Calendar({ selectedDate, onSelect, isOpen, onClose }: CalendarPr
         toYear={2025}
         month={displayMonth}
         onMonthChange={setDisplayMonth}
-        modifiers={{
-          outside: (day) => {
-            return day.getMonth() !== displayMonth.getMonth();
-          }
-        }}
-        modifiersStyles={{
-          outside: { color: '#9CA3AF', opacity: 0.4, cursor: 'not-allowed' }
-        }}
-        disabled={(day) => {
-          return day.getMonth() !== displayMonth.getMonth();
-        }}
         classNames={{
           months: "flex flex-col",
           month: "space-y-4",
@@ -128,13 +117,28 @@ export function Calendar({ selectedDate, onSelect, isOpen, onClose }: CalendarPr
           head_cell: "text-gray-500 rounded-md w-9 font-normal text-[0.8rem]",
           row: "flex w-full mt-2",
           cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-gray-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-          day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
-          day_selected: "bg-blue-100 text-blue-700 hover:bg-blue-100 hover:text-blue-700 focus:bg-blue-100 focus:text-blue-700",
-          day_today: "bg-gray-100",
+          day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full",
+          day_selected: "bg-blue-500 text-white hover:bg-blue-600 hover:text-white focus:bg-blue-500 focus:text-white",
+          day_today: "bg-gray-100 text-blue-500 font-semibold",
           day_outside: "text-gray-300 opacity-40 cursor-not-allowed",
           day_disabled: "text-gray-300 opacity-40 cursor-not-allowed",
           day_range_middle: "aria-selected:bg-gray-100 aria-selected:text-gray-700",
           day_hidden: "invisible",
+        }}
+        modifiers={{
+          outside: (day) => {
+            return day.getMonth() !== displayMonth.getMonth();
+          },
+          today: (day) => {
+            const today = new Date();
+            return day.getDate() === today.getDate() &&
+                   day.getMonth() === today.getMonth() &&
+                   day.getFullYear() === today.getFullYear();
+          }
+        }}
+        modifiersStyles={{
+          outside: { color: '#9CA3AF', opacity: 0.4, cursor: 'not-allowed' },
+          today: { border: '2px solid #3B82F6' }
         }}
       />
     </div>

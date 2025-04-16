@@ -1,117 +1,98 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Calendar } from '@/app/components/calendar';
-import { MonthView } from '@/app/components/month-view';
-import { Booking } from '@/app/models/booking';
-import { bayBreaks } from '@/app/config/bay-breaks';
-import { format } from 'date-fns';
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Filter, SortAsc, SortDesc } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/app/components/calendar";
+import { MonthView } from "@/app/components/month-view";
+import { Booking } from "@/app/models/booking";
+import { format } from "date-fns";
+import { DayView } from "@/app/components/day-view";
+import { WeekView } from "@/app/components/week-view";
 
-function CalendarCaption(props: { 
-  displayMonth: Date; 
-  onMonthChange: (date: Date) => void;
-}) {
-  const { displayMonth, onMonthChange } = props;
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
-  // Get a range of years (e.g., current year ± 10 years)
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
-
-  const handleMonthChange = (monthIndex: number) => {
-    const newDate = new Date(displayMonth);
-    newDate.setMonth(monthIndex);
-    onMonthChange(newDate);
-  };
-
-  const handleYearChange = (year: number) => {
-    const newDate = new Date(displayMonth);
-    newDate.setFullYear(year);
-    onMonthChange(newDate);
-  };
-
-  return (
-    <div className="flex justify-center items-center gap-2">
-      <select
-        value={displayMonth.getMonth()}
-        onChange={(e) => handleMonthChange(parseInt(e.target.value))}
-        className="px-2 py-1 rounded border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {months.map((month, index) => (
-          <option key={month} value={index}>
-            {month}
-          </option>
-        ))}
-      </select>
-      <select
-        value={displayMonth.getFullYear()}
-        onChange={(e) => handleYearChange(parseInt(e.target.value))}
-        className="px-2 py-1 rounded border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {years.map((year) => (
-          <option key={year} value={year}>
-            {year}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
+// Filter and sort state interface
+interface FilterState {
+  status: string | null;
+  customerName: string | null;
+  description: string | null;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
 }
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedBay, setSelectedBay] = useState(2);
-  const [viewMode, setViewMode] = useState<'Day' | 'Week' | 'Month'>('Week');
+  const [viewMode, setViewMode] = useState<"Day" | "Week" | "Month">("Week");
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Filter and sort state
+  const [filters, setFilters] = useState<FilterState>({
+    status: null,
+    customerName: null,
+    description: null,
+    sortBy: 'date',
+    sortOrder: 'asc'
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch bookings when date or bay changes
+  // Fetch bookings when filters, date, or bay changes
   useEffect(() => {
     const fetchBookings = async () => {
       setIsLoading(true);
       try {
-        console.log('Fetching bookings for:', {
-          month: selectedDate.getMonth(),
-          year: selectedDate.getFullYear(),
-          bay: selectedBay
+        // For month view, we need all bookings for the month
+        const monthStart = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+        const monthEnd = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+        
+        const startDateStr = format(monthStart, 'yyyy-MM-dd');
+        const endDateStr = format(monthEnd, 'yyyy-MM-dd');
+        
+        // Build query parameters
+        const params = new URLSearchParams({
+          bay: selectedBay.toString(),
+          startDate: startDateStr,
+          endDate: endDateStr,
+          limit: '100',
+          sortBy: filters.sortBy,
+          sortOrder: filters.sortOrder
         });
-        
-        const response = await fetch(
-          `/api/bookings?month=${selectedDate.getMonth()}&year=${selectedDate.getFullYear()}&bay=${selectedBay}`
-        );
+
+        // Add optional filters if they exist
+        if (filters.status) params.append('status', filters.status);
+        if (filters.customerName) params.append('customerName', filters.customerName);
+        if (filters.description) params.append('description', filters.description);
+
+        console.log("API Request:", Object.fromEntries(params));
+
+        const response = await fetch(`/api/bookings?${params.toString()}`);
         const data = await response.json();
-        console.log('Received bookings:', data);
-        
-        // Convert the API response into Booking class instances
-        const bookingInstances = data.map((bookingData: any) => new Booking(bookingData));
+        console.log("API Response:", data);
+
+        const bookingInstances = data.bookings.map((bookingData: any) => new Booking(bookingData));
         setBookings(bookingInstances);
       } catch (error) {
-        console.error('Error fetching bookings:', error);
+        console.error("Error fetching bookings:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchBookings();
-  }, [selectedDate, selectedBay]);
+  }, [selectedDate, selectedBay, filters]);
 
   // Generate time slots from 8 AM to 5 PM
   const timeSlots = Array.from({ length: 10 }, (_, i) => {
     const hour = i + 8;
-    return `${hour.toString().padStart(2, '0')}:00`;
+    return `${hour.toString().padStart(2, "0")}:00`;
   });
 
   // Get week dates
   const getWeekDates = (date: Date) => {
     const start = new Date(date);
     start.setDate(start.getDate() - start.getDay()); // Start from Sunday
-    
+
     return Array.from({ length: 7 }, (_, i) => {
       const day = new Date(start);
       day.setDate(start.getDate() + i);
@@ -120,16 +101,17 @@ export default function SchedulePage() {
   };
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', { 
-      month: 'long',
-      year: 'numeric'
+    return new Intl.DateTimeFormat("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
     }).format(date);
   };
 
   const formatDayDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      weekday: 'short',
-      day: 'numeric',
+    return new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      day: "numeric",
     }).format(date);
   };
 
@@ -142,26 +124,46 @@ export default function SchedulePage() {
     }
   };
 
-  // Get break time for the selected bay
-  const getBayBreak = (bay: number) => {
-    return bayBreaks.find(breakTime => breakTime.bay === bay);
+  // Get bookings for a specific day
+  const getBookingsForDay = (date: Date) => {
+    const dayStr = format(date, 'yyyy-MM-dd');
+    console.log("Checking bookings for day:", dayStr);
+    console.log("Available bookings:", bookings.map(b => ({
+      id: b.id,
+      date: b.date,
+      bay: b.bay,
+      rawDate: new Date(b.date).toISOString()
+    })));
+    
+    const dayBookings = bookings.filter(booking => {
+      // Parse the booking date string directly
+      const bookingDateStr = booking.date; // This is already in yyyy-MM-dd format
+      const matches = bookingDateStr === dayStr && booking.bay === selectedBay;
+      console.log("Booking check:", {
+        bookingId: booking.id,
+        bookingDate: booking.date,
+        dayStr,
+        bay: booking.bay,
+        selectedBay,
+        matches
+      });
+      return matches;
+    });
+    
+    console.log("Found bookings for day:", dayBookings);
+    return dayBookings;
   };
 
-  // Convert break time to booking
-  const createBreakBooking = (date: string, bay: number) => {
-    const bayBreak = getBayBreak(bay);
-    if (!bayBreak) return null;
+  const handleFilterChange = (key: keyof FilterState, value: string | null) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
 
-    return new Booking({
-      id: `BREAK-${bay}`,
-      customerName: 'Break Time',
-      date,
-      startTime: bayBreak.startTime,
-      endTime: bayBreak.endTime,
-      description: bayBreak.description,
-      bay,
-      status: 'break'
-    });
+  const handleSortChange = (field: string) => {
+    setFilters(prev => ({
+      ...prev,
+      sortBy: field,
+      sortOrder: prev.sortBy === field && prev.sortOrder === 'asc' ? 'desc' : 'asc'
+    }));
   };
 
   return (
@@ -173,11 +175,13 @@ export default function SchedulePage() {
             <ChevronLeft className="w-5 h-5" />
           </button>
           <div className="relative">
-            <button 
+            <button
               onClick={() => setIsCalendarOpen(true)}
               className="flex items-center gap-2 hover:bg-gray-100 px-4 py-2 rounded-lg"
             >
-              <h2 className="text-2xl font-semibold">{formatDate(selectedDate)}</h2>
+              <h2 className="text-2xl font-semibold">
+                {formatDate(selectedDate)}
+              </h2>
             </button>
 
             <Calendar
@@ -201,8 +205,8 @@ export default function SchedulePage() {
                 onClick={() => setSelectedBay(bay)}
                 className={cn(
                   "px-4 py-2 rounded-full",
-                  selectedBay === bay 
-                    ? "bg-blue-100 text-blue-700" 
+                  selectedBay === bay
+                    ? "bg-blue-100 text-blue-700"
                     : "hover:bg-gray-100"
                 )}
               >
@@ -213,151 +217,159 @@ export default function SchedulePage() {
 
           {/* View mode selection */}
           <div className="flex gap-2 bg-gray-100 rounded-full p-1">
-            {['Day', 'Week', 'Month'].map((mode) => (
+            {(["Day", "Week", "Month"] as const).map((mode) => (
               <button
                 key={mode}
-                onClick={() => setViewMode(mode as any)}
+                onClick={() => setViewMode(mode)}
                 className={cn(
                   "px-4 py-1 rounded-full",
-                  viewMode === mode 
-                    ? "bg-white shadow-sm" 
-                    : "hover:bg-gray-200"
+                  viewMode === mode ? "bg-white shadow-sm" : "hover:bg-gray-200"
                 )}
               >
                 {mode}
               </button>
             ))}
           </div>
+
+          {/* Filter and Sort Controls */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={cn(
+                "p-2 rounded-full",
+                showFilters ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+              )}
+            >
+              <Filter className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Filter Panel */}
+      {showFilters && (
+        <div className="mb-6 p-4 bg-white rounded-lg shadow">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Status Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                value={filters.status || ''}
+                onChange={(e) => handleFilterChange('status', e.target.value || null)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="">All Statuses</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="ongoing">Ongoing</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+
+            {/* Customer Name Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Customer Name
+              </label>
+              <input
+                type="text"
+                value={filters.customerName || ''}
+                onChange={(e) => handleFilterChange('customerName', e.target.value || null)}
+                placeholder="Search customer..."
+                className="w-full p-2 border rounded-md"
+              />
+            </div>
+
+            {/* Description Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Service Description
+              </label>
+              <input
+                type="text"
+                value={filters.description || ''}
+                onChange={(e) => handleFilterChange('description', e.target.value || null)}
+                placeholder="Search service..."
+                className="w-full p-2 border rounded-md"
+              />
+            </div>
+          </div>
+
+          {/* Sort Controls */}
+          <div className="mt-4 flex gap-4">
+            <button
+              onClick={() => handleSortChange('date')}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-full",
+                filters.sortBy === 'date' ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+              )}
+            >
+              Date
+              {filters.sortBy === 'date' && (
+                filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
+              )}
+            </button>
+            <button
+              onClick={() => handleSortChange('customerName')}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-full",
+                filters.sortBy === 'customerName' ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+              )}
+            >
+              Customer
+              {filters.sortBy === 'customerName' && (
+                filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
+              )}
+            </button>
+            <button
+              onClick={() => handleSortChange('description')}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-full",
+                filters.sortBy === 'description' ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100"
+              )}
+            >
+              Service
+              {filters.sortBy === 'description' && (
+                filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main content area */}
       <div className="flex-1 overflow-auto">
         {isLoading ? (
           <div className="flex items-center justify-center h-[600px]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full border-4 border-gray-200"></div>
+              <div className="w-12 h-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin absolute top-0 left-0"></div>
+            </div>
           </div>
-        ) : viewMode === 'Month' ? (
+        ) : viewMode === "Month" ? (
           <MonthView
             selectedDate={selectedDate}
             selectedBay={selectedBay}
-            bookings={bookings.filter(booking => !booking.isBreak())}
+            bookings={bookings}
+          />
+        ) : viewMode === "Day" ? (
+          <DayView
+            selectedDate={selectedDate}
+            selectedBay={selectedBay}
+            bookings={bookings}
+            timeSlots={timeSlots}
           />
         ) : (
-          <div className="flex flex-col h-full">
-            {/* Calendar grid */}
-            <div className="bg-white rounded-lg shadow h-[600px] overflow-hidden">
-              {viewMode === 'Week' ? (
-                <>
-                  {/* Week header */}
-                  <div className="grid grid-cols-[80px_1fr] border-b">
-                    <div className="border-r" /> {/* Empty cell for time column */}
-                    <div className="grid grid-cols-7">
-                      {weekDates.map((date) => (
-                        <div key={date.toISOString()} className="text-center py-2 border-r last:border-r-0">
-                          <div className="text-sm font-medium">{formatDayDate(date)}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Week grid */}
-                  <div className="grid grid-cols-[80px_1fr] h-[calc(600px-41px)] overflow-y-auto">
-                    {/* Time column */}
-                    <div className="border-r">
-                      {timeSlots.map((time) => (
-                        <div key={time} className="h-[60px] text-sm text-gray-500 pr-2 text-right">
-                          {time}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Days columns */}
-                    <div className="grid grid-cols-7">
-                      {weekDates.map((date) => (
-                        <div key={date.toISOString()} className="relative border-r last:border-r-0">
-                          {/* Time slot backgrounds */}
-                          {timeSlots.map((time) => (
-                            <div key={time} className="h-[60px] border-b border-gray-100" />
-                          ))}
-
-                          {/* Bookings for this day */}
-                          {bookings
-                            .filter(booking => {
-                              const bookingDate = booking.date;
-                              const currentDate = date.toISOString().slice(0, 10);
-                              return bookingDate === currentDate && booking.bay === selectedBay && !booking.isBreak();
-                            })
-                            .map((booking) => (
-                              <div
-                                key={booking.id}
-                                className={cn(
-                                  "absolute w-full px-2",
-                                  booking.getStatusColor()
-                                )}
-                                style={{
-                                  top: `${booking.getTopPosition()}px`,
-                                  height: `${booking.getHeight()}px`,
-                                }}
-                              >
-                                <div className="p-2 flex flex-col h-full">
-                                  <div className="text-sm font-medium flex-1">{booking.id}</div>
-                                  <div className="text-sm text-gray-600">{booking.description}</div>
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                // Day view
-                <div className="grid grid-cols-[80px_1fr] h-[600px] overflow-hidden">
-                  {/* Time column */}
-                  <div className="border-r">
-                    {timeSlots.map((time) => (
-                      <div key={time} className="h-[60px] text-sm text-gray-500 pr-2 text-right">
-                        {time}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Schedule grid */}
-                  <div className="relative grid grid-cols-1">
-                    {/* Time slot backgrounds */}
-                    {timeSlots.map((time) => (
-                      <div key={time} className="h-[60px] border-b border-gray-100" />
-                    ))}
-
-                    {/* Bookings */}
-                    {bookings
-                      .filter(booking => booking.bay === selectedBay && !booking.isBreak())
-                      .map((booking) => (
-                        <div
-                          key={booking.id}
-                          className={cn(
-                            "absolute w-full px-2",
-                            booking.getStatusColor()
-                          )}
-                          style={{
-                            top: `${booking.getTopPosition()}px`,
-                            height: `${booking.getHeight()}px`,
-                          }}
-                        >
-                          <div className="p-2 flex flex-col h-full">
-                            <div className="text-sm font-medium flex-1">{booking.id}</div>
-                            <div className="text-sm text-gray-600">{booking.description}</div>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <WeekView
+            selectedDate={selectedDate}
+            selectedBay={selectedBay}
+            bookings={bookings}
+            timeSlots={timeSlots}
+            weekDates={weekDates}
+          />
         )}
       </div>
     </div>
   );
-} 
+}

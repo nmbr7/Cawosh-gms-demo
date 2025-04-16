@@ -1,95 +1,75 @@
 "use client";
 
-import { cn } from '@/lib/utils';
-import { type Booking } from './month-view';
+import { cn } from "@/lib/utils";
+import { Booking } from "@/app/models/booking";
 
 interface DayViewProps {
   selectedDate: Date;
   selectedBay: number;
   bookings: Booking[];
+  timeSlots: string[];
 }
 
-const getBookingStatusColor = (status: 'upcoming' | 'ongoing' | 'completed' | 'blocked') => {
-  switch (status) {
-    case 'upcoming':
-      return 'bg-purple-100 text-purple-800';
-    case 'ongoing':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'completed':
-      return 'bg-green-100 text-green-800';
-    case 'blocked':
-      return 'bg-red-100 text-red-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-};
-
-export function DayView({ selectedDate, selectedBay, bookings }: DayViewProps) {
-  // Generate time slots from 8 AM to 5 PM
-  const timeSlots = Array.from({ length: 10 }, (_, i) => {
-    const hour = i + 8;
-    return `${hour.toString().padStart(2, '0')}:00`;
-  });
+export function DayView({ selectedDate, selectedBay, bookings, timeSlots }: DayViewProps) {
+  // Get bookings for a specific day
+  const getBookingsForDay = (date: Date) => {
+    const dayStr = date.toISOString().split('T')[0];
+    return bookings.filter(booking => {
+      const bookingDateStr = booking.date;
+      return bookingDateStr === dayStr && booking.bay === selectedBay;
+    });
+  };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Time slots */}
-      <div className="flex">
-        <div className="w-20 flex-shrink-0">
+    <div className="bg-white rounded-lg shadow h-[600px] overflow-hidden">
+      <div className="grid grid-cols-[80px_1fr] h-full">
+        {/* Time column */}
+        <div className="border-r">
           {timeSlots.map((time) => (
             <div
               key={time}
-              className="h-16 border-b border-gray-200 flex items-center justify-center text-sm text-gray-500"
+              className="h-[60px] text-sm text-gray-500 pr-2 text-right"
             >
               {time}
             </div>
           ))}
         </div>
 
-        {/* Bookings */}
-        <div className="flex-1 relative">
+        {/* Schedule grid */}
+        <div className="relative grid grid-cols-1">
+          {/* Time slot backgrounds */}
           {timeSlots.map((time) => (
             <div
               key={time}
-              className="h-16 border-b border-gray-200"
+              className="h-[60px] border-b border-gray-200"
             />
           ))}
 
-          {bookings
-            .filter(booking => booking.bay === selectedBay)
-            .map((booking) => {
-              const startHour = parseInt(booking.startTime.split(':')[0]);
-              const endHour = parseInt(booking.endTime.split(':')[0]);
-              const duration = endHour - startHour;
-              const topPosition = (startHour - 8) * 60;
-              const height = duration * 60;
-
-              return (
-                <div
-                  key={booking.id}
-                  className={cn(
-                    "absolute w-full px-2",
-                    getBookingStatusColor(booking.status)
-                  )}
-                  style={{
-                    top: `${topPosition}px`,
-                    height: `${height}px`,
-                  }}
-                >
-                  {booking.status !== 'blocked' && (
-                    <div className="p-2 flex flex-col h-full">
-                      <div className="text-sm font-medium flex-1">{booking.id}</div>
-                      <div className="text-sm text-gray-600">{booking.description}</div>
-                    </div>
-                  )}
-                  {booking.status === 'blocked' && (
-                    <div className="p-2">
-                      <div className="text-sm font-medium text-gray-500">{booking.description}</div>
-                    </div>
-                  )}
+          {/* Bookings */}
+          {getBookingsForDay(selectedDate).map((booking) => (
+            <div
+              key={booking.id}
+              className={cn(
+                "absolute w-full px-2",
+                booking.status === 'completed' ? 'bg-green-100 text-green-700' :
+                booking.status === 'ongoing' ? 'bg-amber-100 text-amber-700' :
+                'bg-blue-100 text-blue-700'
+              )}
+              style={{
+                top: `${booking.getTopPosition()}px`,
+                height: `${booking.getHeight()}px`,
+              }}
+            >
+              <div className="p-2 flex flex-col h-full">
+                <div className="text-sm font-medium flex-1">
+                  {booking.id}
                 </div>
-              );
-            })}
+                <div className="text-sm text-gray-600">
+                  {booking.description}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

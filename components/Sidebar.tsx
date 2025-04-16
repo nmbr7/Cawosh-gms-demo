@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
-  Users,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -21,11 +20,15 @@ import { useAuthStore } from "@/store/auth";
 
 const links = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Schedule", href: "/dashboard/schedule", icon: Calendar },
+  { name: "Calendar", href: "/dashboard/schedule", icon: Calendar },
   { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
   { name: "Job Sheet", href: "/dashboard/job-sheet", icon: FileText },
   { name: "Billings", href: "/dashboard/billings", icon: Receipt },
-  { name: "Customer Support", href: "/dashboard/support", icon: HeadphonesIcon },
+  {
+    name: "Customer Support",
+    href: "/dashboard/support",
+    icon: HeadphonesIcon,
+  },
   { name: "Staff Management", href: "/dashboard/staff", icon: UsersIcon },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
@@ -38,7 +41,7 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     // Clear the authentication token
-    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     // Clear the auth store
     logout();
     // Redirect to login page
@@ -49,7 +52,7 @@ export default function Sidebar() {
     <aside
       className={cn(
         "h-screen bg-white shadow-md transition-all duration-300 ease-in-out flex flex-col justify-between",
-        sidebarOpen ? "w-64" : "w-16"
+        sidebarOpen ? "w-64" : "w-20"
       )}
     >
       {/* Top: Logo + Nav */}
@@ -70,7 +73,7 @@ export default function Sidebar() {
                   : "text-gray-700 hover:bg-gray-100"
               )}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="w-6 h-6 flex-shrink-0" />
               {sidebarOpen && <span>{name}</span>}
             </Link>
           ))}

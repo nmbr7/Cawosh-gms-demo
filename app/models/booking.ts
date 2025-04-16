@@ -1,5 +1,16 @@
 export type BookingStatus = 'upcoming' | 'ongoing' | 'completed' | 'blocked' | 'break';
 
+export interface BookingData {
+  id: string;
+  customerName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  description: string;
+  bay: number;
+  status: BookingStatus;
+}
+
 export class Booking {
   id: string;
   customerName: string;
@@ -10,16 +21,7 @@ export class Booking {
   bay: number;
   status: BookingStatus;
 
-  constructor(data: {
-    id: string;
-    customerName: string;
-    date: string;
-    startTime: string;
-    endTime: string;
-    description: string;
-    bay: number;
-    status: BookingStatus;
-  }) {
+  constructor(data: BookingData) {
     this.id = data.id;
     this.customerName = data.customerName;
     this.date = data.date;
@@ -56,13 +58,13 @@ export class Booking {
   }
 
   getDuration(): number {
-    const start = parseInt(this.startTime.split(':')[0]);
-    const end = parseInt(this.endTime.split(':')[0]);
+    const start: number = parseInt(this.startTime.split(':')[0]);
+    const end: number = parseInt(this.endTime.split(':')[0]);
     return end - start;
   }
 
   getTopPosition(): number {
-    const startHour = parseInt(this.startTime.split(':')[0]);
+    const startHour: number = parseInt(this.startTime.split(':')[0]);
     return (startHour - 8) * 60; // Assuming 8 AM is the start time
   }
 
@@ -72,7 +74,7 @@ export class Booking {
 
   // Helper method to convert time string to minutes since 8 AM
   private timeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(':').map(Number);
+    const [hours, minutes]: number[] = time.split(':').map(Number);
     return (hours - 8) * 60 + minutes;
   }
 
@@ -82,10 +84,10 @@ export class Booking {
       return false;
     }
 
-    const thisStart = this.timeToMinutes(this.startTime);
-    const thisEnd = this.timeToMinutes(this.endTime);
-    const otherStart = this.timeToMinutes(other.startTime);
-    const otherEnd = this.timeToMinutes(other.endTime);
+    const thisStart: number = this.timeToMinutes(this.startTime);
+    const thisEnd: number = this.timeToMinutes(this.endTime);
+    const otherStart: number = this.timeToMinutes(other.startTime);
+    const otherEnd: number = this.timeToMinutes(other.endTime);
 
     return (
       (thisStart >= otherStart && thisStart < otherEnd) ||
@@ -96,8 +98,8 @@ export class Booking {
 
   // Validate if the booking times are valid
   isValid(): boolean {
-    const start = this.timeToMinutes(this.startTime);
-    const end = this.timeToMinutes(this.endTime);
+    const start: number = this.timeToMinutes(this.startTime);
+    const end: number = this.timeToMinutes(this.endTime);
     return start >= 0 && end <= 540 && start < end; // 540 minutes = 9 hours (8 AM to 5 PM)
   }
 } 
