@@ -1,4 +1,4 @@
-export type BookingStatus = 'upcoming' | 'ongoing' | 'completed' | 'blocked' | 'break';
+export type BookingStatus = 'scheduled' | 'ongoing' | 'completed' | 'blocked' | 'break';
 
 export interface BookingData {
   id: string;
@@ -34,7 +34,7 @@ export class Booking {
 
   getStatusColor(): string {
     switch (this.status) {
-      case 'upcoming':
+      case 'scheduled':
         return 'bg-purple-100 text-purple-800';
       case 'ongoing':
         return 'bg-yellow-100 text-yellow-800';

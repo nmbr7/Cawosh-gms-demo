@@ -27,7 +27,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   
   // Sort parameters
   const sortBy: string = searchParams.get('sortBy') || 'date';
-  const sortOrder: 'asc' | 'desc' = (searchParams.get('sortOrder') || 'asc') as 'asc' | 'desc';
+  const sortOrder: 'asc' | 'desc' = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
   // Log request parameters
   console.log('API Request:', {
@@ -78,10 +78,10 @@ export async function GET(request: Request): Promise<NextResponse> {
     
     switch (sortBy) {
       case 'date':
-        comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+        comparison = new Date(b.date).getTime() - new Date(a.date).getTime(); // Latest first by default
         break;
       case 'startTime':
-        comparison = a.startTime.localeCompare(b.startTime);
+        comparison = b.startTime.localeCompare(a.startTime); // Latest first by default
         break;
       case 'customerName':
         comparison = a.customerName.localeCompare(b.customerName);
@@ -93,10 +93,10 @@ export async function GET(request: Request): Promise<NextResponse> {
         comparison = a.status.localeCompare(b.status);
         break;
       default:
-        comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+        comparison = new Date(b.date).getTime() - new Date(a.date).getTime(); // Latest first by default
     }
     
-    return sortOrder === 'asc' ? comparison : -comparison;
+    return sortOrder === 'asc' ? -comparison : comparison; // Reverse the order if ascending is requested
   });
 
   // Calculate pagination

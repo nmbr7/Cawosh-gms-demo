@@ -29,7 +29,7 @@ const links = [
     href: "/dashboard/support",
     icon: HeadphonesIcon,
   },
-  { name: "Staff Management", href: "/dashboard/staff", icon: UsersIcon },
+  { name: "Staff Management", href: "/dashboard/users", icon: UsersIcon },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

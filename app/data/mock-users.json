@@ -1,0 +1,236 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "employeeId": "EMP001",
+      "firstName": "John",
+      "lastName": "Smith",
+      "email": "john.smith@cawosh.com",
+      "phone": "+1 234 567 8901",
+      "role": "admin",
+      "position": "System Administrator",
+      "status": "active",
+      "permissions": ["all"],
+      "accessLevel": 3,
+      "department": "IT",
+      "joiningDate": "2023-01-15",
+      "employmentType": "full-time",
+      "workingHours": {
+        "start": "09:00",
+        "end": "17:00",
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+      },
+      "skills": ["System Administration", "Network Security", "Database Management"],
+      "certifications": [
+        {
+          "name": "AWS Certified Solutions Architect",
+          "issuer": "Amazon Web Services",
+          "date": "2022-06-15",
+          "expiry": "2025-06-15"
+        }
+      ],
+      "systemAccess": {
+        "canManageUsers": true,
+        "canManageSettings": true,
+        "canViewReports": true,
+        "canManageBilling": true
+      },
+      "lastLogin": "2024-03-20T14:30:00Z",
+      "createdAt": "2023-01-15T09:00:00Z",
+      "updatedAt": "2024-03-20T14:30:00Z"
+    },
+    {
+      "id": "2",
+      "employeeId": "EMP002",
+      "firstName": "Sarah",
+      "lastName": "Johnson",
+      "email": "sarah.johnson@cawosh.com",
+      "phone": "+1 234 567 8902",
+      "role": "manager",
+      "position": "Operations Manager",
+      "status": "active",
+      "permissions": ["manage_staff", "view_reports"],
+      "accessLevel": 2,
+      "department": "Operations",
+      "joiningDate": "2023-02-01",
+      "employmentType": "full-time",
+      "managedDepartments": ["Service", "Maintenance"],
+      "teamSize": 15,
+      "workingHours": {
+        "start": "08:00",
+        "end": "16:00",
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+      },
+      "skills": ["Team Management", "Process Optimization", "Customer Service"],
+      "performanceMetrics": {
+        "efficiency": 95,
+        "customerSatisfaction": 92,
+        "teamEfficiency": 88
+      },
+      "systemAccess": {
+        "canManageUsers": true,
+        "canManageSettings": false,
+        "canViewReports": true,
+        "canManageBilling": false
+      },
+      "lastLogin": "2024-03-20T13:45:00Z",
+      "createdAt": "2023-02-01T09:00:00Z",
+      "updatedAt": "2024-03-20T13:45:00Z"
+    },
+    {
+      "id": "3",
+      "employeeId": "EMP003",
+      "firstName": "Michael",
+      "lastName": "Brown",
+      "email": "michael.brown@cawosh.com",
+      "phone": "+1 234 567 8903",
+      "role": "staff",
+      "position": "Service Technician",
+      "status": "active",
+      "permissions": ["view_schedule", "update_status"],
+      "accessLevel": 1,
+      "department": "Service",
+      "joiningDate": "2023-03-10",
+      "employmentType": "full-time",
+      "assignedBay": 3,
+      "specialization": ["Oil Change", "Brake Service", "Tire Rotation"],
+      "toolsAssigned": ["Diagnostic Scanner", "Lift", "Air Compressor"],
+      "currentTasks": ["Oil Change - Bay 3", "Tire Rotation - Bay 5"],
+      "workingHours": {
+        "start": "08:00",
+        "end": "16:00",
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+      },
+      "skills": ["Automotive Repair", "Diagnostics", "Customer Service"],
+      "attendance": [
+        {
+          "date": "2024-03-20",
+          "checkIn": "08:00",
+          "checkOut": "16:00",
+          "status": "present"
+        }
+      ],
+      "performanceMetrics": {
+        "efficiency": 90,
+        "customerSatisfaction": 95,
+        "tasksCompleted": 8
+      },
+      "systemAccess": {
+        "canManageUsers": false,
+        "canManageSettings": false,
+        "canViewReports": false,
+        "canManageBilling": false
+      },
+      "lastLogin": "2024-03-20T12:15:00Z",
+      "createdAt": "2023-03-10T09:00:00Z",
+      "updatedAt": "2024-03-20T12:15:00Z"
+    },
+    {
+      "id": "4",
+      "employeeId": "EMP004",
+      "firstName": "Emily",
+      "lastName": "Davis",
+      "email": "emily.davis@cawosh.com",
+      "phone": "+1 234 567 8904",
+      "role": "staff",
+      "position": "Service Technician",
+      "status": "on-leave",
+      "permissions": ["view_schedule", "update_status"],
+      "accessLevel": 1,
+      "department": "Service",
+      "joiningDate": "2023-04-05",
+      "employmentType": "full-time",
+      "assignedBay": 2,
+      "specialization": ["Engine Diagnostics", "Electrical Systems", "AC Service"],
+      "toolsAssigned": ["Multimeter", "OBD Scanner", "AC Machine"],
+      "workingHours": {
+        "start": "09:00",
+        "end": "17:00",
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+      },
+      "skills": ["Electrical Systems", "Engine Diagnostics", "AC Repair"],
+      "certifications": [
+        {
+          "name": "ASE Certified Master Technician",
+          "issuer": "National Institute for Automotive Service Excellence",
+          "date": "2022-12-01",
+          "expiry": "2025-12-01"
+        }
+      ],
+      "systemAccess": {
+        "canManageUsers": false,
+        "canManageSettings": false,
+        "canViewReports": false,
+        "canManageBilling": false
+      },
+      "lastLogin": "2024-03-15T10:30:00Z",
+      "createdAt": "2023-04-05T09:00:00Z",
+      "updatedAt": "2024-03-15T10:30:00Z"
+    },
+    {
+      "id": "5",
+      "employeeId": "EMP005",
+      "firstName": "David",
+      "lastName": "Wilson",
+      "email": "david.wilson@cawosh.com",
+      "phone": "+1 234 567 8905",
+      "role": "manager",
+      "position": "Service Manager",
+      "status": "active",
+      "permissions": ["manage_staff", "view_reports"],
+      "accessLevel": 2,
+      "department": "Service",
+      "joiningDate": "2023-05-20",
+      "employmentType": "full-time",
+      "managedDepartments": ["Service"],
+      "teamSize": 8,
+      "reportingTo": "Sarah Johnson",
+      "workingHours": {
+        "start": "08:00",
+        "end": "16:00",
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+      },
+      "skills": ["Service Management", "Team Leadership", "Customer Relations"],
+      "performanceMetrics": {
+        "efficiency": 92,
+        "customerSatisfaction": 94,
+        "teamEfficiency": 90,
+        "revenueTargets": 95
+      },
+      "systemAccess": {
+        "canManageUsers": true,
+        "canManageSettings": false,
+        "canViewReports": true,
+        "canManageBilling": false
+      },
+      "lastLogin": "2024-03-20T11:45:00Z",
+      "createdAt": "2023-05-20T09:00:00Z",
+      "updatedAt": "2024-03-20T11:45:00Z"
+    },
+    {
+      "id": "6",
+      "firstName": "Robert",
+      "lastName": "Taylor",
+      "email": "robert.taylor@example.com",
+      "phone": "07678901234",
+      "role": "staff",
+      "status": "inactive",
+      "position": "Service Technician",
+      "department": "Service",
+      "employmentType": "contract",
+      "joiningDate": "2023-11-01",
+      "specialization": ["Air Conditioning", "General Maintenance"],
+      "permissions": ["view_schedule"],
+      "accessLevel": 1,
+      "systemAccess": {
+        "canManageUsers": false,
+        "canManageSettings": false,
+        "canViewReports": false,
+        "canManageBilling": false
+      },
+      "lastLogin": "2024-01-10T16:45:00Z",
+      "createdAt": "2023-11-01T10:00:00Z",
+      "updatedAt": "2024-01-10T16:45:00Z"
+    }
+  ]
+} 

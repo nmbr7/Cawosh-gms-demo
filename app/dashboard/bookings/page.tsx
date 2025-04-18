@@ -8,16 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Filter, SortAsc, SortDesc } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-
-// Loading spinner component
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center h-64">
-    <div className="relative">
-      <div className="w-12 h-12 rounded-full border-4 border-gray-200"></div>
-      <div className="w-12 h-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin absolute top-0 left-0"></div>
-    </div>
-  </div>
-);
+import React from "react";
 
 interface PaginationInfo {
   currentPage: number;
@@ -142,12 +133,11 @@ export default function BookingsPage() {
             <Select
               value={selectedBay.toString()}
               onValueChange={(value) => setSelectedBay(value === "all" ? "all" : parseInt(value))}
-              disabled
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] bg-white">
                 <SelectValue placeholder="Select bay" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 <SelectItem value="all">All Bays</SelectItem>
                 <SelectItem value="1">Bay 1</SelectItem>
                 <SelectItem value="2">Bay 2</SelectItem>
@@ -163,29 +153,193 @@ export default function BookingsPage() {
                 "flex items-center gap-2",
                 showFilters && "bg-blue-100"
               )}
-              disabled
             >
               <Filter className="w-4 h-4" />
               Filters
             </Button>
           </div>
 
-          {/* Sort controls */}
-          <div className="flex gap-2">
-            <Button variant="outline" disabled>
-              Date
-            </Button>
-            <Button variant="outline" disabled>
-              Customer
-            </Button>
-            <Button variant="outline" disabled>
-              Service
+          <div className="flex items-center gap-4">
+            {/* Sort controls */}
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                onClick={() => handleSortChange('date')}
+                className={cn(
+                  "flex items-center gap-2",
+                  filters.sortBy === 'date' && "bg-blue-100"
+                )}
+              >
+                Date
+                {filters.sortBy === 'date' && (
+                  filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
+                )}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => handleSortChange('customerName')}
+                className={cn(
+                  "flex items-center gap-2",
+                  filters.sortBy === 'customerName' && "bg-blue-100"
+                )}
+              >
+                Customer
+                {filters.sortBy === 'customerName' && (
+                  filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
+                )}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => handleSortChange('description')}
+                className={cn(
+                  "flex items-center gap-2",
+                  filters.sortBy === 'description' && "bg-blue-100"
+                )}
+              >
+                Service
+                {filters.sortBy === 'description' && (
+                  filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+
+            {/* Create Booking button */}
+            <Button
+              onClick={() => {/* TODO: Add create booking handler */}}
+              className="bg-blue-500 text-white hover:bg-blue-600"
+            >
+              Create Booking
             </Button>
           </div>
         </div>
 
-        {/* Loading spinner */}
-        <LoadingSpinner />
+        {/* Filter panel */}
+        {showFilters && (
+          <div className="mb-6 p-4 bg-white rounded-lg shadow">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Customer name filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Customer Name
+                </label>
+                <Input
+                  type="text"
+                  value={filters.customerName || ''}
+                  onChange={(e) => handleFilterChange('customerName', e.target.value || null)}
+                  placeholder="Search customer..."
+                />
+              </div>
+
+              {/* Description filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Service Description
+                </label>
+                <Input
+                  type="text"
+                  value={filters.description || ''}
+                  onChange={(e) => handleFilterChange('description', e.target.value || null)}
+                  placeholder="Search service..."
+                />
+              </div>
+
+              {/* Status filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Status
+                </label>
+                <Select
+                  value={filters.status}
+                  onValueChange={(value) => handleFilterChange('status', value as BookingStatus | "all")}
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="ongoing">Ongoing</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bookings table */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <table className="min-w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Booking ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Customer
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Service
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Time
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Bay
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white">
+              {/* Progress bar as divider */}
+              <tr>
+                <td colSpan={7} className="p-0">
+                  <div className="h-1 bg-blue-500 animate-pulse"></div>
+                </td>
+              </tr>
+              {/* Shimmer rows */}
+              {[1, 2, 3].map((row) => (
+                <React.Fragment key={row}>
+                  <tr className="animate-pulse">
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-16"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-32"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-48"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-24"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-20"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-12"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-20"></div>
+                    </td>
+                  </tr>
+                  {row < 3 && (
+                    <tr>
+                      <td colSpan={7} className="p-0">
+                        <div className="h-px bg-gray-200"></div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }
@@ -208,10 +362,10 @@ export default function BookingsPage() {
             value={selectedBay.toString()}
             onValueChange={(value) => setSelectedBay(value === "all" ? "all" : parseInt(value))}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[180px] bg-white">
               <SelectValue placeholder="Select bay" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               <SelectItem value="all">All Bays</SelectItem>
               <SelectItem value="1">Bay 1</SelectItem>
               <SelectItem value="2">Bay 2</SelectItem>
@@ -233,46 +387,56 @@ export default function BookingsPage() {
           </Button>
         </div>
 
-        {/* Sort controls */}
-        <div className="flex gap-2">
+        <div className="flex items-center gap-4">
+          {/* Sort controls */}
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => handleSortChange('date')}
+              className={cn(
+                "flex items-center gap-2",
+                filters.sortBy === 'date' && "bg-blue-100"
+              )}
+            >
+              Date
+              {filters.sortBy === 'date' && (
+                filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
+              )}
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => handleSortChange('customerName')}
+              className={cn(
+                "flex items-center gap-2",
+                filters.sortBy === 'customerName' && "bg-blue-100"
+              )}
+            >
+              Customer
+              {filters.sortBy === 'customerName' && (
+                filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
+              )}
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => handleSortChange('description')}
+              className={cn(
+                "flex items-center gap-2",
+                filters.sortBy === 'description' && "bg-blue-100"
+              )}
+            >
+              Service
+              {filters.sortBy === 'description' && (
+                filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+
+          {/* Create Booking button */}
           <Button
-            variant="outline"
-            onClick={() => handleSortChange('date')}
-            className={cn(
-              "flex items-center gap-2",
-              filters.sortBy === 'date' && "bg-blue-100"
-            )}
+            onClick={() => {/* TODO: Add create booking handler */}}
+            className="bg-blue-500 text-white hover:bg-blue-600"
           >
-            Date
-            {filters.sortBy === 'date' && (
-              filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => handleSortChange('customerName')}
-            className={cn(
-              "flex items-center gap-2",
-              filters.sortBy === 'customerName' && "bg-blue-100"
-            )}
-          >
-            Customer
-            {filters.sortBy === 'customerName' && (
-              filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => handleSortChange('description')}
-            className={cn(
-              "flex items-center gap-2",
-              filters.sortBy === 'description' && "bg-blue-100"
-            )}
-          >
-            Service
-            {filters.sortBy === 'description' && (
-              filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
-            )}
+            Create Booking
           </Button>
         </div>
       </div>
@@ -281,27 +445,6 @@ export default function BookingsPage() {
       {showFilters && (
         <div className="mb-6 p-4 bg-white rounded-lg shadow">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Status filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
-              </label>
-              <Select
-                value={filters.status}
-                onValueChange={(value) => handleFilterChange('status', value as BookingStatus | "all")}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="scheduled">Scheduled</SelectItem>
-                  <SelectItem value="ongoing">Ongoing</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Customer name filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -326,6 +469,27 @@ export default function BookingsPage() {
                 onChange={(e) => handleFilterChange('description', e.target.value || null)}
                 placeholder="Search service..."
               />
+            </div>
+
+            {/* Status filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <Select
+                value={filters.status}
+                onValueChange={(value) => handleFilterChange('status', value as BookingStatus | "all")}
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="ongoing">Ongoing</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -385,7 +549,9 @@ export default function BookingsPage() {
                     "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
                     booking.status === 'completed' && "bg-green-100 text-green-800",
                     booking.status === 'ongoing' && "bg-amber-100 text-amber-800",
-                    booking.status === 'upcoming' && "bg-blue-100 text-blue-800"
+                    booking.status === 'scheduled' && "bg-blue-100 text-blue-800",
+                    booking.status === 'blocked' && "bg-red-100 text-red-800",
+                    booking.status === 'break' && "bg-gray-100 text-gray-800"
                   )}>
                     {booking.status}
                   </span>
@@ -403,7 +569,7 @@ export default function BookingsPage() {
           {Math.min(currentPage * paginationInfo.itemsPerPage, paginationInfo.totalItems)} of{' '}
           {paginationInfo.totalItems} bookings
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             onClick={() => handlePageChange(currentPage - 1)}
@@ -411,6 +577,24 @@ export default function BookingsPage() {
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
+          
+          {/* Page numbers */}
+          <div className="flex gap-1">
+            {Array.from({ length: paginationInfo.totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? "default" : "outline"}
+                onClick={() => handlePageChange(page)}
+                className={cn(
+                  "w-8 h-8 p-0",
+                  currentPage === page && "bg-blue-500 text-white hover:bg-blue-600"
+                )}
+              >
+                {page}
+              </Button>
+            ))}
+          </div>
+
           <Button
             variant="outline"
             onClick={() => handlePageChange(currentPage + 1)}

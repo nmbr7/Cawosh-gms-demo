@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { DayView } from "@/app/components/day-view";
 import { WeekView } from "@/app/components/week-view";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -18,7 +19,7 @@ export default function SchedulePage() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Fetch bookings when date or bay changes
   useEffect(() => {
     const fetchBookings = async () => {
@@ -99,13 +100,33 @@ export default function SchedulePage() {
     }
   };
 
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date);
+    setViewMode("Day");
+  };
+
+  const handlePreviousDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  const handleNextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + 1);
+    setSelectedDate(newDate);
+  };
+
   return (
     <div className="p-6">
       {/* Header with navigation and view controls */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-full">
+            <button 
+              onClick={handlePreviousDay}
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <div className="relative">
@@ -125,7 +146,10 @@ export default function SchedulePage() {
                 onClose={() => setIsCalendarOpen(false)}
               />
             </div>
-            <button className="p-2 hover:bg-gray-100 rounded-full">
+            <button 
+              onClick={handleNextDay}
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -136,13 +160,13 @@ export default function SchedulePage() {
               value={selectedBay.toString()}
               onValueChange={(value) => setSelectedBay(parseInt(value))}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] bg-white">
                 <SelectValue placeholder="Select bay" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="1">Bay 1</SelectItem>
-                <SelectItem value="2">Bay 2</SelectItem>
-                <SelectItem value="3">Bay 3</SelectItem>
+                <SelectItem value="1" className="hover:bg-gray-100">Bay 1</SelectItem>
+                <SelectItem value="2" className="hover:bg-gray-100">Bay 2</SelectItem>
+                <SelectItem value="3" className="hover:bg-gray-100">Bay 3</SelectItem>
               </SelectContent>
             </Select>
 
@@ -151,13 +175,13 @@ export default function SchedulePage() {
               value={viewMode}
               onValueChange={(value) => setViewMode(value as "Day" | "Week" | "Month")}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] bg-white">
                 <SelectValue placeholder="Select view" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="Day">Day View</SelectItem>
-                <SelectItem value="Week">Week View</SelectItem>
-                <SelectItem value="Month">Month View</SelectItem>
+                <SelectItem value="Day" className="hover:bg-gray-100">Day View</SelectItem>
+                <SelectItem value="Week" className="hover:bg-gray-100">Week View</SelectItem>
+                <SelectItem value="Month" className="hover:bg-gray-100">Month View</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -178,6 +202,7 @@ export default function SchedulePage() {
             selectedDate={selectedDate}
             selectedBay={selectedBay}
             bookings={bookings}
+            onDayClick={handleDayClick}
           />
         ) : viewMode === "Day" ? (
           <DayView

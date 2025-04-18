@@ -9,9 +9,10 @@ interface MonthViewProps {
   selectedDate: Date;
   selectedBay: number;
   bookings: Booking[];
+  onDayClick: (date: Date) => void;
 }
 
-export function MonthView({ selectedDate, selectedBay, bookings }: MonthViewProps): React.ReactElement {
+export function MonthView({ selectedDate, selectedBay, bookings, onDayClick }: MonthViewProps): React.ReactElement {
   // Get all days in the current month
   const monthStart: Date = startOfMonth(selectedDate);
   const monthEnd: Date = endOfMonth(selectedDate);
@@ -75,12 +76,14 @@ export function MonthView({ selectedDate, selectedBay, bookings }: MonthViewProp
               return (
                 <div
                   key={`${weekIndex}-${dayIndex}`}
+                  onClick={() => day && onDayClick(day)}
                   className={cn(
                     "bg-white p-2 min-h-[100px]",
                     !isCurrentMonth && "text-gray-400",
                     isCurrentDay ? 'border-blue-500' : 'border-gray-200',
                     isSelectedDay ? 'bg-blue-50' : '',
-                    weekIndex === weeks.length - 1 && "border-b border-gray-200"
+                    weekIndex === weeks.length - 1 && "border-b border-gray-200",
+                    day && "cursor-pointer hover:bg-gray-50"
                   )}
                 >
                   {day && (
