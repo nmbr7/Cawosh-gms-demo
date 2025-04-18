@@ -24,11 +24,7 @@ const links = [
   { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
   { name: "Job Sheet", href: "/dashboard/job-sheet", icon: FileText },
   { name: "Billings", href: "/dashboard/billings", icon: Receipt },
-  {
-    name: "Customer Support",
-    href: "/dashboard/support",
-    icon: HeadphonesIcon,
-  },
+  { name: "Customer Support", href: "/dashboard/customer-support", icon: HeadphonesIcon },
   { name: "Staff Management", href: "/dashboard/users", icon: UsersIcon },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];

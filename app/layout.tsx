@@ -20,9 +20,31 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Cawosh",
-  description:
-    "A back-office dashboard for garages to manage bookings, schedule service slots, handle staff, and streamline billing",
+  title: "Cawosh Admin",
+  description: "Admin dashboard for Cawosh Auto Service",
+  icons: {
+    icon: [
+      {
+        url: '/favicon.ico',
+        sizes: 'any',
+        type: 'image/x-icon',
+      }
+    ],
+    apple: [
+      {
+        url: '/favicon.ico',
+        sizes: '180x180',
+        type: 'image/x-icon',
+      }
+    ],
+    shortcut: [
+      {
+        url: '/favicon.ico',
+        sizes: 'any',
+        type: 'image/x-icon',
+      }
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +54,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${outfit.className} antialiased`}>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+      </head>
       <body>
         {children}
         <Toaster />

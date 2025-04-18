@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Booking } from '@/app/models/booking';
 import mockBookings from '@/app/data/mock-bookings.json';
 
 export async function GET(request: Request): Promise<NextResponse> {

@@ -9,6 +9,7 @@ import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Filter, SortAsc, S
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import React from "react";
+import { BookingDetailsModal } from "@/app/components/booking-details-modal";
 
 interface PaginationInfo {
   currentPage: number;
@@ -30,6 +31,7 @@ export default function BookingsPage() {
   const [selectedBay, setSelectedBay] = useState<number | "all">("all");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
@@ -38,6 +40,8 @@ export default function BookingsPage() {
     totalItems: 0,
     itemsPerPage: 10
   });
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
@@ -123,6 +127,55 @@ export default function BookingsPage() {
     }
   };
 
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      setError(null);
+      setCurrentPage(1); // Reset to first page
+
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: '1',
+        limit: '10',
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder
+      });
+
+      // Add bay filter if selected
+      if (selectedBay !== "all") {
+        params.append('bay', selectedBay.toString());
+      }
+
+      // Add status filter if not "all"
+      if (filters.status !== "all") {
+        params.append('status', filters.status);
+      }
+
+      // Add customer name filter if exists
+      if (filters.customerName) {
+        params.append('customerName', filters.customerName);
+      }
+
+      // Add description filter if exists
+      if (filters.description) {
+        params.append('description', filters.description);
+      }
+
+      const response = await fetch(`/api/bookings?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch bookings');
+      }
+      const data = await response.json();
+
+      setBookings(data.bookings);
+      setPaginationInfo(data.pagination);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="p-6">
@@ -156,6 +209,50 @@ export default function BookingsPage() {
             >
               <Filter className="w-4 h-4" />
               Filters
+            </Button>
+
+            {/* Refresh button */}
+            <Button
+              variant="outline"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className={cn(
+                "flex items-center gap-2",
+                isRefreshing && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              {isRefreshing ? (
+                <svg
+                  className="w-4 h-4 animate-spin"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              )}
+              {isRefreshing ? "Refreshing..." : "Refresh"}
             </Button>
           </div>
 
@@ -321,12 +418,6 @@ export default function BookingsPage() {
                     <td className="px-6 py-4">
                       <div className="h-4 bg-gray-200 rounded w-20"></div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="h-4 bg-gray-200 rounded w-12"></div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="h-4 bg-gray-200 rounded w-20"></div>
-                    </td>
                   </tr>
                   {row < 3 && (
                     <tr>
@@ -384,6 +475,50 @@ export default function BookingsPage() {
           >
             <Filter className="w-4 h-4" />
             Filters
+          </Button>
+
+          {/* Refresh button */}
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className={cn(
+              "flex items-center gap-2",
+              isRefreshing && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            {isRefreshing ? (
+              <svg
+                className="w-4 h-4 animate-spin"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            )}
+            {isRefreshing ? "Refreshing..." : "Refresh"}
           </Button>
         </div>
 
@@ -524,40 +659,113 @@ export default function BookingsPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {bookings.map((booking) => (
-              <tr key={booking.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {booking.id}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {booking.customerName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {booking.description}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {format(new Date(booking.date), 'MMM dd, yyyy')}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {booking.startTime} - {booking.endTime}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  Bay {booking.bay}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={cn(
-                    "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                    booking.status === 'completed' && "bg-green-100 text-green-800",
-                    booking.status === 'ongoing' && "bg-amber-100 text-amber-800",
-                    booking.status === 'scheduled' && "bg-blue-100 text-blue-800",
-                    booking.status === 'blocked' && "bg-red-100 text-red-800",
-                    booking.status === 'break' && "bg-gray-100 text-gray-800"
-                  )}>
-                    {booking.status}
-                  </span>
+            {bookings.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    <div className="p-4 bg-gray-50 rounded-full">
+                      <svg
+                        className="w-8 h-8 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-lg font-medium text-gray-900">
+                        {filters.status !== "all" || filters.customerName || filters.description
+                          ? "No bookings match your filters"
+                          : "No bookings found"}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {filters.status !== "all" || filters.customerName || filters.description
+                          ? "Try adjusting your filters or search criteria"
+                          : "Get started by creating a new booking"}
+                      </p>
+                    </div>
+                    {filters.status !== "all" || filters.customerName || filters.description ? (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setFilters({
+                            status: "all",
+                            customerName: null,
+                            description: null,
+                            sortBy: 'date',
+                            sortOrder: 'desc'
+                          });
+                        }}
+                        className="mt-2"
+                      >
+                        Clear filters
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => {/* TODO: Add create booking handler */}}
+                        className="mt-2"
+                      >
+                        Create Booking
+                      </Button>
+                    )}
+                  </div>
                 </td>
               </tr>
-            ))}
+            ) : (
+              bookings.map((booking) => (
+                <tr 
+                  key={booking.id} 
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => {
+                    setSelectedBooking(booking);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {booking.id}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {booking.customerName}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    <div className="font-medium">{booking.description}</div>
+                    <div className="mt-1 text-xs text-gray-400">
+                      {booking.car.make} {booking.car.model} ({booking.car.year}) • {booking.car.color}
+                      <br />
+                      {booking.car.registrationNumber} • {booking.car.vehicleType}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {format(new Date(booking.date), 'MMM dd, yyyy')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {booking.startTime} - {booking.endTime}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    Bay {booking.bay}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={cn(
+                      "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
+                      booking.status === 'completed' && "bg-green-100 text-green-800",
+                      booking.status === 'ongoing' && "bg-amber-100 text-amber-800",
+                      booking.status === 'scheduled' && "bg-blue-100 text-blue-800",
+                      booking.status === 'blocked' && "bg-red-100 text-red-800",
+                      booking.status === 'break' && "bg-gray-100 text-gray-800"
+                    )}>
+                      {booking.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -604,6 +812,13 @@ export default function BookingsPage() {
           </Button>
         </div>
       </div>
+
+      {/* Booking Details Modal */}
+      <BookingDetailsModal
+        booking={selectedBooking}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

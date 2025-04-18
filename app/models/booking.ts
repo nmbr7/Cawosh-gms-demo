@@ -1,8 +1,11 @@
+import { CarData } from './car';
+
 export type BookingStatus = 'scheduled' | 'ongoing' | 'completed' | 'blocked' | 'break';
 
 export interface BookingData {
   id: string;
   customerName: string;
+  car: CarData;
   date: string;
   startTime: string;
   endTime: string;
@@ -14,6 +17,7 @@ export interface BookingData {
 export class Booking {
   id: string;
   customerName: string;
+  car: CarData;
   date: string;
   startTime: string;
   endTime: string;
@@ -24,6 +28,7 @@ export class Booking {
   constructor(data: BookingData) {
     this.id = data.id;
     this.customerName = data.customerName;
+    this.car = data.car;
     this.date = data.date;
     this.startTime = data.startTime;
     this.endTime = data.endTime;
