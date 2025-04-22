@@ -1,11 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-type User = {
-  id: number;
-  email: string;
-  name: string;
-};
+import type { User } from "@/types/user";
 
 type AuthState = {
   user: User | null;

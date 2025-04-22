@@ -41,18 +41,36 @@ export default function LoginPage() {
 
       // Set the user in the auth store with the complete user data
       setUser({
-        ...data.data.user,
+        _id: data.data.user._id,
+        employeeId: data.data.user.employeeId,
+        firstName: data.data.user.firstName,
+        lastName: data.data.user.lastName,
+        email: data.data.user.email,
+        phone: data.data.user.phone,
+        role: data.data.user.role,
+        position: data.data.user.position,
+        status: data.data.user.status,
         permissions: data.data.permissions,
-        systemAccess: data.data.systemAccess
+        accessLevel: data.data.user.accessLevel,
+        department: data.data.user.department,
+        joiningDate: data.data.user.joiningDate,
+        employmentType: data.data.user.employmentType,
+        workingHours: data.data.user.workingHours,
+        skills: data.data.user.skills,
+        certifications: data.data.user.certifications,
+        systemAccess: data.data.systemAccess,
+        lastLogin: data.data.user.lastLogin,
+        createdAt: data.data.user.createdAt,
+        updatedAt: data.data.user.updatedAt,
+        __v: data.data.user.__v,
+        userId: data.data.user.userId
       });
-      console.log('We have set the user');
 
       // Wait for the cookie to be set and auth store to be updated
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Navigate to dashboard
       router.push("/dashboard");
-      console.log("We have navigated to the dashboard");
       setIsLoading(false);
     } catch (error) {
       console.error("Login error:", error);

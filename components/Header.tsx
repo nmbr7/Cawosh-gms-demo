@@ -1,22 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Mail, Bell, Search } from 'lucide-react';
+import { useAuthStore } from '@/store/auth';
 
 export default function Header() {
   const [showMessages, setShowMessages] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [user, setUser] = useState({ name: '', avatar: '', role: '' });
+  const user = useAuthStore((state) => state.user);
   const router = useRouter();
-
-  useEffect(() => {
-    async function fetchUser() {
-      const response = await fetch('/api/user');
-      const data = await response.json();
-      setUser(data);
-    }
-    fetchUser();
-  }, []);
 
   const toggleMessages = () => setShowMessages(!showMessages);
   const toggleNotifications = () => setShowNotifications(!showNotifications);
@@ -26,7 +18,7 @@ export default function Header() {
     <header className="flex items-center justify-between p-4 bg-white text-black shadow-md">
       {/* Left section - Greeting */}
       <div>
-        <h1 className="text-xl font-bold">Hi, {user.name}</h1>
+        <h1 className="text-xl font-bold">Hi, {user?.firstName} {user?.lastName}</h1>
         <p className="text-sm">Let's check your Garage today</p>
       </div>
 
@@ -64,14 +56,10 @@ export default function Header() {
 
       {/* Right section - Profile */}
       <div className="relative flex items-center space-x-3">
-        {user.avatar ? (
-          <img src={user.avatar} alt="Avatar" className="h-10 w-10 rounded-full" />
-        ) : (
-          <div className="h-10 w-10 rounded-full bg-gray-300"></div>
-        )}
+        <div className="h-10 w-10 rounded-full bg-gray-300"></div>
         <div className="flex flex-col">
-          <span>{user.name}</span>
-          <span className="text-sm text-gray-500">{user.role}</span>
+          <span>{user?.firstName} {user?.lastName}</span>
+          <span className="text-sm text-gray-500">{user?.role}</span>
         </div>
         <button onClick={toggleProfileMenu}>
           {showProfileMenu && (
