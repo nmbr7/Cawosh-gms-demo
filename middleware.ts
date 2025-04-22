@@ -11,7 +11,9 @@ export function middleware(request: NextRequest) {
   const isPublicRoute = publicRoutes.includes(pathname);
   
   // Get the token from cookies
-  const token = request.cookies.get('token')?.value;
+  const token = request.cookies.get('access_token')?.value;
+
+  console.log("token", token);
 
   // If user is authenticated and trying to access a public route, redirect to dashboard
   if (token && isPublicRoute) {
@@ -24,7 +26,7 @@ export function middleware(request: NextRequest) {
   }
 
   // If user is not authenticated and trying to access a protected route, redirect to login
-  if (!token && !isPublicRoute) {
+  if (!token && !isPublicRoute && !pathname.startsWith('/api/')) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

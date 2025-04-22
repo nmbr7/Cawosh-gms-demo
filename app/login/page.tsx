@@ -22,7 +22,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -35,16 +34,28 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error);
+        setError(data.error || "Login failed");
         setIsLoading(false);
         return;
       }
 
-      // Set the token in cookies
-      document.cookie = `token=${data.user.id}; path=/; max-age=86400`; // 24 hours
-      setUser(data.user);
-      router.replace("/dashboard");
+      // Set the user in the auth store with the complete user data
+      setUser({
+        ...data.data.user,
+        permissions: data.data.permissions,
+        systemAccess: data.data.systemAccess
+      });
+      console.log('We have set the user');
+
+      // Wait for the cookie to be set and auth store to be updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Navigate to dashboard
+      router.push("/dashboard");
+      console.log("We have navigated to the dashboard");
+      setIsLoading(false);
     } catch (error) {
+      console.error("Login error:", error);
       setError("An error occurred. Please try again.");
       setIsLoading(false);
     }

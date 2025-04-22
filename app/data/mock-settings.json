@@ -1,0 +1,161 @@
+{
+  "business": {
+    "garageName": "AutoCare Pro",
+    "businessAddress": "123 Main Street, City, State 12345",
+    "contactPhone": "+1 (555) 123-4567",
+    "contactEmail": "contact@autocarepro.com",
+    "businessHours": {
+      "monday": { "open": "09:00", "close": "18:00" },
+      "tuesday": { "open": "09:00", "close": "18:00" },
+      "wednesday": { "open": "09:00", "close": "18:00" },
+      "thursday": { "open": "09:00", "close": "18:00" },
+      "friday": { "open": "09:00", "close": "18:00" },
+      "saturday": { "open": "10:00", "close": "16:00" },
+      "sunday": { "open": "00:00", "close": "00:00" }
+    },
+    "taxSettings": {
+      "taxRate": 8.5,
+      "taxRegistrationNumber": "TAX-123456789"
+    }
+  },
+  "services": {
+    "categories": [
+      {
+        "id": "1",
+        "name": "Oil Change",
+        "duration": 30,
+        "price": 49.99,
+        "category": "maintenance"
+      },
+      {
+        "id": "2",
+        "name": "Brake Service",
+        "duration": 60,
+        "price": 129.99,
+        "category": "repair"
+      },
+      {
+        "id": "3",
+        "name": "Vehicle Inspection",
+        "duration": 45,
+        "price": 39.99,
+        "category": "inspection"
+      }
+    ]
+  },
+  "vehicles": {
+    "types": [
+      {
+        "make": "Toyota",
+        "model": "Camry"
+      },
+      {
+        "make": "Honda",
+        "model": "Civic"
+      }
+    ],
+    "documentationRequirements": {
+      "vehicleRegistration": true,
+      "insuranceDocuments": true,
+      "serviceHistory": true
+    }
+  },
+  "staff": {
+    "roles": [
+      {
+        "name": "Administrator",
+        "permissions": ["all"]
+      },
+      {
+        "name": "Manager",
+        "permissions": ["manage_bookings", "manage_staff", "view_reports"]
+      },
+      {
+        "name": "Technician",
+        "permissions": ["view_bookings", "update_service_status"]
+      }
+    ],
+    "workSchedule": {
+      "workingHours": "08:00",
+      "breakDuration": 30
+    }
+  },
+  "customers": {
+    "notificationPreferences": {
+      "email": true,
+      "sms": true,
+      "push": false
+    },
+    "loyaltyProgram": {
+      "enabled": true,
+      "pointsPerDollar": 1,
+      "discountThreshold": 100
+    }
+  },
+  "bookings": {
+    "advanceBookingDays": 30,
+    "minimumNoticeHours": 2,
+    "autoConfirm": false,
+    "cancellationPolicy": {
+      "freeCancellationHours": 24,
+      "lateCancellationFee": 20
+    }
+  },
+  "billing": {
+    "paymentMethods": ["credit_card", "cash", "bank_transfer"],
+    "invoiceSettings": {
+      "prefix": "INV",
+      "nextNumber": 1001,
+      "dueDays": 15
+    },
+    "taxInclusive": true
+  },
+  "notifications": {
+    "email": {
+      "bookingConfirmation": true,
+      "serviceReminder": true,
+      "paymentReceipt": true
+    },
+    "sms": {
+      "bookingConfirmation": true,
+      "serviceReminder": true,
+      "paymentReceipt": false
+    }
+  },
+  "integrations": {
+    "calendar": {
+      "google": true,
+      "outlook": false
+    },
+    "payment": {
+      "stripe": true,
+      "paypal": false
+    }
+  },
+  "system": {
+    "timezone": "America/New_York",
+    "dateFormat": "MM/DD/YYYY",
+    "timeFormat": "12h",
+    "language": "en"
+  },
+  "security": {
+    "twoFactorAuth": true,
+    "sessionTimeout": 30,
+    "passwordPolicy": {
+      "minLength": 8,
+      "requireNumbers": true,
+      "requireSpecialChars": true
+    }
+  },
+  "backup": {
+    "autoBackup": true,
+    "backupFrequency": "daily",
+    "retentionDays": 30,
+    "lastBackup": "2024-03-20T10:00:00Z"
+  },
+  "reports": {
+    "defaultPeriod": "monthly",
+    "autoGenerate": true,
+    "emailRecipients": ["admin@autocarepro.com"]
+  }
+} 

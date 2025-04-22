@@ -18,12 +18,26 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       setUser: (user) => set({ user }),
-      logout: () => {
-        set({ user: null });
-        // Clear any stored data
-        localStorage.removeItem("auth-storage");
-        // Force a hard navigation to login to prevent back button issues
-        window.location.href = "/login";
+      logout: async () => {
+        try {
+          // Call the logout API endpoint to clear the HTTP-only cookie
+          await fetch('/api/auth/logout', {
+            method: 'POST',
+          });
+          
+          // Clear the store state
+          set({ user: null });
+          // Clear persisted data from localStorage
+          localStorage.removeItem("auth-storage");
+          // Force a hard navigation to login to prevent back button issues
+          window.location.href = "/login";
+        } catch (error) {
+          console.error('Logout error:', error);
+          // Even if the API call fails, we should still clear local state
+          set({ user: null });
+          localStorage.removeItem("auth-storage");
+          window.location.href = "/login";
+        }
       },
     }),
     {

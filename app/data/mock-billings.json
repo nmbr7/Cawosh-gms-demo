@@ -1,0 +1,186 @@
+{
+  "billings": [
+    {
+      "id": "BILL-001",
+      "bookingId": "CAW-B001",
+      "customerName": "John Smith",
+      "carDetails": {
+        "make": "Toyota",
+        "model": "Camry",
+        "registrationNumber": "ABC123"
+      },
+      "serviceDetails": {
+        "description": "Oil Change",
+        "date": "2025-04-01",
+        "duration": "1 hour"
+      },
+      "charges": {
+        "labor": 75.00,
+        "parts": [
+          {
+            "name": "Engine Oil (5W-30)",
+            "quantity": 5,
+            "unitPrice": 12.00,
+            "total": 60.00
+          },
+          {
+            "name": "Oil Filter",
+            "quantity": 1,
+            "unitPrice": 15.00,
+            "total": 15.00
+          }
+        ],
+        "subtotal": 150.00,
+        "tax": 15.00,
+        "total": 165.00
+      },
+      "paymentStatus": "paid",
+      "paymentMethod": "credit_card",
+      "paymentDate": "2025-04-01T10:15:00Z",
+      "invoiceNumber": "INV-2025-001"
+    },
+    {
+      "id": "BILL-002",
+      "bookingId": "CAW-B002",
+      "customerName": "Sarah Johnson",
+      "carDetails": {
+        "make": "Honda",
+        "model": "Civic",
+        "registrationNumber": "DEF456"
+      },
+      "serviceDetails": {
+        "description": "Brake Service",
+        "date": "2025-04-02",
+        "duration": "1.5 hours"
+      },
+      "charges": {
+        "labor": 120.00,
+        "parts": [
+          {
+            "name": "Brake Pads (Front)",
+            "quantity": 2,
+            "unitPrice": 45.00,
+            "total": 90.00
+          },
+          {
+            "name": "Brake Fluid",
+            "quantity": 1,
+            "unitPrice": 25.00,
+            "total": 25.00
+          }
+        ],
+        "subtotal": 235.00,
+        "tax": 23.50,
+        "total": 258.50
+      },
+      "paymentStatus": "paid",
+      "paymentMethod": "debit_card",
+      "paymentDate": "2025-04-02T12:30:00Z",
+      "invoiceNumber": "INV-2025-002"
+    },
+    {
+      "id": "BILL-003",
+      "bookingId": "CAW-B003",
+      "customerName": "Michael Brown",
+      "carDetails": {
+        "make": "Ford",
+        "model": "F-150",
+        "registrationNumber": "GHI789"
+      },
+      "serviceDetails": {
+        "description": "Tire Rotation",
+        "date": "2025-04-03",
+        "duration": "1 hour"
+      },
+      "charges": {
+        "labor": 60.00,
+        "parts": [],
+        "subtotal": 60.00,
+        "tax": 6.00,
+        "total": 66.00
+      },
+      "paymentStatus": "paid",
+      "paymentMethod": "cash",
+      "paymentDate": "2025-04-03T14:15:00Z",
+      "invoiceNumber": "INV-2025-003"
+    },
+    {
+      "id": "BILL-004",
+      "bookingId": "CAW-B004",
+      "customerName": "Emily Davis",
+      "carDetails": {
+        "make": "Tesla",
+        "model": "Model 3",
+        "registrationNumber": "JKL012"
+      },
+      "serviceDetails": {
+        "description": "Battery Check",
+        "date": "2025-04-04",
+        "duration": "1 hour"
+      },
+      "charges": {
+        "labor": 90.00,
+        "parts": [
+          {
+            "name": "Battery Terminal Cleaner",
+            "quantity": 1,
+            "unitPrice": 15.00,
+            "total": 15.00
+          }
+        ],
+        "subtotal": 105.00,
+        "tax": 10.50,
+        "total": 115.50
+      },
+      "paymentStatus": "paid",
+      "paymentMethod": "online_transfer",
+      "paymentDate": "2025-04-04T15:45:00Z",
+      "invoiceNumber": "INV-2025-004"
+    },
+    {
+      "id": "BILL-005",
+      "bookingId": "CAW-B005",
+      "customerName": "David Wilson",
+      "carDetails": {
+        "make": "Chevrolet",
+        "model": "Silverado",
+        "registrationNumber": "MNO345"
+      },
+      "serviceDetails": {
+        "description": "Transmission Service",
+        "date": "2025-04-05",
+        "duration": "2 hours"
+      },
+      "charges": {
+        "labor": 180.00,
+        "parts": [
+          {
+            "name": "Transmission Fluid",
+            "quantity": 12,
+            "unitPrice": 15.00,
+            "total": 180.00
+          },
+          {
+            "name": "Transmission Filter",
+            "quantity": 1,
+            "unitPrice": 45.00,
+            "total": 45.00
+          },
+          {
+            "name": "Gasket",
+            "quantity": 1,
+            "unitPrice": 25.00,
+            "total": 25.00
+          }
+        ],
+        "subtotal": 430.00,
+        "tax": 43.00,
+        "total": 473.00
+      },
+      "paymentStatus": "paid",
+      "paymentMethod": "credit_card",
+      "paymentDate": "2025-04-05T10:30:00Z",
+      "invoiceNumber": "INV-2025-005"
+    }
+  ]
+} 

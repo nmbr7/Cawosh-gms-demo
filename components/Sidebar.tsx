@@ -20,28 +20,23 @@ import { useAuthStore } from "@/store/auth";
 
 const links = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Calendar", href: "/dashboard/schedule", icon: Calendar },
-  { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
-  { name: "Job Sheet", href: "/dashboard/job-sheet", icon: FileText },
-  { name: "Billings", href: "/dashboard/billings", icon: Receipt },
-  { name: "Customer Support", href: "/dashboard/customer-support", icon: HeadphonesIcon },
-  { name: "Staff Management", href: "/dashboard/users", icon: UsersIcon },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Calendar", href: "/schedule", icon: Calendar },
+  { name: "Bookings", href: "/bookings", icon: FileText },
+  { name: "Job Sheet", href: "/job-sheet", icon: FileText },
+  { name: "Billings", href: "/billings", icon: Receipt },
+  { name: "Customer Support", href: "/customer-support", icon: HeadphonesIcon },
+  { name: "Staff Management", href: "/users", icon: UsersIcon },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { sidebarOpen, toggleSidebar } = useUIStore();
   const logout = useAuthStore((state) => state.logout);
 
   const handleLogout = () => {
-    // Clear the authentication token
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    // Clear the auth store
+    // Clear the auth store and handle all logout logic
     logout();
-    // Redirect to login page
-    router.replace("/login");
   };
 
   return (

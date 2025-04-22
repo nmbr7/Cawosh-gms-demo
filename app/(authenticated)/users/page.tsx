@@ -154,17 +154,16 @@ export default function UsersPage() {
   if (isLoading) {
     return (
       <div className="p-6">
-        
         {/* Header with filters */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             {/* Search input */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 bg-white" />
               <Input
                 type="text"
                 placeholder="Search users..."
-                className="w-[300px] pl-9 pr-8"
+                className="w-[300px] pl-9 pr-8 bg-white"
                 value={filters.search || ''}
                 onChange={(e) => handleFilterChange('search', e.target.value || null)}
               />
@@ -384,11 +383,11 @@ export default function UsersPage() {
         <div className="flex items-center gap-4">
           {/* Search input */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 bg-white" />
             <Input
               type="text"
               placeholder="Search users..."
-              className="w-[300px] pl-9 pr-8"
+              className="w-[300px] pl-9 pr-8 bg-white"
               value={filters.search || ''}
               onChange={(e) => handleFilterChange('search', e.target.value || null)}
             />

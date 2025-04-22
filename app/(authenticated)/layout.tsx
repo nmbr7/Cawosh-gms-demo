@@ -8,7 +8,7 @@ import Sidebar from "@/components/Sidebar";
 import { cn } from "@/lib/utils";
 import Header from "@/components/Header";
 
-export default function DashboardLayout({
+export default function AuthenticatedLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -20,6 +20,7 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (!user) {
+      console.log("No user found, redirecting to login");
       router.replace("/login");
     } else {
       setIsLoading(false);
@@ -50,4 +51,4 @@ export default function DashboardLayout({
       </main>
     </div>
   );
-}
+} 
