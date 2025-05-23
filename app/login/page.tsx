@@ -23,10 +23,10 @@ export default function LoginPage() {
     setError("");
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
@@ -63,11 +63,11 @@ export default function LoginPage() {
         createdAt: data.data.user.createdAt,
         updatedAt: data.data.user.updatedAt,
         __v: data.data.user.__v,
-        userId: data.data.user.userId
+        userId: data.data.user.userId,
       });
 
       // Wait for the cookie to be set and auth store to be updated
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Navigate to dashboard
       router.push("/dashboard");
@@ -110,7 +110,10 @@ export default function LoginPage() {
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
         <div className="mb-4 text-right">
-          <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
             Forgot Password?
           </Link>
         </div>

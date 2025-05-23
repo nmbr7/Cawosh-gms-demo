@@ -3,9 +3,22 @@
 import { useState, useEffect } from "react";
 import { Booking, BookingStatus } from "@/app/models/booking";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Filter, SortAsc, SortDesc } from "lucide-react";
+import {
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  SortAsc,
+  SortDesc,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import React from "react";
@@ -24,7 +37,7 @@ interface FilterState {
   customerName: string | null;
   description: string | null;
   sortBy: string;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: "asc" | "desc";
 }
 
 export default function BookingsPage() {
@@ -38,7 +51,7 @@ export default function BookingsPage() {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 10
+    itemsPerPage: 10,
   });
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,8 +61,8 @@ export default function BookingsPage() {
     status: "all",
     customerName: null,
     description: null,
-    sortBy: 'date',
-    sortOrder: 'desc'
+    sortBy: "date",
+    sortOrder: "desc",
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -62,44 +75,44 @@ export default function BookingsPage() {
         // Build query parameters
         const params = new URLSearchParams({
           page: currentPage.toString(),
-          limit: '10',
+          limit: "10",
           sortBy: filters.sortBy,
-          sortOrder: filters.sortOrder
+          sortOrder: filters.sortOrder,
         });
 
         // Add bay filter if selected
         if (selectedBay !== "all") {
-          params.append('bay', selectedBay.toString());
+          params.append("bay", selectedBay.toString());
         }
 
         // Add status filter if not "all"
         if (filters.status !== "all") {
-          params.append('status', filters.status);
+          params.append("status", filters.status);
         }
 
         // Add customer name filter if exists
         if (filters.customerName) {
-          params.append('customerName', filters.customerName);
+          params.append("customerName", filters.customerName);
         }
 
         // Add description filter if exists
         if (filters.description) {
-          params.append('description', filters.description);
+          params.append("description", filters.description);
         }
 
-        console.log("API Request:", Object.fromEntries(params));
+        // console.log("API Request:", Object.fromEntries(params));
 
         const response = await fetch(`/api/bookings?${params.toString()}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch bookings');
+          throw new Error("Failed to fetch bookings");
         }
         const data = await response.json();
-        console.log("API Response:", data);
+        // console.log("API Response:", data);
 
         setBookings(data.bookings);
         setPaginationInfo(data.pagination);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setIsLoading(false);
       }
@@ -109,15 +122,16 @@ export default function BookingsPage() {
   }, [currentPage, selectedBay, filters]);
 
   const handleFilterChange = (key: keyof FilterState, value: string | null) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1); // Reset to first page when filters change
   };
 
   const handleSortChange = (field: string) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       sortBy: field,
-      sortOrder: prev.sortBy === field && prev.sortOrder === 'asc' ? 'desc' : 'asc'
+      sortOrder:
+        prev.sortBy === field && prev.sortOrder === "asc" ? "desc" : "asc",
     }));
   };
 
@@ -135,42 +149,42 @@ export default function BookingsPage() {
 
       // Build query parameters
       const params = new URLSearchParams({
-        page: '1',
-        limit: '10',
+        page: "1",
+        limit: "10",
         sortBy: filters.sortBy,
-        sortOrder: filters.sortOrder
+        sortOrder: filters.sortOrder,
       });
 
       // Add bay filter if selected
       if (selectedBay !== "all") {
-        params.append('bay', selectedBay.toString());
+        params.append("bay", selectedBay.toString());
       }
 
       // Add status filter if not "all"
       if (filters.status !== "all") {
-        params.append('status', filters.status);
+        params.append("status", filters.status);
       }
 
       // Add customer name filter if exists
       if (filters.customerName) {
-        params.append('customerName', filters.customerName);
+        params.append("customerName", filters.customerName);
       }
 
       // Add description filter if exists
       if (filters.description) {
-        params.append('description', filters.description);
+        params.append("description", filters.description);
       }
 
       const response = await fetch(`/api/bookings?${params.toString()}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch bookings');
+        throw new Error("Failed to fetch bookings");
       }
       const data = await response.json();
 
       setBookings(data.bookings);
       setPaginationInfo(data.pagination);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsRefreshing(false);
     }
@@ -185,7 +199,9 @@ export default function BookingsPage() {
             {/* Bay selection */}
             <Select
               value={selectedBay.toString()}
-              onValueChange={(value) => setSelectedBay(value === "all" ? "all" : parseInt(value))}
+              onValueChange={(value) =>
+                setSelectedBay(value === "all" ? "all" : parseInt(value))
+              }
             >
               <SelectTrigger className="w-[180px] bg-white">
                 <SelectValue placeholder="Select bay" />
@@ -259,50 +275,61 @@ export default function BookingsPage() {
           <div className="flex items-center gap-4">
             {/* Sort controls */}
             <div className="flex gap-2">
-              <Button 
+              <Button
                 variant="outline"
-                onClick={() => handleSortChange('date')}
+                onClick={() => handleSortChange("date")}
                 className={cn(
                   "flex items-center gap-2",
-                  filters.sortBy === 'date' && "bg-blue-100"
+                  filters.sortBy === "date" && "bg-blue-100"
                 )}
               >
                 Date
-                {filters.sortBy === 'date' && (
-                  filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
-                )}
+                {filters.sortBy === "date" &&
+                  (filters.sortOrder === "asc" ? (
+                    <SortAsc className="w-4 h-4" />
+                  ) : (
+                    <SortDesc className="w-4 h-4" />
+                  ))}
               </Button>
-              <Button 
+              <Button
                 variant="outline"
-                onClick={() => handleSortChange('customerName')}
+                onClick={() => handleSortChange("customerName")}
                 className={cn(
                   "flex items-center gap-2",
-                  filters.sortBy === 'customerName' && "bg-blue-100"
+                  filters.sortBy === "customerName" && "bg-blue-100"
                 )}
               >
                 Customer
-                {filters.sortBy === 'customerName' && (
-                  filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
-                )}
+                {filters.sortBy === "customerName" &&
+                  (filters.sortOrder === "asc" ? (
+                    <SortAsc className="w-4 h-4" />
+                  ) : (
+                    <SortDesc className="w-4 h-4" />
+                  ))}
               </Button>
-              <Button 
+              <Button
                 variant="outline"
-                onClick={() => handleSortChange('description')}
+                onClick={() => handleSortChange("description")}
                 className={cn(
                   "flex items-center gap-2",
-                  filters.sortBy === 'description' && "bg-blue-100"
+                  filters.sortBy === "description" && "bg-blue-100"
                 )}
               >
                 Service
-                {filters.sortBy === 'description' && (
-                  filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
-                )}
+                {filters.sortBy === "description" &&
+                  (filters.sortOrder === "asc" ? (
+                    <SortAsc className="w-4 h-4" />
+                  ) : (
+                    <SortDesc className="w-4 h-4" />
+                  ))}
               </Button>
             </div>
 
             {/* Create Booking button */}
             <Button
-              onClick={() => {/* TODO: Add create booking handler */}}
+              onClick={() => {
+                /* TODO: Add create booking handler */
+              }}
               className="bg-blue-500 text-white hover:bg-blue-600"
             >
               Create Booking
@@ -321,8 +348,10 @@ export default function BookingsPage() {
                 </label>
                 <Input
                   type="text"
-                  value={filters.customerName || ''}
-                  onChange={(e) => handleFilterChange('customerName', e.target.value || null)}
+                  value={filters.customerName || ""}
+                  onChange={(e) =>
+                    handleFilterChange("customerName", e.target.value || null)
+                  }
                   placeholder="Search customer..."
                 />
               </div>
@@ -334,8 +363,10 @@ export default function BookingsPage() {
                 </label>
                 <Input
                   type="text"
-                  value={filters.description || ''}
-                  onChange={(e) => handleFilterChange('description', e.target.value || null)}
+                  value={filters.description || ""}
+                  onChange={(e) =>
+                    handleFilterChange("description", e.target.value || null)
+                  }
                   placeholder="Search service..."
                 />
               </div>
@@ -347,7 +378,9 @@ export default function BookingsPage() {
                 </label>
                 <Select
                   value={filters.status}
-                  onValueChange={(value) => handleFilterChange('status', value as BookingStatus | "all")}
+                  onValueChange={(value) =>
+                    handleFilterChange("status", value as BookingStatus | "all")
+                  }
                 >
                   <SelectTrigger className="bg-white">
                     <SelectValue placeholder="Select status" />
@@ -451,7 +484,9 @@ export default function BookingsPage() {
           {/* Bay selection */}
           <Select
             value={selectedBay.toString()}
-            onValueChange={(value) => setSelectedBay(value === "all" ? "all" : parseInt(value))}
+            onValueChange={(value) =>
+              setSelectedBay(value === "all" ? "all" : parseInt(value))
+            }
           >
             <SelectTrigger className="w-[180px] bg-white">
               <SelectValue placeholder="Select bay" />
@@ -525,50 +560,61 @@ export default function BookingsPage() {
         <div className="flex items-center gap-4">
           {/* Sort controls */}
           <div className="flex gap-2">
-            <Button 
+            <Button
               variant="outline"
-              onClick={() => handleSortChange('date')}
+              onClick={() => handleSortChange("date")}
               className={cn(
                 "flex items-center gap-2",
-                filters.sortBy === 'date' && "bg-blue-100"
+                filters.sortBy === "date" && "bg-blue-100"
               )}
             >
               Date
-              {filters.sortBy === 'date' && (
-                filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
-              )}
+              {filters.sortBy === "date" &&
+                (filters.sortOrder === "asc" ? (
+                  <SortAsc className="w-4 h-4" />
+                ) : (
+                  <SortDesc className="w-4 h-4" />
+                ))}
             </Button>
-            <Button 
+            <Button
               variant="outline"
-              onClick={() => handleSortChange('customerName')}
+              onClick={() => handleSortChange("customerName")}
               className={cn(
                 "flex items-center gap-2",
-                filters.sortBy === 'customerName' && "bg-blue-100"
+                filters.sortBy === "customerName" && "bg-blue-100"
               )}
             >
               Customer
-              {filters.sortBy === 'customerName' && (
-                filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
-              )}
+              {filters.sortBy === "customerName" &&
+                (filters.sortOrder === "asc" ? (
+                  <SortAsc className="w-4 h-4" />
+                ) : (
+                  <SortDesc className="w-4 h-4" />
+                ))}
             </Button>
-            <Button 
+            <Button
               variant="outline"
-              onClick={() => handleSortChange('description')}
+              onClick={() => handleSortChange("description")}
               className={cn(
                 "flex items-center gap-2",
-                filters.sortBy === 'description' && "bg-blue-100"
+                filters.sortBy === "description" && "bg-blue-100"
               )}
             >
               Service
-              {filters.sortBy === 'description' && (
-                filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />
-              )}
+              {filters.sortBy === "description" &&
+                (filters.sortOrder === "asc" ? (
+                  <SortAsc className="w-4 h-4" />
+                ) : (
+                  <SortDesc className="w-4 h-4" />
+                ))}
             </Button>
           </div>
 
           {/* Create Booking button */}
           <Button
-            onClick={() => {/* TODO: Add create booking handler */}}
+            onClick={() => {
+              /* TODO: Add create booking handler */
+            }}
             className="bg-blue-500 text-white hover:bg-blue-600"
           >
             Create Booking
@@ -587,8 +633,10 @@ export default function BookingsPage() {
               </label>
               <Input
                 type="text"
-                value={filters.customerName || ''}
-                onChange={(e) => handleFilterChange('customerName', e.target.value || null)}
+                value={filters.customerName || ""}
+                onChange={(e) =>
+                  handleFilterChange("customerName", e.target.value || null)
+                }
                 placeholder="Search customer..."
               />
             </div>
@@ -600,8 +648,10 @@ export default function BookingsPage() {
               </label>
               <Input
                 type="text"
-                value={filters.description || ''}
-                onChange={(e) => handleFilterChange('description', e.target.value || null)}
+                value={filters.description || ""}
+                onChange={(e) =>
+                  handleFilterChange("description", e.target.value || null)
+                }
                 placeholder="Search service..."
               />
             </div>
@@ -613,7 +663,9 @@ export default function BookingsPage() {
               </label>
               <Select
                 value={filters.status}
-                onValueChange={(value) => handleFilterChange('status', value as BookingStatus | "all")}
+                onValueChange={(value) =>
+                  handleFilterChange("status", value as BookingStatus | "all")
+                }
               >
                 <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Select status" />
@@ -681,17 +733,23 @@ export default function BookingsPage() {
                     </div>
                     <div className="text-center">
                       <h3 className="text-lg font-medium text-gray-900">
-                        {filters.status !== "all" || filters.customerName || filters.description
+                        {filters.status !== "all" ||
+                        filters.customerName ||
+                        filters.description
                           ? "No bookings match your filters"
                           : "No bookings found"}
                       </h3>
                       <p className="mt-1 text-sm text-gray-500">
-                        {filters.status !== "all" || filters.customerName || filters.description
+                        {filters.status !== "all" ||
+                        filters.customerName ||
+                        filters.description
                           ? "Try adjusting your filters or search criteria"
                           : "Get started by creating a new booking"}
                       </p>
                     </div>
-                    {filters.status !== "all" || filters.customerName || filters.description ? (
+                    {filters.status !== "all" ||
+                    filters.customerName ||
+                    filters.description ? (
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -699,8 +757,8 @@ export default function BookingsPage() {
                             status: "all",
                             customerName: null,
                             description: null,
-                            sortBy: 'date',
-                            sortOrder: 'desc'
+                            sortBy: "date",
+                            sortOrder: "desc",
                           });
                         }}
                         className="mt-2"
@@ -709,7 +767,9 @@ export default function BookingsPage() {
                       </Button>
                     ) : (
                       <Button
-                        onClick={() => {/* TODO: Add create booking handler */}}
+                        onClick={() => {
+                          /* TODO: Add create booking handler */
+                        }}
                         className="mt-2"
                       >
                         Create Booking
@@ -720,8 +780,8 @@ export default function BookingsPage() {
               </tr>
             ) : (
               bookings.map((booking) => (
-                <tr 
-                  key={booking.id} 
+                <tr
+                  key={booking.id}
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => {
                     setSelectedBooking(booking);
@@ -737,13 +797,15 @@ export default function BookingsPage() {
                   <td className="px-6 py-4 text-sm text-gray-500">
                     <div className="font-medium">{booking.description}</div>
                     <div className="mt-1 text-xs text-gray-400">
-                      {booking.car.make} {booking.car.model} ({booking.car.year}) • {booking.car.color}
+                      {booking.car.make} {booking.car.model} ({booking.car.year}
+                      ) • {booking.car.color}
                       <br />
-                      {booking.car.registrationNumber} • {booking.car.vehicleType}
+                      {booking.car.registrationNumber} •{" "}
+                      {booking.car.vehicleType}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {format(new Date(booking.date), 'MMM dd, yyyy')}
+                    {format(new Date(booking.date), "MMM dd, yyyy")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {booking.startTime} - {booking.endTime}
@@ -752,14 +814,21 @@ export default function BookingsPage() {
                     Bay {booking.bay}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={cn(
-                      "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                      booking.status === 'completed' && "bg-green-100 text-green-800",
-                      booking.status === 'ongoing' && "bg-amber-100 text-amber-800",
-                      booking.status === 'scheduled' && "bg-blue-100 text-blue-800",
-                      booking.status === 'blocked' && "bg-red-100 text-red-800",
-                      booking.status === 'break' && "bg-gray-100 text-gray-800"
-                    )}>
+                    <span
+                      className={cn(
+                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
+                        booking.status === "completed" &&
+                          "bg-green-100 text-green-800",
+                        booking.status === "ongoing" &&
+                          "bg-amber-100 text-amber-800",
+                        booking.status === "scheduled" &&
+                          "bg-blue-100 text-blue-800",
+                        booking.status === "blocked" &&
+                          "bg-red-100 text-red-800",
+                        booking.status === "break" &&
+                          "bg-gray-100 text-gray-800"
+                      )}
+                    >
                       {booking.status}
                     </span>
                   </td>
@@ -773,9 +842,12 @@ export default function BookingsPage() {
       {/* Pagination */}
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          Showing {((currentPage - 1) * paginationInfo.itemsPerPage) + 1} to{' '}
-          {Math.min(currentPage * paginationInfo.itemsPerPage, paginationInfo.totalItems)} of{' '}
-          {paginationInfo.totalItems} bookings
+          Showing {(currentPage - 1) * paginationInfo.itemsPerPage + 1} to{" "}
+          {Math.min(
+            currentPage * paginationInfo.itemsPerPage,
+            paginationInfo.totalItems
+          )}{" "}
+          of {paginationInfo.totalItems} bookings
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -785,17 +857,21 @@ export default function BookingsPage() {
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          
+
           {/* Page numbers */}
           <div className="flex gap-1">
-            {Array.from({ length: paginationInfo.totalPages }, (_, i) => i + 1).map((page) => (
+            {Array.from(
+              { length: paginationInfo.totalPages },
+              (_, i) => i + 1
+            ).map((page) => (
               <Button
                 key={page}
                 variant={currentPage === page ? "default" : "outline"}
                 onClick={() => handlePageChange(page)}
                 className={cn(
                   "w-8 h-8 p-0",
-                  currentPage === page && "bg-blue-500 text-white hover:bg-blue-600"
+                  currentPage === page &&
+                    "bg-blue-500 text-white hover:bg-blue-600"
                 )}
               >
                 {page}

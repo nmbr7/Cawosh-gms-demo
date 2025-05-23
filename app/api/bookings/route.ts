@@ -1,35 +1,52 @@
-import { NextResponse } from 'next/server';
-import mockBookings from '@/app/data/mock-bookings.json';
+import { NextResponse } from "next/server";
+import mockBookings from "@/app/data/mock-bookings.json";
 
 export async function GET(request: Request): Promise<NextResponse> {
   // Add 1 second delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   const { searchParams }: URL = new URL(request.url);
-  
+
   // Pagination parameters
-  const page: number = parseInt(searchParams.get('page') || '1');
-  const limit: number = parseInt(searchParams.get('limit') || '10');
-  
+  const page: number = parseInt(searchParams.get("page") || "1");
+  const limit: number = parseInt(searchParams.get("limit") || "10");
+
   // Filter parameters
-  const bay: number | null = searchParams.get('bay') ? parseInt(searchParams.get('bay')!) : null;
-  const status: string | null = searchParams.get('status') || null;
-  const customerName: string | null = searchParams.get('customerName') || null;
-  const description: string | null = searchParams.get('description') || null;
-  
+  const bay: number | null = searchParams.get("bay")
+    ? parseInt(searchParams.get("bay")!)
+    : null;
+  const status: string | null = searchParams.get("status") || null;
+  const customerName: string | null = searchParams.get("customerName") || null;
+  const description: string | null = searchParams.get("description") || null;
+
   // Date range parameters
   const today = new Date();
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  const startDate = new Date(searchParams.get('startDate') || firstDayOfMonth);
-  const endDate = new Date(searchParams.get('endDate') || lastDayOfMonth);
-  
+  console.log("today", today);
+  const firstDayOfMonth = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)
+  );
+  const lastDayOfMonth = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0)
+  );
+
+  console.log("startDate", searchParams.get("startDate"));
+  console.log("endDate", searchParams.get("endDate"));
+
+  console.log("firstDayOfMonth", firstDayOfMonth);
+  console.log("lastDayOfMonth", lastDayOfMonth);
+
+  console.log(searchParams.get("startDate") || firstDayOfMonth);
+  console.log(searchParams.get("endDate") || lastDayOfMonth);
+
+  const startDate = new Date(searchParams.get("startDate") || firstDayOfMonth);
+  const endDate = new Date(searchParams.get("endDate") || lastDayOfMonth);
   // Sort parameters
-  const sortBy: string = searchParams.get('sortBy') || 'date';
-  const sortOrder: 'asc' | 'desc' = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
+  const sortBy: string = searchParams.get("sortBy") || "date";
+  const sortOrder: "asc" | "desc" = (searchParams.get("sortOrder") ||
+    "desc") as "asc" | "desc";
 
   // Log request parameters
-  console.log('API Request:', {
+  console.log("API Request:", {
     page,
     limit,
     filters: {
@@ -38,64 +55,73 @@ export async function GET(request: Request): Promise<NextResponse> {
       customerName,
       description,
       startDate: startDate.toISOString(),
-      endDate: endDate.toISOString()
+      endDate: endDate.toISOString(),
     },
     sort: {
       by: sortBy,
-      order: sortOrder
-    }
+      order: sortOrder,
+    },
   });
 
   // Apply filters
-  let filteredBookings = mockBookings.bookings.filter(booking => {
+  const filteredBookings = mockBookings.bookings.filter((booking) => {
     // Date range filter
     const bookingDate = booking.date;
-    const startDateStr = startDate.toISOString().split('T')[0];
-    const endDateStr = endDate.toISOString().split('T')[0];
-    const isInDateRange = bookingDate >= startDateStr && bookingDate <= endDateStr;
-    
+    const startDateStr = startDate.toISOString().split("T")[0];
+    const endDateStr = endDate.toISOString().split("T")[0];
+    const isInDateRange =
+      bookingDate >= startDateStr && bookingDate <= endDateStr;
+
     // Bay filter
     const matchesBay = bay === null || booking.bay === bay;
-    
+
     // Status filter
     const matchesStatus = status === null || booking.status === status;
-    
+
     // Customer name filter (case-insensitive)
-    const matchesCustomer = customerName === null || 
+    const matchesCustomer =
+      customerName === null ||
       booking.customerName.toLowerCase().includes(customerName.toLowerCase());
-    
+
     // Description filter (case-insensitive)
-    const matchesDescription = description === null || 
+    const matchesDescription =
+      description === null ||
       booking.description.toLowerCase().includes(description.toLowerCase());
-    
-    return isInDateRange && matchesBay && matchesStatus && matchesCustomer && matchesDescription;
+
+    return (
+      isInDateRange &&
+      matchesBay &&
+      matchesStatus &&
+      matchesCustomer &&
+      matchesDescription
+    );
   });
 
   // Apply sorting
   filteredBookings.sort((a, b) => {
     let comparison = 0;
-    
+
     switch (sortBy) {
-      case 'date':
+      case "date":
         comparison = new Date(b.date).getTime() - new Date(a.date).getTime(); // Latest first by default
         break;
-      case 'startTime':
+      case "startTime":
         comparison = b.startTime.localeCompare(a.startTime); // Latest first by default
         break;
-      case 'customerName':
+      case "customerName":
         comparison = a.customerName.localeCompare(b.customerName);
         break;
-      case 'description':
+      case "description":
         comparison = a.description.localeCompare(b.description);
         break;
-      case 'status':
+      case "status":
         comparison = a.status.localeCompare(b.status);
         break;
       default:
         comparison = new Date(b.date).getTime() - new Date(a.date).getTime(); // Latest first by default
     }
-    
-    return sortOrder === 'asc' ? -comparison : comparison; // Reverse the order if ascending is requested
+
+    return sortOrder === "asc" ? -comparison : comparison; // Reverse the order if ascending is requested
   });
 
   // Calculate pagination
@@ -110,16 +136,16 @@ export async function GET(request: Request): Promise<NextResponse> {
       currentPage: page,
       totalPages,
       totalItems: filteredBookings.length,
-      itemsPerPage: limit
-    }
+      itemsPerPage: limit,
+    },
   };
 
   // Log response
-  console.log('API Response:', {
+  console.log("API Response:", {
     totalItems: filteredBookings.length,
     returnedItems: paginatedBookings.length,
-    pagination: response.pagination
+    pagination: response.pagination,
   });
 
   return NextResponse.json(response);
-} 
+}

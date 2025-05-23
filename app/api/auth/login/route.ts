@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 const API_URL = process.env.API_URL;
 
@@ -9,16 +9,16 @@ export async function POST(request: Request) {
     // Validate required fields
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: "Email and password are required" },
         { status: 400 }
       );
     }
 
     // First API call - Login
-    const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
-      method: 'POST',
+    const loginResponse = await fetch(`${API_URL}/api/v1/auth/login`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         email,
@@ -29,27 +29,24 @@ export async function POST(request: Request) {
     if (!loginResponse.ok) {
       const errorData = await loginResponse.json();
       return NextResponse.json(
-        { error: errorData.message || 'Login failed' },
+        { error: errorData.message || "Login failed" },
         { status: loginResponse.status }
       );
     }
 
     const loginData = await loginResponse.json();
 
-    console.log(loginData);
-
     // Second API call - Get user details
-    const userResponse = await fetch(`${API_URL}/api/users/me`, {
+    const userResponse = await fetch(`${API_URL}/api/v1/users/me`, {
       headers: {
-        'Authorization': `Bearer ${loginData.data.access_token}`,
+        Authorization: `Bearer ${loginData.data.access_token}`,
       },
     });
-
 
     if (!userResponse.ok) {
       const errorData = await userResponse.json();
       return NextResponse.json(
-        { error: errorData.message || 'Failed to fetch user details' },
+        { error: errorData.message || "Failed to fetch user details" },
         { status: userResponse.status }
       );
     }
@@ -58,7 +55,7 @@ export async function POST(request: Request) {
     // Create the response
     const response = NextResponse.json({
       success: true,
-      message: 'Login successful',
+      message: "Login successful",
       data: {
         user: userData.data,
         token: loginData.data.access_token,
@@ -68,20 +65,20 @@ export async function POST(request: Request) {
     });
 
     // Set the access token in an HTTP-only cookie
-    response.cookies.set('access_token', loginData.data.access_token, {
+    response.cookies.set("access_token", loginData.data.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return response;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     return NextResponse.json(
-      { error: 'Failed to process login request' },
+      { error: "Failed to process login request" },
       { status: 500 }
     );
   }
-} 
+}

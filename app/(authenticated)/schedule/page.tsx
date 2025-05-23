@@ -9,8 +9,13 @@ import { Booking } from "@/app/models/booking";
 import { format } from "date-fns";
 import { DayView } from "@/app/components/day-view";
 import { WeekView } from "@/app/components/week-view";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -26,27 +31,38 @@ export default function SchedulePage() {
       setIsLoading(true);
       try {
         // For month view, we need all bookings for the month
-        const monthStart = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-        const monthEnd = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
-        
-        const startDateStr = format(monthStart, 'yyyy-MM-dd');
-        const endDateStr = format(monthEnd, 'yyyy-MM-dd');
-        
+        const monthStart = new Date(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth(),
+          1
+        );
+        const monthEnd = new Date(
+          selectedDate.getFullYear(),
+          selectedDate.getMonth() + 1,
+          0
+        );
+
+        const startDateStr = format(monthStart, "yyyy-MM-dd");
+        const endDateStr = format(monthEnd, "yyyy-MM-dd");
+
         // Build query parameters
         const params = new URLSearchParams({
           bay: selectedBay.toString(),
           startDate: startDateStr,
           endDate: endDateStr,
-          limit: '100'
+          limit: "100",
         });
 
         console.log("API Request:", Object.fromEntries(params));
 
         const response = await fetch(`/api/bookings?${params.toString()}`);
+        console.log("API Response:", response);
         const data = await response.json();
         console.log("API Response:", data);
 
-        const bookingInstances = data.bookings.map((bookingData: any) => new Booking(bookingData));
+        const bookingInstances = data.bookings.map(
+          (bookingData: any) => new Booking(bookingData)
+        );
         setBookings(bookingInstances);
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -80,7 +96,7 @@ export default function SchedulePage() {
     return new Intl.DateTimeFormat("en-US", {
       day: "numeric",
       month: "long",
-      year: "numeric"
+      year: "numeric",
     }).format(date);
   };
 
@@ -123,7 +139,7 @@ export default function SchedulePage() {
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={handlePreviousDay}
               className="p-2 hover:bg-gray-100 rounded-full"
             >
@@ -146,7 +162,7 @@ export default function SchedulePage() {
                 onClose={() => setIsCalendarOpen(false)}
               />
             </div>
-            <button 
+            <button
               onClick={handleNextDay}
               className="p-2 hover:bg-gray-100 rounded-full"
             >
@@ -164,24 +180,38 @@ export default function SchedulePage() {
                 <SelectValue placeholder="Select bay" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="1" className="hover:bg-gray-100">Bay 1</SelectItem>
-                <SelectItem value="2" className="hover:bg-gray-100">Bay 2</SelectItem>
-                <SelectItem value="3" className="hover:bg-gray-100">Bay 3</SelectItem>
+                <SelectItem value="1" className="hover:bg-gray-100">
+                  Bay 1
+                </SelectItem>
+                <SelectItem value="2" className="hover:bg-gray-100">
+                  Bay 2
+                </SelectItem>
+                <SelectItem value="3" className="hover:bg-gray-100">
+                  Bay 3
+                </SelectItem>
               </SelectContent>
             </Select>
 
             {/* View mode selection */}
             <Select
               value={viewMode}
-              onValueChange={(value) => setViewMode(value as "Day" | "Week" | "Month")}
+              onValueChange={(value) =>
+                setViewMode(value as "Day" | "Week" | "Month")
+              }
             >
               <SelectTrigger className="w-[180px] bg-white">
                 <SelectValue placeholder="Select view" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                <SelectItem value="Day" className="hover:bg-gray-100">Day View</SelectItem>
-                <SelectItem value="Week" className="hover:bg-gray-100">Week View</SelectItem>
-                <SelectItem value="Month" className="hover:bg-gray-100">Month View</SelectItem>
+                <SelectItem value="Day" className="hover:bg-gray-100">
+                  Day View
+                </SelectItem>
+                <SelectItem value="Week" className="hover:bg-gray-100">
+                  Week View
+                </SelectItem>
+                <SelectItem value="Month" className="hover:bg-gray-100">
+                  Month View
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
