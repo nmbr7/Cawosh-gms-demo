@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Mail, Bell, Search } from 'lucide-react';
-import { useAuthStore } from '@/store/auth';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Mail, Bell, Search } from "lucide-react";
+import { useAuthStore } from "@/store/auth";
 
 export default function Header() {
   const [showMessages, setShowMessages] = useState(false);
@@ -18,8 +18,10 @@ export default function Header() {
     <header className="flex items-center justify-between p-4 bg-white text-black shadow-md">
       {/* Left section - Greeting */}
       <div>
-        <h1 className="text-xl font-bold">Hi, {user?.firstName} {user?.lastName}</h1>
-        <p className="text-sm">Let's check your Garage today</p>
+        <h1 className="text-xl font-bold">
+          Hi, {user?.firstName} {user?.lastName}
+        </h1>
+        <p className="text-sm">Let&apos;s check your Garage today</p>
       </div>
 
       {/* Center section - Search and notifications */}
@@ -31,7 +33,7 @@ export default function Header() {
               type="text"
               placeholder="Search..."
               className="w-full p-2.5 rounded-lg bg-gray-200 text-black pl-10 pr-10"
-              onFocus={() => console.log('Focus search')}
+              onFocus={() => console.log("Focus search")}
             />
             <span className="absolute right-4 top-2.5 text-gray-500">⌘ K</span>
           </div>
@@ -41,14 +43,22 @@ export default function Header() {
                 <Mail className="h-6 w-6" />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
               </button>
-              {showMessages && <div className="absolute bg-white text-black p-4 shadow-lg rounded-md">Mock Messages</div>}
+              {showMessages && (
+                <div className="absolute bg-white text-black p-4 shadow-lg rounded-md">
+                  Mock Messages
+                </div>
+              )}
             </div>
             <div className="relative">
               <button onClick={toggleNotifications}>
                 <Bell className="h-6 w-6" />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
               </button>
-              {showNotifications && <div className="absolute bg-white text-black p-4 shadow-lg rounded-md">Mock Notifications</div>}
+              {showNotifications && (
+                <div className="absolute bg-white text-black p-4 shadow-lg rounded-md">
+                  Mock Notifications
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -58,19 +68,36 @@ export default function Header() {
       <div className="relative flex items-center space-x-3">
         <div className="h-10 w-10 rounded-full bg-gray-300"></div>
         <div className="flex flex-col">
-          <span>{user?.firstName} {user?.lastName}</span>
+          <span>
+            {user?.firstName} {user?.lastName}
+          </span>
           <span className="text-sm text-gray-500">{user?.role}</span>
         </div>
         <button onClick={toggleProfileMenu}>
           {showProfileMenu && (
             <div className="absolute right-0 mt-2 w-48 bg-white text-black p-4 shadow-lg rounded-md">
-              <button onClick={() => router.push('/profile')} className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded">Profile</button>
-              <button onClick={() => router.push('/settings')} className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded">Settings</button>
-              <button onClick={() => router.push('/logout')} className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded">Logout</button>
+              <button
+                onClick={() => router.push("/profile")}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded"
+              >
+                Profile
+              </button>
+              <button
+                onClick={() => router.push("/settings")}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded"
+              >
+                Settings
+              </button>
+              <button
+                onClick={() => router.push("/logout")}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded"
+              >
+                Logout
+              </button>
             </div>
           )}
         </button>
       </div>
     </header>
   );
-} 
+}

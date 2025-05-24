@@ -1,0 +1,1367 @@
+{
+  "users": [
+    {
+      "id": "user_001",
+      "email": "admin@cawosh.com",
+      "password": "admin123",
+      "firstName": "Admin",
+      "lastName": "User",
+      "role": "admin",
+      "position": "System Administrator",
+      "permissions": ["all"],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user_002",
+      "email": "manager@cawosh.com",
+      "password": "manager123",
+      "firstName": "Manager",
+      "lastName": "User",
+      "role": "manager",
+      "position": "Service Manager",
+      "permissions": ["manage_bookings", "manage_technicians", "view_reports"],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user_003",
+      "email": "technician@cawosh.com",
+      "password": "tech123",
+      "firstName": "Technician",
+      "lastName": "User",
+      "role": "technician",
+      "position": "Senior Technician",
+      "permissions": ["view_bookings", "update_job_sheets"],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user_004",
+      "email": "imran@cawosh.com",
+      "password": "tech123",
+      "firstName": "Imran",
+      "lastName": "Ali",
+      "role": "technician",
+      "position": "Senior Technician",
+      "permissions": ["view_bookings", "update_job_sheets"],
+      "specializations": [
+        "brakes",
+        "engine",
+        "battery",
+        "electrical",
+        "diagnostics"
+      ],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user_005",
+      "email": "ahmed@cawosh.com",
+      "password": "tech123",
+      "firstName": "Ahmed",
+      "lastName": "Hassan",
+      "role": "technician",
+      "position": "Transmission Specialist",
+      "permissions": ["view_bookings", "update_job_sheets"],
+      "specializations": ["transmission", "clutch", "gearbox", "drivetrain"],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user_006",
+      "email": "mohammed@cawosh.com",
+      "password": "tech123",
+      "firstName": "Mohammed",
+      "lastName": "Khan",
+      "role": "technician",
+      "position": "Suspension Specialist",
+      "permissions": ["view_bookings", "update_job_sheets"],
+      "specializations": ["suspension", "steering", "alignment", "tires"],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user_007",
+      "email": "sarah@cawosh.com",
+      "password": "tech123",
+      "firstName": "Sarah",
+      "lastName": "Ahmed",
+      "role": "technician",
+      "position": "AC Specialist",
+      "permissions": ["view_bookings", "update_job_sheets"],
+      "specializations": ["ac", "heating", "ventilation", "climate_control"],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user_008",
+      "email": "fatima@cawosh.com",
+      "password": "tech123",
+      "firstName": "Fatima",
+      "lastName": "Zahra",
+      "role": "technician",
+      "position": "Hybrid Specialist",
+      "permissions": ["view_bookings", "update_job_sheets"],
+      "specializations": ["hybrid", "electric", "battery", "electronics"],
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "BK-001",
+      "serviceId": "svc_001",
+      "serviceName": "Oil Change",
+      "date": "2025-05-15",
+      "startTime": "09:00",
+      "endTime": "10:00",
+      "bay": 1,
+      "status": "completed",
+      "car": {
+        "make": "Toyota",
+        "model": "Camry",
+        "year": 2022,
+        "registration": "ABC123"
+      },
+      "customer": {
+        "name": "John Smith",
+        "email": "john.smith@email.com",
+        "phone": "+971501234567",
+        "notes": "Regular customer, prefers morning appointments"
+      }
+    },
+    {
+      "id": "BK-002",
+      "serviceId": "svc_002",
+      "serviceName": "Brake Service",
+      "date": "2025-05-15",
+      "startTime": "10:30",
+      "endTime": "12:00",
+      "bay": 2,
+      "status": "completed",
+      "car": {
+        "make": "Honda",
+        "model": "Civic",
+        "year": 2021,
+        "registration": "DEF456"
+      },
+      "customer": {
+        "name": "Sarah Johnson",
+        "email": "sarah.j@email.com",
+        "phone": "+971502345678",
+        "notes": "First time customer"
+      }
+    },
+    {
+      "id": "BK-003",
+      "serviceId": "svc_003",
+      "serviceName": "Battery Replacement",
+      "date": "2025-05-15",
+      "startTime": "13:00",
+      "endTime": "13:45",
+      "bay": 3,
+      "status": "completed",
+      "car": {
+        "make": "Ford",
+        "model": "Focus",
+        "year": 2020,
+        "registration": "GHI789"
+      },
+      "customer": {
+        "name": "Michael Brown",
+        "email": "m.brown@email.com",
+        "phone": "+971503456789",
+        "notes": "Company vehicle"
+      }
+    },
+    {
+      "id": "BK-004",
+      "serviceId": "svc_001",
+      "serviceName": "Oil Change",
+      "date": "2025-05-16",
+      "startTime": "09:00",
+      "endTime": "10:00",
+      "bay": 1,
+      "status": "completed",
+      "car": {
+        "make": "BMW",
+        "model": "3 Series",
+        "year": 2023,
+        "registration": "JKL012"
+      },
+      "customer": {
+        "name": "Emma Wilson",
+        "email": "emma.w@email.com",
+        "phone": "+971504567890",
+        "notes": "VIP customer"
+      }
+    },
+    {
+      "id": "BK-005",
+      "serviceId": "svc_004",
+      "serviceName": "Transmission Service",
+      "date": "2025-05-16",
+      "startTime": "10:30",
+      "endTime": "12:30",
+      "bay": 2,
+      "status": "completed",
+      "car": {
+        "make": "Mercedes",
+        "model": "C-Class",
+        "year": 2022,
+        "registration": "MNO345"
+      },
+      "customer": {
+        "name": "David Lee",
+        "email": "d.lee@email.com",
+        "phone": "+971505678901",
+        "notes": "Regular maintenance"
+      }
+    },
+    {
+      "id": "BK-006",
+      "serviceId": "svc_005",
+      "serviceName": "Wheel Alignment",
+      "date": "2025-05-16",
+      "startTime": "13:00",
+      "endTime": "14:00",
+      "bay": 3,
+      "status": "completed",
+      "car": {
+        "make": "Audi",
+        "model": "A4",
+        "year": 2021,
+        "registration": "PQR678"
+      },
+      "customer": {
+        "name": "Lisa Anderson",
+        "email": "l.anderson@email.com",
+        "phone": "+971506789012",
+        "notes": "Complained about steering"
+      }
+    },
+    {
+      "id": "BK-007",
+      "serviceId": "svc_006",
+      "serviceName": "AC Service",
+      "date": "2025-05-17",
+      "startTime": "09:00",
+      "endTime": "10:30",
+      "bay": 1,
+      "status": "completed",
+      "car": {
+        "make": "Lexus",
+        "model": "ES",
+        "year": 2023,
+        "registration": "STU901"
+      },
+      "customer": {
+        "name": "Robert Taylor",
+        "email": "r.taylor@email.com",
+        "phone": "+971507890123",
+        "notes": "AC not cooling properly"
+      }
+    },
+    {
+      "id": "BK-008",
+      "serviceId": "svc_007",
+      "serviceName": "Hybrid Battery Service",
+      "date": "2025-05-17",
+      "startTime": "11:00",
+      "endTime": "13:00",
+      "bay": 2,
+      "status": "completed",
+      "car": {
+        "make": "Toyota",
+        "model": "Prius",
+        "year": 2022,
+        "registration": "VWX234"
+      },
+      "customer": {
+        "name": "Maria Garcia",
+        "email": "m.garcia@email.com",
+        "phone": "+971508901234",
+        "notes": "Hybrid battery warning light"
+      }
+    },
+    {
+      "id": "BK-009",
+      "serviceId": "svc_001",
+      "serviceName": "Oil Change",
+      "date": "2025-05-18",
+      "startTime": "09:00",
+      "endTime": "10:00",
+      "bay": 1,
+      "status": "completed",
+      "car": {
+        "make": "Hyundai",
+        "model": "Sonata",
+        "year": 2021,
+        "registration": "YZA567"
+      },
+      "customer": {
+        "name": "James Wilson",
+        "email": "j.wilson@email.com",
+        "phone": "+971509012345",
+        "notes": "Regular customer"
+      }
+    },
+    {
+      "id": "BK-010",
+      "serviceId": "svc_002",
+      "serviceName": "Brake Service",
+      "date": "2025-05-18",
+      "startTime": "10:30",
+      "endTime": "12:00",
+      "bay": 2,
+      "status": "completed",
+      "car": {
+        "make": "Kia",
+        "model": "Optima",
+        "year": 2020,
+        "registration": "BCD890"
+      },
+      "customer": {
+        "name": "Patricia Martinez",
+        "email": "p.martinez@email.com",
+        "phone": "+971500123456",
+        "notes": "Brake noise complaint"
+      }
+    },
+    {
+      "id": "BK-011",
+      "serviceId": "svc_003",
+      "serviceName": "Battery Replacement",
+      "date": "2025-05-18",
+      "startTime": "13:00",
+      "endTime": "13:45",
+      "bay": 3,
+      "status": "completed",
+      "car": {
+        "make": "Nissan",
+        "model": "Altima",
+        "year": 2022,
+        "registration": "EFG123"
+      },
+      "customer": {
+        "name": "Thomas White",
+        "email": "t.white@email.com",
+        "phone": "+971501234567",
+        "notes": "Battery died overnight"
+      }
+    },
+    {
+      "id": "BK-012",
+      "serviceId": "svc_006",
+      "serviceName": "AC Service",
+      "date": "2025-05-19",
+      "startTime": "09:00",
+      "endTime": "10:30",
+      "bay": 1,
+      "status": "completed",
+      "car": {
+        "make": "Volkswagen",
+        "model": "Passat",
+        "year": 2021,
+        "registration": "HIJ456"
+      },
+      "customer": {
+        "name": "Jennifer Davis",
+        "email": "j.davis@email.com",
+        "phone": "+971502345678",
+        "notes": "AC not working in hot weather"
+      }
+    },
+    {
+      "id": "BK-013",
+      "serviceId": "svc_007",
+      "serviceName": "Hybrid Battery Service",
+      "date": "2025-05-19",
+      "startTime": "11:00",
+      "endTime": "13:00",
+      "bay": 2,
+      "status": "completed",
+      "car": {
+        "make": "Toyota",
+        "model": "RAV4 Hybrid",
+        "year": 2023,
+        "registration": "KLM789"
+      },
+      "customer": {
+        "name": "William Thompson",
+        "email": "w.thompson@email.com",
+        "phone": "+971503456789",
+        "notes": "Hybrid system warning"
+      }
+    },
+    {
+      "id": "BK-014",
+      "serviceId": "svc_001",
+      "serviceName": "Oil Change",
+      "date": "2025-05-19",
+      "startTime": "13:30",
+      "endTime": "14:30",
+      "bay": 3,
+      "status": "completed",
+      "car": {
+        "make": "Mazda",
+        "model": "6",
+        "year": 2022,
+        "registration": "NOP012"
+      },
+      "customer": {
+        "name": "Elizabeth Clark",
+        "email": "e.clark@email.com",
+        "phone": "+971504567890",
+        "notes": "Regular maintenance"
+      }
+    },
+    {
+      "id": "BK-015",
+      "serviceId": "svc_004",
+      "serviceName": "Transmission Service",
+      "date": "2025-05-20",
+      "startTime": "09:00",
+      "endTime": "11:00",
+      "bay": 1,
+      "status": "completed",
+      "car": {
+        "make": "Subaru",
+        "model": "Legacy",
+        "year": 2021,
+        "registration": "QRS345"
+      },
+      "customer": {
+        "name": "Richard Lewis",
+        "email": "r.lewis@email.com",
+        "phone": "+971505678901",
+        "notes": "Transmission issues"
+      }
+    },
+    {
+      "id": "BK-016",
+      "serviceId": "svc_005",
+      "serviceName": "Wheel Alignment",
+      "date": "2025-05-20",
+      "startTime": "11:30",
+      "endTime": "12:30",
+      "bay": 2,
+      "status": "completed",
+      "car": {
+        "make": "Volvo",
+        "model": "S60",
+        "year": 2023,
+        "registration": "TUV678"
+      },
+      "customer": {
+        "name": "Susan Walker",
+        "email": "s.walker@email.com",
+        "phone": "+971506789012",
+        "notes": "Wheel alignment needed"
+      }
+    },
+    {
+      "id": "BK-017",
+      "serviceId": "svc_006",
+      "serviceName": "AC Service",
+      "date": "2025-05-20",
+      "startTime": "13:00",
+      "endTime": "14:30",
+      "bay": 3,
+      "status": "completed",
+      "car": {
+        "make": "Infiniti",
+        "model": "Q50",
+        "year": 2022,
+        "registration": "WXY901"
+      },
+      "customer": {
+        "name": "Daniel Hall",
+        "email": "d.hall@email.com",
+        "phone": "+971507890123",
+        "notes": "AC compressor noise"
+      }
+    },
+    {
+      "id": "BK-018",
+      "serviceId": "svc_007",
+      "serviceName": "Hybrid Battery Service",
+      "date": "2025-05-21",
+      "startTime": "09:00",
+      "endTime": "11:00",
+      "bay": 1,
+      "status": "completed",
+      "car": {
+        "make": "Toyota",
+        "model": "Highlander Hybrid",
+        "year": 2023,
+        "registration": "ZAB234"
+      },
+      "customer": {
+        "name": "Margaret Allen",
+        "email": "m.allen@email.com",
+        "phone": "+971508901234",
+        "notes": "Hybrid battery check"
+      }
+    },
+    {
+      "id": "BK-019",
+      "serviceId": "svc_001",
+      "serviceName": "Oil Change",
+      "date": "2025-05-21",
+      "startTime": "11:30",
+      "endTime": "12:30",
+      "bay": 2,
+      "status": "completed",
+      "car": {
+        "make": "Chevrolet",
+        "model": "Malibu",
+        "year": 2021,
+        "registration": "CDE567"
+      },
+      "customer": {
+        "name": "Joseph Young",
+        "email": "j.young@email.com",
+        "phone": "+971509012345",
+        "notes": "Regular oil change"
+      }
+    },
+    {
+      "id": "BK-020",
+      "serviceId": "svc_002",
+      "serviceName": "Brake Service",
+      "date": "2025-05-21",
+      "startTime": "13:00",
+      "endTime": "14:30",
+      "bay": 3,
+      "status": "completed",
+      "car": {
+        "make": "Buick",
+        "model": "Regal",
+        "year": 2022,
+        "registration": "FGH890"
+      },
+      "customer": {
+        "name": "Nancy King",
+        "email": "n.king@email.com",
+        "phone": "+971500123456",
+        "notes": "Brake service requested"
+      }
+    }
+  ],
+  "jobSheets": [
+    {
+      "id": "JB-001",
+      "bookingId": "BK-001",
+      "technicianId": "tech_001",
+      "checklist": [
+        {
+          "task": "Oil Change",
+          "status": "completed"
+        },
+        {
+          "task": "Oil Filter Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Check Oil Level",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_001",
+          "itemName": "Synthetic Oil 5W-30",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_002",
+          "itemName": "Oil Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-002",
+      "bookingId": "BK-002",
+      "technicianId": "tech_002",
+      "checklist": [
+        {
+          "task": "Brake Pad Inspection",
+          "status": "completed"
+        },
+        {
+          "task": "Brake Pad Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Brake Fluid Check",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_003",
+          "itemName": "Brake Pads",
+          "quantity": 4
+        },
+        {
+          "itemId": "part_004",
+          "itemName": "Brake Fluid",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-003",
+      "bookingId": "BK-003",
+      "technicianId": "tech_003",
+      "checklist": [
+        {
+          "task": "Battery Test",
+          "status": "completed"
+        },
+        {
+          "task": "Battery Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Terminal Cleaning",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_005",
+          "itemName": "Car Battery",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-004",
+      "bookingId": "BK-004",
+      "technicianId": "tech_001",
+      "checklist": [
+        {
+          "task": "Oil Change",
+          "status": "completed"
+        },
+        {
+          "task": "Oil Filter Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Check Oil Level",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_001",
+          "itemName": "Synthetic Oil 5W-30",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_002",
+          "itemName": "Oil Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-005",
+      "bookingId": "BK-005",
+      "technicianId": "tech_002",
+      "checklist": [
+        {
+          "task": "Transmission Fluid Check",
+          "status": "completed"
+        },
+        {
+          "task": "Transmission Fluid Change",
+          "status": "completed"
+        },
+        {
+          "task": "Transmission Filter Replacement",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_006",
+          "itemName": "Transmission Fluid",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_007",
+          "itemName": "Transmission Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-006",
+      "bookingId": "BK-006",
+      "technicianId": "tech_003",
+      "checklist": [
+        {
+          "task": "Wheel Alignment Check",
+          "status": "completed"
+        },
+        {
+          "task": "Wheel Alignment Adjustment",
+          "status": "completed"
+        },
+        {
+          "task": "Tire Pressure Check",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [],
+      "status": "completed"
+    },
+    {
+      "id": "JB-007",
+      "bookingId": "BK-007",
+      "technicianId": "tech_004",
+      "checklist": [
+        {
+          "task": "AC System Inspection",
+          "status": "completed"
+        },
+        {
+          "task": "AC Refrigerant Recharge",
+          "status": "completed"
+        },
+        {
+          "task": "AC Filter Replacement",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_008",
+          "itemName": "AC Refrigerant",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_009",
+          "itemName": "AC Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-008",
+      "bookingId": "BK-008",
+      "technicianId": "tech_005",
+      "checklist": [
+        {
+          "task": "Hybrid Battery Check",
+          "status": "completed"
+        },
+        {
+          "task": "Hybrid System Diagnostics",
+          "status": "completed"
+        },
+        {
+          "task": "Battery Health Report",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [],
+      "status": "completed"
+    },
+    {
+      "id": "JB-009",
+      "bookingId": "BK-009",
+      "technicianId": "tech_001",
+      "checklist": [
+        {
+          "task": "Oil Change",
+          "status": "completed"
+        },
+        {
+          "task": "Oil Filter Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Check Oil Level",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_001",
+          "itemName": "Synthetic Oil 5W-30",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_002",
+          "itemName": "Oil Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-010",
+      "bookingId": "BK-010",
+      "technicianId": "tech_002",
+      "checklist": [
+        {
+          "task": "Brake Pad Inspection",
+          "status": "completed"
+        },
+        {
+          "task": "Brake Pad Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Brake Fluid Check",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_003",
+          "itemName": "Brake Pads",
+          "quantity": 4
+        },
+        {
+          "itemId": "part_004",
+          "itemName": "Brake Fluid",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-011",
+      "bookingId": "BK-011",
+      "technicianId": "tech_003",
+      "checklist": [
+        {
+          "task": "Battery Test",
+          "status": "completed"
+        },
+        {
+          "task": "Battery Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Terminal Cleaning",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_005",
+          "itemName": "Car Battery",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-012",
+      "bookingId": "BK-012",
+      "technicianId": "tech_004",
+      "checklist": [
+        {
+          "task": "AC System Inspection",
+          "status": "completed"
+        },
+        {
+          "task": "AC Refrigerant Recharge",
+          "status": "completed"
+        },
+        {
+          "task": "AC Filter Replacement",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_008",
+          "itemName": "AC Refrigerant",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_009",
+          "itemName": "AC Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-013",
+      "bookingId": "BK-013",
+      "technicianId": "tech_005",
+      "checklist": [
+        {
+          "task": "Hybrid Battery Check",
+          "status": "completed"
+        },
+        {
+          "task": "Hybrid System Diagnostics",
+          "status": "completed"
+        },
+        {
+          "task": "Battery Health Report",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [],
+      "status": "completed"
+    },
+    {
+      "id": "JB-014",
+      "bookingId": "BK-014",
+      "technicianId": "tech_001",
+      "checklist": [
+        {
+          "task": "Oil Change",
+          "status": "completed"
+        },
+        {
+          "task": "Oil Filter Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Check Oil Level",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_001",
+          "itemName": "Synthetic Oil 5W-30",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_002",
+          "itemName": "Oil Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-015",
+      "bookingId": "BK-015",
+      "technicianId": "tech_002",
+      "checklist": [
+        {
+          "task": "Transmission Fluid Check",
+          "status": "completed"
+        },
+        {
+          "task": "Transmission Fluid Change",
+          "status": "completed"
+        },
+        {
+          "task": "Transmission Filter Replacement",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_006",
+          "itemName": "Transmission Fluid",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_007",
+          "itemName": "Transmission Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-016",
+      "bookingId": "BK-016",
+      "technicianId": "tech_003",
+      "checklist": [
+        {
+          "task": "Wheel Alignment Check",
+          "status": "completed"
+        },
+        {
+          "task": "Wheel Alignment Adjustment",
+          "status": "completed"
+        },
+        {
+          "task": "Tire Pressure Check",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [],
+      "status": "completed"
+    },
+    {
+      "id": "JB-017",
+      "bookingId": "BK-017",
+      "technicianId": "tech_004",
+      "checklist": [
+        {
+          "task": "AC System Inspection",
+          "status": "completed"
+        },
+        {
+          "task": "AC Refrigerant Recharge",
+          "status": "completed"
+        },
+        {
+          "task": "AC Filter Replacement",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_008",
+          "itemName": "AC Refrigerant",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_009",
+          "itemName": "AC Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-018",
+      "bookingId": "BK-018",
+      "technicianId": "tech_005",
+      "checklist": [
+        {
+          "task": "Hybrid Battery Check",
+          "status": "completed"
+        },
+        {
+          "task": "Hybrid System Diagnostics",
+          "status": "completed"
+        },
+        {
+          "task": "Battery Health Report",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [],
+      "status": "completed"
+    },
+    {
+      "id": "JB-019",
+      "bookingId": "BK-019",
+      "technicianId": "tech_001",
+      "checklist": [
+        {
+          "task": "Oil Change",
+          "status": "completed"
+        },
+        {
+          "task": "Oil Filter Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Check Oil Level",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_001",
+          "itemName": "Synthetic Oil 5W-30",
+          "quantity": 1
+        },
+        {
+          "itemId": "part_002",
+          "itemName": "Oil Filter",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    },
+    {
+      "id": "JB-020",
+      "bookingId": "BK-020",
+      "technicianId": "tech_002",
+      "checklist": [
+        {
+          "task": "Brake Pad Inspection",
+          "status": "completed"
+        },
+        {
+          "task": "Brake Pad Replacement",
+          "status": "completed"
+        },
+        {
+          "task": "Brake Fluid Check",
+          "status": "completed"
+        }
+      ],
+      "partsUsed": [
+        {
+          "itemId": "part_003",
+          "itemName": "Brake Pads",
+          "quantity": 4
+        },
+        {
+          "itemId": "part_004",
+          "itemName": "Brake Fluid",
+          "quantity": 1
+        }
+      ],
+      "status": "completed"
+    }
+  ],
+  "technicians": [
+    {
+      "id": "tech_001",
+      "userId": "user_004",
+      "name": "Imran Ali",
+      "specializations": [
+        "brakes",
+        "engine",
+        "battery",
+        "electrical",
+        "diagnostics"
+      ],
+      "isAvailable": true,
+      "currentJobId": null
+    },
+    {
+      "id": "tech_002",
+      "userId": "user_005",
+      "name": "Ahmed Hassan",
+      "specializations": ["transmission", "clutch", "gearbox", "drivetrain"],
+      "isAvailable": true,
+      "currentJobId": null
+    },
+    {
+      "id": "tech_003",
+      "userId": "user_006",
+      "name": "Mohammed Khan",
+      "specializations": ["suspension", "steering", "alignment", "tires"],
+      "isAvailable": true,
+      "currentJobId": null
+    },
+    {
+      "id": "tech_004",
+      "userId": "user_007",
+      "name": "Sarah Ahmed",
+      "specializations": ["ac", "heating", "ventilation", "climate_control"],
+      "isAvailable": true,
+      "currentJobId": null
+    },
+    {
+      "id": "tech_005",
+      "userId": "user_008",
+      "name": "Fatima Zahra",
+      "specializations": ["hybrid", "electric", "battery", "electronics"],
+      "isAvailable": true,
+      "currentJobId": null
+    }
+  ],
+  "inventory": [
+    {
+      "id": "part_001",
+      "name": "Synthetic Oil 5W-30",
+      "category": "fluids",
+      "quantity": 50,
+      "unit": "liters",
+      "price": 15.99,
+      "minStockLevel": 10
+    },
+    {
+      "id": "part_002",
+      "name": "Oil Filter",
+      "category": "filters",
+      "quantity": 30,
+      "unit": "pieces",
+      "price": 8.99,
+      "minStockLevel": 5
+    },
+    {
+      "id": "part_003",
+      "name": "Brake Pads",
+      "category": "brakes",
+      "quantity": 20,
+      "unit": "sets",
+      "price": 45.99,
+      "minStockLevel": 5
+    },
+    {
+      "id": "part_004",
+      "name": "Brake Fluid",
+      "category": "fluids",
+      "quantity": 25,
+      "unit": "liters",
+      "price": 12.99,
+      "minStockLevel": 5
+    },
+    {
+      "id": "part_005",
+      "name": "Car Battery",
+      "category": "electrical",
+      "quantity": 10,
+      "unit": "pieces",
+      "price": 120.99,
+      "minStockLevel": 2
+    },
+    {
+      "id": "part_006",
+      "name": "Transmission Fluid",
+      "category": "fluids",
+      "quantity": 30,
+      "unit": "liters",
+      "price": 18.99,
+      "minStockLevel": 5
+    },
+    {
+      "id": "part_007",
+      "name": "Transmission Filter",
+      "category": "filters",
+      "quantity": 15,
+      "unit": "pieces",
+      "price": 25.99,
+      "minStockLevel": 3
+    },
+    {
+      "id": "part_008",
+      "name": "AC Refrigerant",
+      "category": "ac",
+      "quantity": 20,
+      "unit": "cans",
+      "price": 35.99,
+      "minStockLevel": 5
+    },
+    {
+      "id": "part_009",
+      "name": "AC Filter",
+      "category": "filters",
+      "quantity": 25,
+      "unit": "pieces",
+      "price": 15.99,
+      "minStockLevel": 5
+    }
+  ],
+  "services": [
+    {
+      "id": "svc_001",
+      "name": "Oil Change",
+      "description": "Complete oil change service including filter replacement",
+      "basePrice": 100,
+      "baseDuration": 60,
+      "category": "maintenance"
+    },
+    {
+      "id": "svc_002",
+      "name": "Brake Service",
+      "description": "Brake pad replacement and brake fluid check",
+      "basePrice": 150,
+      "baseDuration": 90,
+      "category": "brakes"
+    },
+    {
+      "id": "svc_003",
+      "name": "Battery Replacement",
+      "description": "Battery testing and replacement service",
+      "basePrice": 200,
+      "baseDuration": 45,
+      "category": "electrical"
+    },
+    {
+      "id": "svc_004",
+      "name": "Transmission Service",
+      "description": "Transmission fluid change and filter replacement",
+      "basePrice": 250,
+      "baseDuration": 120,
+      "category": "transmission"
+    },
+    {
+      "id": "svc_005",
+      "name": "Wheel Alignment",
+      "description": "Complete wheel alignment service",
+      "basePrice": 80,
+      "baseDuration": 60,
+      "category": "suspension"
+    },
+    {
+      "id": "svc_006",
+      "name": "AC Service",
+      "description": "AC system check and refrigerant recharge",
+      "basePrice": 180,
+      "baseDuration": 90,
+      "category": "ac"
+    },
+    {
+      "id": "svc_007",
+      "name": "Hybrid Battery Service",
+      "description": "Hybrid battery health check and diagnostics",
+      "basePrice": 300,
+      "baseDuration": 120,
+      "category": "electrical"
+    }
+  ],
+  "garages": [
+    {
+      "id": "garage_001",
+      "name": "FastFix Garage",
+      "services": [
+        {
+          "serviceId": "svc_001",
+          "isActive": true,
+          "customPrice": 120,
+          "customDuration": 75
+        },
+        {
+          "serviceId": "svc_002",
+          "isActive": true,
+          "customPrice": 180,
+          "customDuration": 90
+        },
+        {
+          "serviceId": "svc_003",
+          "isActive": true,
+          "customPrice": 220,
+          "customDuration": 45
+        },
+        {
+          "serviceId": "svc_004",
+          "isActive": true,
+          "customPrice": 280,
+          "customDuration": 120
+        },
+        {
+          "serviceId": "svc_005",
+          "isActive": true,
+          "customPrice": 100,
+          "customDuration": 60
+        },
+        {
+          "serviceId": "svc_006",
+          "isActive": true,
+          "customPrice": 200,
+          "customDuration": 90
+        },
+        {
+          "serviceId": "svc_007",
+          "isActive": false
+        }
+      ]
+    }
+  ]
+}

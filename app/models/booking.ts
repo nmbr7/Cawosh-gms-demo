@@ -1,75 +1,90 @@
-import { CarData } from './car';
+import { CarData } from "./car";
 
-export type BookingStatus = 'scheduled' | 'ongoing' | 'completed' | 'blocked' | 'break';
+export type BookingStatus =
+  | "scheduled"
+  | "ongoing"
+  | "completed"
+  | "blocked"
+  | "break";
+
+interface CustomerData {
+  name: string;
+  email: string;
+  phone: string;
+  notes: string;
+}
 
 export interface BookingData {
   id: string;
-  customerName: string;
+  serviceId: string;
+  serviceName: string;
+  customer: CustomerData;
   car: CarData;
   date: string;
   startTime: string;
   endTime: string;
-  description: string;
   bay: number;
   status: BookingStatus;
 }
 
 export class Booking {
   id: string;
-  customerName: string;
+  serviceId: string;
+  serviceName: string;
+  customer: CustomerData;
   car: CarData;
   date: string;
   startTime: string;
   endTime: string;
-  description: string;
   bay: number;
   status: BookingStatus;
 
   constructor(data: BookingData) {
     this.id = data.id;
-    this.customerName = data.customerName;
+    this.serviceId = data.serviceId;
+    this.serviceName = data.serviceName;
+    this.customer = data.customer;
     this.car = data.car;
     this.date = data.date;
     this.startTime = data.startTime;
     this.endTime = data.endTime;
-    this.description = data.description;
     this.bay = data.bay;
     this.status = data.status;
   }
 
   getStatusColor(): string {
     switch (this.status) {
-      case 'scheduled':
-        return 'bg-purple-100 text-purple-800';
-      case 'ongoing':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'blocked':
-        return 'bg-red-100 text-red-800';
-      case 'break':
-        return 'bg-gray-200 text-gray-600';
+      case "scheduled":
+        return "bg-purple-100 text-purple-800";
+      case "ongoing":
+        return "bg-yellow-100 text-yellow-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "blocked":
+        return "bg-red-100 text-red-800";
+      case "break":
+        return "bg-gray-200 text-gray-600";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   }
 
   isBlocked(): boolean {
-    return this.status === 'blocked' || this.status === 'break';
+    return this.status === "blocked" || this.status === "break";
   }
 
   isBreak(): boolean {
-    return this.status === 'break';
+    return this.status === "break";
   }
 
   getDuration(): number {
-    const start: number = parseInt(this.startTime.split(':')[0]);
-    const end: number = parseInt(this.endTime.split(':')[0]);
+    const start: number = parseInt(this.startTime.split(":")[0]);
+    const end: number = parseInt(this.endTime.split(":")[0]);
     return end - start;
   }
 
   getTopPosition(): number {
-    const startHour: number = parseInt(this.startTime.split(':')[0]);
+    const startHour: number = parseInt(this.startTime.split(":")[0]);
     return (startHour - 8) * 60; // Assuming 8 AM is the start time
   }
 
@@ -79,7 +94,7 @@ export class Booking {
 
   // Helper method to convert time string to minutes since 8 AM
   private timeToMinutes(time: string): number {
-    const [hours, minutes]: number[] = time.split(':').map(Number);
+    const [hours, minutes]: number[] = time.split(":").map(Number);
     return (hours - 8) * 60 + minutes;
   }
 
@@ -107,4 +122,4 @@ export class Booking {
     const end: number = this.timeToMinutes(this.endTime);
     return start >= 0 && end <= 540 && start < end; // 540 minutes = 9 hours (8 AM to 5 PM)
   }
-} 
+}

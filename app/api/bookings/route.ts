@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import mockBookings from "@/app/data/mock-bookings.json";
+import mockBookings from "@/app/mock-db/db.json";
 
 export async function GET(request: Request): Promise<NextResponse> {
   // Add 1 second delay
@@ -29,39 +29,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0)
   );
 
-  console.log("startDate", searchParams.get("startDate"));
-  console.log("endDate", searchParams.get("endDate"));
-
-  console.log("firstDayOfMonth", firstDayOfMonth);
-  console.log("lastDayOfMonth", lastDayOfMonth);
-
-  console.log(searchParams.get("startDate") || firstDayOfMonth);
-  console.log(searchParams.get("endDate") || lastDayOfMonth);
-
   const startDate = new Date(searchParams.get("startDate") || firstDayOfMonth);
   const endDate = new Date(searchParams.get("endDate") || lastDayOfMonth);
   // Sort parameters
   const sortBy: string = searchParams.get("sortBy") || "date";
   const sortOrder: "asc" | "desc" = (searchParams.get("sortOrder") ||
     "desc") as "asc" | "desc";
-
-  // Log request parameters
-  console.log("API Request:", {
-    page,
-    limit,
-    filters: {
-      bay,
-      status,
-      customerName,
-      description,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-    },
-    sort: {
-      by: sortBy,
-      order: sortOrder,
-    },
-  });
 
   // Apply filters
   const filteredBookings = mockBookings.bookings.filter((booking) => {
@@ -139,13 +112,6 @@ export async function GET(request: Request): Promise<NextResponse> {
       itemsPerPage: limit,
     },
   };
-
-  // Log response
-  console.log("API Response:", {
-    totalItems: filteredBookings.length,
-    returnedItems: paginatedBookings.length,
-    pagination: response.pagination,
-  });
 
   return NextResponse.json(response);
 }

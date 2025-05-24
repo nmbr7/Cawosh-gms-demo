@@ -23,7 +23,15 @@
       "startTime": "09:00",
       "endTime": "10:00",
       "bay": 1,
-      "status": "completed"
+      "status": "completed",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_021",
+      "serviceStatus": "completed",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B002",
@@ -48,7 +56,15 @@
       "startTime": "10:30",
       "endTime": "12:00",
       "bay": 2,
-      "status": "completed"
+      "status": "completed",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_022",
+      "serviceStatus": "completed",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B003",
@@ -73,7 +89,15 @@
       "startTime": "13:00",
       "endTime": "14:00",
       "bay": 3,
-      "status": "completed"
+      "status": "completed",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_023",
+      "serviceStatus": "completed",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B004",
@@ -98,7 +122,15 @@
       "startTime": "14:30",
       "endTime": "15:30",
       "bay": 1,
-      "status": "completed"
+      "status": "completed",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_024",
+      "serviceStatus": "completed",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B005",
@@ -123,7 +155,15 @@
       "startTime": "08:00",
       "endTime": "10:00",
       "bay": 2,
-      "status": "completed"
+      "status": "completed",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_025",
+      "serviceStatus": "completed",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B006",
@@ -148,7 +188,15 @@
       "startTime": "11:00",
       "endTime": "12:30",
       "bay": 3,
-      "status": "ongoing"
+      "status": "ongoing",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_026",
+      "serviceStatus": "in_progress",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B007",
@@ -173,7 +221,15 @@
       "startTime": "09:30",
       "endTime": "11:00",
       "bay": 1,
-      "status": "ongoing"
+      "status": "ongoing",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_027",
+      "serviceStatus": "in_progress",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B008",
@@ -198,7 +254,15 @@
       "startTime": "13:30",
       "endTime": "15:00",
       "bay": 2,
-      "status": "ongoing"
+      "status": "ongoing",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_028",
+      "serviceStatus": "in_progress",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B009",
@@ -223,7 +287,15 @@
       "startTime": "10:00",
       "endTime": "11:30",
       "bay": 3,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_029",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B010",
@@ -248,7 +320,15 @@
       "startTime": "14:00",
       "endTime": "15:30",
       "bay": 1,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_030",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B011",
@@ -273,7 +353,15 @@
       "startTime": "09:00",
       "endTime": "11:00",
       "bay": 2,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_031",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B012",
@@ -298,7 +386,15 @@
       "startTime": "13:00",
       "endTime": "14:30",
       "bay": 3,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_032",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B013",
@@ -323,7 +419,15 @@
       "startTime": "10:30",
       "endTime": "12:30",
       "bay": 1,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_033",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B014",
@@ -348,7 +452,15 @@
       "startTime": "14:00",
       "endTime": "15:30",
       "bay": 2,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_034",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B015",
@@ -373,7 +485,15 @@
       "startTime": "09:30",
       "endTime": "11:00",
       "bay": 3,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_035",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B016",
@@ -398,7 +518,15 @@
       "startTime": "11:00",
       "endTime": "12:00",
       "bay": 1,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_036",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B017",
@@ -423,7 +551,15 @@
       "startTime": "13:30",
       "endTime": "15:00",
       "bay": 2,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_037",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B018",
@@ -448,7 +584,15 @@
       "startTime": "10:00",
       "endTime": "11:30",
       "bay": 3,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_038",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B019",
@@ -473,7 +617,15 @@
       "startTime": "14:30",
       "endTime": "16:00",
       "bay": 1,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_039",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     },
     {
       "id": "CAW-B020",
@@ -498,7 +650,15 @@
       "startTime": "09:00",
       "endTime": "11:00",
       "bay": 2,
-      "status": "scheduled"
+      "status": "scheduled",
+      "technicianId": "tech_003",
+      "jobSheetId": "job_040",
+      "serviceStatus": "not_started",
+      "createdBy": {
+        "id": "staff_002",
+        "name": "Aisha Khan",
+        "role": "receptionist"
+      }
     }
   ]
 }

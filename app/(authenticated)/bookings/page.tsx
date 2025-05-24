@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import {
-  Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
   Filter,
@@ -35,7 +34,7 @@ interface PaginationInfo {
 interface FilterState {
   status: BookingStatus | "all";
   customerName: string | null;
-  description: string | null;
+  serviceId: string | null;
   sortBy: string;
   sortOrder: "asc" | "desc";
 }
@@ -60,7 +59,7 @@ export default function BookingsPage() {
   const [filters, setFilters] = useState<FilterState>({
     status: "all",
     customerName: null,
-    description: null,
+    serviceId: null,
     sortBy: "date",
     sortOrder: "desc",
   });
@@ -95,9 +94,9 @@ export default function BookingsPage() {
           params.append("customerName", filters.customerName);
         }
 
-        // Add description filter if exists
-        if (filters.description) {
-          params.append("description", filters.description);
+        // Add service ID filter if exists
+        if (filters.serviceId) {
+          params.append("serviceId", filters.serviceId);
         }
 
         // console.log("API Request:", Object.fromEntries(params));
@@ -170,9 +169,9 @@ export default function BookingsPage() {
         params.append("customerName", filters.customerName);
       }
 
-      // Add description filter if exists
-      if (filters.description) {
-        params.append("description", filters.description);
+      // Add service ID filter if exists
+      if (filters.serviceId) {
+        params.append("serviceId", filters.serviceId);
       }
 
       const response = await fetch(`/api/bookings?${params.toString()}`);
@@ -309,14 +308,14 @@ export default function BookingsPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleSortChange("description")}
+                onClick={() => handleSortChange("serviceId")}
                 className={cn(
                   "flex items-center gap-2",
-                  filters.sortBy === "description" && "bg-blue-100"
+                  filters.sortBy === "serviceId" && "bg-blue-100"
                 )}
               >
                 Service
-                {filters.sortBy === "description" &&
+                {filters.sortBy === "serviceId" &&
                   (filters.sortOrder === "asc" ? (
                     <SortAsc className="w-4 h-4" />
                   ) : (
@@ -356,16 +355,16 @@ export default function BookingsPage() {
                 />
               </div>
 
-              {/* Description filter */}
+              {/* Service filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Service Description
+                  Service
                 </label>
                 <Input
                   type="text"
-                  value={filters.description || ""}
+                  value={filters.serviceId || ""}
                   onChange={(e) =>
-                    handleFilterChange("description", e.target.value || null)
+                    handleFilterChange("serviceId", e.target.value || null)
                   }
                   placeholder="Search service..."
                 />
@@ -594,14 +593,14 @@ export default function BookingsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleSortChange("description")}
+              onClick={() => handleSortChange("serviceId")}
               className={cn(
                 "flex items-center gap-2",
-                filters.sortBy === "description" && "bg-blue-100"
+                filters.sortBy === "serviceId" && "bg-blue-100"
               )}
             >
               Service
-              {filters.sortBy === "description" &&
+              {filters.sortBy === "serviceId" &&
                 (filters.sortOrder === "asc" ? (
                   <SortAsc className="w-4 h-4" />
                 ) : (
@@ -641,16 +640,16 @@ export default function BookingsPage() {
               />
             </div>
 
-            {/* Description filter */}
+            {/* Service filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Service Description
+                Service
               </label>
               <Input
                 type="text"
-                value={filters.description || ""}
+                value={filters.serviceId || ""}
                 onChange={(e) =>
-                  handleFilterChange("description", e.target.value || null)
+                  handleFilterChange("serviceId", e.target.value || null)
                 }
                 placeholder="Search service..."
               />
@@ -735,28 +734,28 @@ export default function BookingsPage() {
                       <h3 className="text-lg font-medium text-gray-900">
                         {filters.status !== "all" ||
                         filters.customerName ||
-                        filters.description
+                        filters.serviceId
                           ? "No bookings match your filters"
                           : "No bookings found"}
                       </h3>
                       <p className="mt-1 text-sm text-gray-500">
                         {filters.status !== "all" ||
                         filters.customerName ||
-                        filters.description
+                        filters.serviceId
                           ? "Try adjusting your filters or search criteria"
                           : "Get started by creating a new booking"}
                       </p>
                     </div>
                     {filters.status !== "all" ||
                     filters.customerName ||
-                    filters.description ? (
+                    filters.serviceId ? (
                       <Button
                         variant="outline"
                         onClick={() => {
                           setFilters({
                             status: "all",
                             customerName: null,
-                            description: null,
+                            serviceId: null,
                             sortBy: "date",
                             sortOrder: "desc",
                           });
@@ -792,16 +791,20 @@ export default function BookingsPage() {
                     {booking.id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {booking.customerName}
+                    <div className="font-medium">{booking.customer.name}</div>
+                    <div className="text-xs text-gray-400">
+                      {booking.customer.email}
+                      {/* <br />
+                      {booking.customer.phone} */}
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
-                    <div className="font-medium">{booking.description}</div>
+                    <div className="font-medium">{booking.serviceName}</div>
                     <div className="mt-1 text-xs text-gray-400">
                       {booking.car.make} {booking.car.model} ({booking.car.year}
-                      ) • {booking.car.color}
-                      <br />
-                      {booking.car.registrationNumber} •{" "}
-                      {booking.car.vehicleType}
+                      )
+                      {/* <br />
+                      {booking.car.registration} */}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
