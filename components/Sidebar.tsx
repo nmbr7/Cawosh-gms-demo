@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -63,6 +63,7 @@ export default function Sidebar() {
                   ? "bg-blue-100 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"
               )}
+              onClick={() => href === "/settings" && toggleSidebar()}
             >
               <Icon className="w-6 h-6 flex-shrink-0" />
               {sidebarOpen && <span>{name}</span>}

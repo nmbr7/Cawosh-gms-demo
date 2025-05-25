@@ -123,10 +123,27 @@ export async function GET(request: Request) {
       itemsPerPage: limit,
     };
 
-    // Return the response
+    console.log({
+      technicians: technicians, // Return all technicians from the database
+      statuses: [
+        { value: "completed", label: "Completed" },
+        { value: "in_progress", label: "In Progress" },
+        { value: "not_started", label: "Not Started" },
+      ],
+    });
+
+    // Return the response with all technicians regardless of filters
     return NextResponse.json({
       jobSheets: jobSheetsWithDetails,
       pagination: paginationInfo,
+      filters: {
+        technicians: technicians, // Return all technicians from the database
+        statuses: [
+          { value: "completed", label: "Completed" },
+          { value: "in_progress", label: "In Progress" },
+          { value: "not_started", label: "Not Started" },
+        ],
+      },
     });
   } catch (error) {
     console.error("Error in job sheet API:", error);

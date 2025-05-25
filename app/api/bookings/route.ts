@@ -7,6 +7,12 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   const { searchParams }: URL = new URL(request.url);
 
+  // New: 'all' parameter
+  const all: boolean = searchParams.get("all") === "true";
+
+  console.log("all", all);
+  console.log("searchParams", searchParams);
+
   // Pagination parameters
   const page: number = parseInt(searchParams.get("page") || "1");
   const limit: number = parseInt(searchParams.get("limit") || "10");
@@ -21,7 +27,6 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   // Date range parameters
   const today = new Date();
-  console.log("today", today);
   const firstDayOfMonth = new Date(
     Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)
   );
@@ -31,6 +36,10 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   const startDate = new Date(searchParams.get("startDate") || firstDayOfMonth);
   const endDate = new Date(searchParams.get("endDate") || lastDayOfMonth);
+
+  console.log("startDate", startDate);
+  console.log("endDate", endDate);
+
   // Sort parameters
   const sortBy: string = searchParams.get("sortBy") || "date";
   const sortOrder: "asc" | "desc" = (searchParams.get("sortOrder") ||
@@ -44,6 +53,11 @@ export async function GET(request: Request): Promise<NextResponse> {
     const endDateStr = endDate.toISOString().split("T")[0];
     const isInDateRange =
       bookingDate >= startDateStr && bookingDate <= endDateStr;
+
+    if (all) {
+      // Only apply date filter if 'all' is true
+      return isInDateRange;
+    }
 
     // Bay filter
     const matchesBay = bay === null || booking.bay === bay;
@@ -69,6 +83,8 @@ export async function GET(request: Request): Promise<NextResponse> {
       matchesDescription
     );
   });
+
+  console.log("filteredBookings", filteredBookings.length);
 
   // Apply sorting
   filteredBookings.sort((a, b) => {
@@ -96,6 +112,13 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     return sortOrder === "asc" ? -comparison : comparison; // Reverse the order if ascending is requested
   });
+
+  if (all) {
+    console.log("filteredBookings", filteredBookings.length);
+    console.log("returning");
+    // Return all filtered bookings (date filter only), no pagination
+    return NextResponse.json({ bookings: filteredBookings });
+  }
 
   // Calculate pagination
   const startIndex = (page - 1) * limit;

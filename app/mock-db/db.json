@@ -2,6 +2,7 @@
   "users": [
     {
       "id": "user_001",
+      "tenant_id": "garage_001",
       "email": "admin@cawosh.com",
       "password": "admin123",
       "firstName": "Admin",
@@ -14,6 +15,7 @@
     },
     {
       "id": "user_002",
+      "tenant_id": "garage_001",
       "email": "manager@cawosh.com",
       "password": "manager123",
       "firstName": "Manager",
@@ -26,6 +28,7 @@
     },
     {
       "id": "user_003",
+      "tenant_id": "garage_001",
       "email": "technician@cawosh.com",
       "password": "tech123",
       "firstName": "Technician",
@@ -38,6 +41,7 @@
     },
     {
       "id": "user_004",
+      "tenant_id": "garage_001",
       "email": "imran@cawosh.com",
       "password": "tech123",
       "firstName": "Imran",
@@ -57,6 +61,7 @@
     },
     {
       "id": "user_005",
+      "tenant_id": "garage_001",
       "email": "ahmed@cawosh.com",
       "password": "tech123",
       "firstName": "Ahmed",
@@ -70,6 +75,7 @@
     },
     {
       "id": "user_006",
+      "tenant_id": "garage_001",
       "email": "mohammed@cawosh.com",
       "password": "tech123",
       "firstName": "Mohammed",
@@ -83,6 +89,7 @@
     },
     {
       "id": "user_007",
+      "tenant_id": "garage_001",
       "email": "sarah@cawosh.com",
       "password": "tech123",
       "firstName": "Sarah",
@@ -96,6 +103,7 @@
     },
     {
       "id": "user_008",
+      "tenant_id": "garage_001",
       "email": "fatima@cawosh.com",
       "password": "tech123",
       "firstName": "Fatima",
@@ -111,6 +119,7 @@
   "bookings": [
     {
       "id": "BK-001",
+      "tenant_id": "garage_001",
       "serviceId": "svc_001",
       "serviceName": "Oil Change",
       "date": "2025-05-15",
@@ -133,6 +142,7 @@
     },
     {
       "id": "BK-002",
+      "tenant_id": "garage_001",
       "serviceId": "svc_002",
       "serviceName": "Brake Service",
       "date": "2025-05-15",
@@ -155,6 +165,7 @@
     },
     {
       "id": "BK-003",
+      "tenant_id": "garage_001",
       "serviceId": "svc_003",
       "serviceName": "Battery Replacement",
       "date": "2025-05-15",
@@ -177,6 +188,7 @@
     },
     {
       "id": "BK-004",
+      "tenant_id": "garage_001",
       "serviceId": "svc_001",
       "serviceName": "Oil Change",
       "date": "2025-05-16",
@@ -199,6 +211,7 @@
     },
     {
       "id": "BK-005",
+      "tenant_id": "garage_001",
       "serviceId": "svc_004",
       "serviceName": "Transmission Service",
       "date": "2025-05-16",
@@ -221,6 +234,7 @@
     },
     {
       "id": "BK-006",
+      "tenant_id": "garage_001",
       "serviceId": "svc_005",
       "serviceName": "Wheel Alignment",
       "date": "2025-05-16",
@@ -243,6 +257,7 @@
     },
     {
       "id": "BK-007",
+      "tenant_id": "garage_001",
       "serviceId": "svc_006",
       "serviceName": "AC Service",
       "date": "2025-05-17",
@@ -265,6 +280,7 @@
     },
     {
       "id": "BK-008",
+      "tenant_id": "garage_001",
       "serviceId": "svc_007",
       "serviceName": "Hybrid Battery Service",
       "date": "2025-05-17",
@@ -287,6 +303,7 @@
     },
     {
       "id": "BK-009",
+      "tenant_id": "garage_001",
       "serviceId": "svc_001",
       "serviceName": "Oil Change",
       "date": "2025-05-18",
@@ -309,6 +326,7 @@
     },
     {
       "id": "BK-010",
+      "tenant_id": "garage_001",
       "serviceId": "svc_002",
       "serviceName": "Brake Service",
       "date": "2025-05-18",
@@ -331,6 +349,7 @@
     },
     {
       "id": "BK-011",
+      "tenant_id": "garage_001",
       "serviceId": "svc_003",
       "serviceName": "Battery Replacement",
       "date": "2025-05-18",
@@ -353,6 +372,7 @@
     },
     {
       "id": "BK-012",
+      "tenant_id": "garage_001",
       "serviceId": "svc_006",
       "serviceName": "AC Service",
       "date": "2025-05-19",
@@ -375,6 +395,7 @@
     },
     {
       "id": "BK-013",
+      "tenant_id": "garage_001",
       "serviceId": "svc_007",
       "serviceName": "Hybrid Battery Service",
       "date": "2025-05-19",
@@ -397,6 +418,7 @@
     },
     {
       "id": "BK-014",
+      "tenant_id": "garage_001",
       "serviceId": "svc_001",
       "serviceName": "Oil Change",
       "date": "2025-05-19",
@@ -419,6 +441,7 @@
     },
     {
       "id": "BK-015",
+      "tenant_id": "garage_001",
       "serviceId": "svc_004",
       "serviceName": "Transmission Service",
       "date": "2025-05-20",
@@ -441,6 +464,7 @@
     },
     {
       "id": "BK-016",
+      "tenant_id": "garage_001",
       "serviceId": "svc_005",
       "serviceName": "Wheel Alignment",
       "date": "2025-05-20",
@@ -463,6 +487,7 @@
     },
     {
       "id": "BK-017",
+      "tenant_id": "garage_001",
       "serviceId": "svc_006",
       "serviceName": "AC Service",
       "date": "2025-05-20",
@@ -485,6 +510,7 @@
     },
     {
       "id": "BK-018",
+      "tenant_id": "garage_001",
       "serviceId": "svc_007",
       "serviceName": "Hybrid Battery Service",
       "date": "2025-05-21",
@@ -507,6 +533,7 @@
     },
     {
       "id": "BK-019",
+      "tenant_id": "garage_001",
       "serviceId": "svc_001",
       "serviceName": "Oil Change",
       "date": "2025-05-21",
@@ -529,6 +556,7 @@
     },
     {
       "id": "BK-020",
+      "tenant_id": "garage_001",
       "serviceId": "svc_002",
       "serviceName": "Brake Service",
       "date": "2025-05-21",
@@ -553,6 +581,7 @@
   "jobSheets": [
     {
       "id": "JB-001",
+      "tenant_id": "garage_001",
       "bookingId": "BK-001",
       "technicianId": "tech_001",
       "checklist": [
@@ -585,6 +614,7 @@
     },
     {
       "id": "JB-002",
+      "tenant_id": "garage_001",
       "bookingId": "BK-002",
       "technicianId": "tech_002",
       "checklist": [
@@ -617,6 +647,7 @@
     },
     {
       "id": "JB-003",
+      "tenant_id": "garage_001",
       "bookingId": "BK-003",
       "technicianId": "tech_003",
       "checklist": [
@@ -644,6 +675,7 @@
     },
     {
       "id": "JB-004",
+      "tenant_id": "garage_001",
       "bookingId": "BK-004",
       "technicianId": "tech_001",
       "checklist": [
@@ -676,6 +708,7 @@
     },
     {
       "id": "JB-005",
+      "tenant_id": "garage_001",
       "bookingId": "BK-005",
       "technicianId": "tech_002",
       "checklist": [
@@ -708,6 +741,7 @@
     },
     {
       "id": "JB-006",
+      "tenant_id": "garage_001",
       "bookingId": "BK-006",
       "technicianId": "tech_003",
       "checklist": [
@@ -729,6 +763,7 @@
     },
     {
       "id": "JB-007",
+      "tenant_id": "garage_001",
       "bookingId": "BK-007",
       "technicianId": "tech_004",
       "checklist": [
@@ -761,6 +796,7 @@
     },
     {
       "id": "JB-008",
+      "tenant_id": "garage_001",
       "bookingId": "BK-008",
       "technicianId": "tech_005",
       "checklist": [
@@ -782,6 +818,7 @@
     },
     {
       "id": "JB-009",
+      "tenant_id": "garage_001",
       "bookingId": "BK-009",
       "technicianId": "tech_001",
       "checklist": [
@@ -814,6 +851,7 @@
     },
     {
       "id": "JB-010",
+      "tenant_id": "garage_001",
       "bookingId": "BK-010",
       "technicianId": "tech_002",
       "checklist": [
@@ -846,6 +884,7 @@
     },
     {
       "id": "JB-011",
+      "tenant_id": "garage_001",
       "bookingId": "BK-011",
       "technicianId": "tech_003",
       "checklist": [
@@ -873,6 +912,7 @@
     },
     {
       "id": "JB-012",
+      "tenant_id": "garage_001",
       "bookingId": "BK-012",
       "technicianId": "tech_004",
       "checklist": [
@@ -905,6 +945,7 @@
     },
     {
       "id": "JB-013",
+      "tenant_id": "garage_001",
       "bookingId": "BK-013",
       "technicianId": "tech_005",
       "checklist": [
@@ -926,6 +967,7 @@
     },
     {
       "id": "JB-014",
+      "tenant_id": "garage_001",
       "bookingId": "BK-014",
       "technicianId": "tech_001",
       "checklist": [
@@ -958,6 +1000,7 @@
     },
     {
       "id": "JB-015",
+      "tenant_id": "garage_001",
       "bookingId": "BK-015",
       "technicianId": "tech_002",
       "checklist": [
@@ -990,6 +1033,7 @@
     },
     {
       "id": "JB-016",
+      "tenant_id": "garage_001",
       "bookingId": "BK-016",
       "technicianId": "tech_003",
       "checklist": [
@@ -1011,6 +1055,7 @@
     },
     {
       "id": "JB-017",
+      "tenant_id": "garage_001",
       "bookingId": "BK-017",
       "technicianId": "tech_004",
       "checklist": [
@@ -1043,6 +1088,7 @@
     },
     {
       "id": "JB-018",
+      "tenant_id": "garage_001",
       "bookingId": "BK-018",
       "technicianId": "tech_005",
       "checklist": [
@@ -1064,6 +1110,7 @@
     },
     {
       "id": "JB-019",
+      "tenant_id": "garage_001",
       "bookingId": "BK-019",
       "technicianId": "tech_001",
       "checklist": [
@@ -1096,6 +1143,7 @@
     },
     {
       "id": "JB-020",
+      "tenant_id": "garage_001",
       "bookingId": "BK-020",
       "technicianId": "tech_002",
       "checklist": [
@@ -1130,6 +1178,7 @@
   "technicians": [
     {
       "id": "tech_001",
+      "tenant_id": "garage_001",
       "userId": "user_004",
       "name": "Imran Ali",
       "specializations": [
@@ -1144,6 +1193,7 @@
     },
     {
       "id": "tech_002",
+      "tenant_id": "garage_001",
       "userId": "user_005",
       "name": "Ahmed Hassan",
       "specializations": ["transmission", "clutch", "gearbox", "drivetrain"],
@@ -1152,6 +1202,7 @@
     },
     {
       "id": "tech_003",
+      "tenant_id": "garage_001",
       "userId": "user_006",
       "name": "Mohammed Khan",
       "specializations": ["suspension", "steering", "alignment", "tires"],
@@ -1160,6 +1211,7 @@
     },
     {
       "id": "tech_004",
+      "tenant_id": "garage_001",
       "userId": "user_007",
       "name": "Sarah Ahmed",
       "specializations": ["ac", "heating", "ventilation", "climate_control"],
@@ -1168,6 +1220,7 @@
     },
     {
       "id": "tech_005",
+      "tenant_id": "garage_001",
       "userId": "user_008",
       "name": "Fatima Zahra",
       "specializations": ["hybrid", "electric", "battery", "electronics"],
@@ -1178,6 +1231,7 @@
   "inventory": [
     {
       "id": "part_001",
+      "tenant_id": "garage_001",
       "name": "Synthetic Oil 5W-30",
       "category": "fluids",
       "quantity": 50,
@@ -1187,6 +1241,7 @@
     },
     {
       "id": "part_002",
+      "tenant_id": "garage_001",
       "name": "Oil Filter",
       "category": "filters",
       "quantity": 30,
@@ -1196,6 +1251,7 @@
     },
     {
       "id": "part_003",
+      "tenant_id": "garage_001",
       "name": "Brake Pads",
       "category": "brakes",
       "quantity": 20,
@@ -1205,6 +1261,7 @@
     },
     {
       "id": "part_004",
+      "tenant_id": "garage_001",
       "name": "Brake Fluid",
       "category": "fluids",
       "quantity": 25,
@@ -1214,6 +1271,7 @@
     },
     {
       "id": "part_005",
+      "tenant_id": "garage_001",
       "name": "Car Battery",
       "category": "electrical",
       "quantity": 10,
@@ -1223,6 +1281,7 @@
     },
     {
       "id": "part_006",
+      "tenant_id": "garage_001",
       "name": "Transmission Fluid",
       "category": "fluids",
       "quantity": 30,
@@ -1232,6 +1291,7 @@
     },
     {
       "id": "part_007",
+      "tenant_id": "garage_001",
       "name": "Transmission Filter",
       "category": "filters",
       "quantity": 15,
@@ -1241,6 +1301,7 @@
     },
     {
       "id": "part_008",
+      "tenant_id": "garage_001",
       "name": "AC Refrigerant",
       "category": "ac",
       "quantity": 20,
@@ -1250,6 +1311,7 @@
     },
     {
       "id": "part_009",
+      "tenant_id": "garage_001",
       "name": "AC Filter",
       "category": "filters",
       "quantity": 25,
@@ -1261,43 +1323,63 @@
   "services": [
     {
       "id": "svc_001",
+      "tenant_id": "garage_001",
       "name": "Oil Change",
-      "description": "Complete oil change service including filter replacement",
-      "basePrice": 100,
-      "baseDuration": 60,
-      "category": "maintenance"
+      "description": "Complete oil and filter change service",
+      "duration": 60,
+      "price": 150,
+      "category": "maintenance",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
     },
     {
       "id": "svc_002",
+      "tenant_id": "garage_001",
       "name": "Brake Service",
-      "description": "Brake pad replacement and brake fluid check",
-      "basePrice": 150,
-      "baseDuration": 90,
-      "category": "brakes"
+      "description": "Brake inspection, pad replacement, and fluid check",
+      "duration": 90,
+      "price": 300,
+      "category": "repair",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
     },
     {
       "id": "svc_003",
+      "tenant_id": "garage_001",
       "name": "Battery Replacement",
       "description": "Battery testing and replacement service",
-      "basePrice": 200,
-      "baseDuration": 45,
-      "category": "electrical"
+      "duration": 45,
+      "price": 200,
+      "category": "electrical",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
     },
     {
       "id": "svc_004",
+      "tenant_id": "garage_001",
       "name": "Transmission Service",
-      "description": "Transmission fluid change and filter replacement",
-      "basePrice": 250,
-      "baseDuration": 120,
-      "category": "transmission"
+      "description": "Transmission fluid change and inspection",
+      "duration": 120,
+      "price": 400,
+      "category": "repair",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
     },
     {
       "id": "svc_005",
+      "tenant_id": "garage_001",
       "name": "Wheel Alignment",
-      "description": "Complete wheel alignment service",
-      "basePrice": 80,
-      "baseDuration": 60,
-      "category": "suspension"
+      "description": "Four-wheel alignment and balancing",
+      "duration": 60,
+      "price": 250,
+      "category": "maintenance",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-01T00:00:00Z"
     },
     {
       "id": "svc_006",

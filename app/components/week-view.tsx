@@ -6,17 +6,22 @@ import { format } from "date-fns";
 
 interface WeekViewProps {
   selectedDate: Date;
-  selectedBay: number;
+  selectedBay: number | "all";
   bookings: Booking[];
   timeSlots: string[];
   weekDates: Date[];
 }
 
-export function WeekView({ selectedDate, selectedBay, bookings, timeSlots, weekDates }: WeekViewProps) {
+export function WeekView({
+  selectedBay,
+  bookings,
+  timeSlots,
+  weekDates,
+}: WeekViewProps) {
   // Get bookings for a specific day
   const getBookingsForDay = (date: Date) => {
-    const dayStr = format(date, 'yyyy-MM-dd');
-    return bookings.filter(booking => {
+    const dayStr = format(date, "yyyy-MM-dd");
+    return bookings.filter((booking) => {
       const bookingDateStr = booking.date;
       return bookingDateStr === dayStr && booking.bay === selectedBay;
     });
@@ -42,9 +47,7 @@ export function WeekView({ selectedDate, selectedBay, bookings, timeSlots, weekD
                 key={date.toISOString()}
                 className="text-center py-2 border-r last:border-r-0"
               >
-                <div className="text-sm font-medium">
-                  {formatDayDate(date)}
-                </div>
+                <div className="text-sm font-medium">{formatDayDate(date)}</div>
               </div>
             ))}
           </div>
@@ -85,9 +88,11 @@ export function WeekView({ selectedDate, selectedBay, bookings, timeSlots, weekD
                     key={booking.id}
                     className={cn(
                       "absolute w-full px-2",
-                      booking.status === 'completed' ? 'bg-green-100 text-green-700' :
-                      booking.status === 'ongoing' ? 'bg-amber-100 text-amber-700' :
-                      'bg-blue-100 text-blue-700'
+                      booking.status === "completed"
+                        ? "bg-green-100 text-green-700"
+                        : booking.status === "ongoing"
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-blue-100 text-blue-700"
                     )}
                     style={{
                       top: `${booking.getTopPosition()}px`,
@@ -99,7 +104,7 @@ export function WeekView({ selectedDate, selectedBay, bookings, timeSlots, weekD
                         {booking.id}
                       </div>
                       <div className="text-sm text-gray-600">
-                        {booking.description}
+                        {booking.serviceName}
                       </div>
                     </div>
                   </div>
@@ -111,4 +116,4 @@ export function WeekView({ selectedDate, selectedBay, bookings, timeSlots, weekD
       </div>
     </div>
   );
-} 
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -68,6 +68,17 @@ interface FilterState {
   sortOrder: "asc" | "desc";
 }
 
+interface FilterOptions {
+  technicians: Array<{
+    id: string;
+    name: string;
+  }>;
+  statuses: Array<{
+    value: string;
+    label: string;
+  }>;
+}
+
 const formatTime = (time: string) => {
   try {
     const [hours, minutes] = time.split(":");
@@ -95,6 +106,10 @@ export default function JobSheetPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    technicians: [],
+    statuses: [],
+  });
   const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 1,
@@ -112,93 +127,20 @@ export default function JobSheetPage() {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  // Get unique technicians from job sheets
-  const technicians = useMemo(() => {
-    const uniqueTechnicians = new Map<string, { id: string; name: string }>();
-    jobSheets.forEach((js) => {
-      if (js.technician && !uniqueTechnicians.has(js.technician.id)) {
-        uniqueTechnicians.set(js.technician.id, js.technician);
-      }
-    });
-    return Array.from(uniqueTechnicians.values());
-  }, [jobSheets]);
-
-  useEffect(() => {
-    const fetchJobSheets = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // Build query parameters
-        const params = new URLSearchParams({
-          page: currentPage.toString(),
-          limit: "10",
-          sortBy: filters.sortBy,
-          sortOrder: filters.sortOrder,
-        });
-
-        // Add status filter if not "all"
-        if (filters.status !== "all") {
-          params.append("status", filters.status);
-        }
-
-        // Add booking ID filter if exists
-        if (filters.bookingId) {
-          params.append("bookingId", filters.bookingId);
-        }
-
-        // Add technician ID filter if exists
-        if (filters.technicianId) {
-          params.append("technicianId", filters.technicianId);
-        }
-
-        const response = await fetch(`/api/job-sheet?${params.toString()}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch job sheets");
-        }
-        const data = await response.json();
-
-        setJobSheets(data.jobSheets);
-        setPaginationInfo(data.pagination);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchJobSheets();
-  }, [currentPage, filters]);
-
-  const handleFilterChange = (key: keyof FilterState, value: string | null) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    setCurrentPage(1); // Reset to first page when filters change
-  };
-
-  const handleSortChange = (field: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      sortBy: field,
-      sortOrder:
-        prev.sortBy === field && prev.sortOrder === "asc" ? "desc" : "asc",
-    }));
-  };
-
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= paginationInfo.totalPages) {
       setCurrentPage(newPage);
     }
   };
 
-  const handleRefresh = async () => {
+  const fetchJobSheets = async () => {
     try {
-      setIsRefreshing(true);
+      setIsLoading(true);
       setError(null);
-      setCurrentPage(1); // Reset to first page
 
       // Build query parameters
       const params = new URLSearchParams({
-        page: "1",
+        page: currentPage.toString(),
         limit: "10",
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder,
@@ -227,11 +169,44 @@ export default function JobSheetPage() {
 
       setJobSheets(data.jobSheets);
       setPaginationInfo(data.pagination);
+      setFilterOptions(data.filters);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      setError(null);
+      setCurrentPage(1); // Reset to first page
+      await fetchJobSheets();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsRefreshing(false);
     }
+  };
+
+  useEffect(() => {
+    fetchJobSheets();
+  }, [currentPage, filters]);
+
+  const handleFilterChange = (key: keyof FilterState, value: string | null) => {
+    console.log("handleFilterChange", key, value);
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handleSortChange = (field: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      sortBy: field,
+      sortOrder:
+        prev.sortBy === field && prev.sortOrder === "asc" ? "desc" : "asc",
+    }));
   };
 
   const handleJobSheetClick = (jobSheet: JobSheet) => {
@@ -345,7 +320,7 @@ export default function JobSheetPage() {
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     <SelectItem value="all">All Technicians</SelectItem>
-                    {technicians.map((tech) => (
+                    {filterOptions.technicians.map((tech) => (
                       <SelectItem key={tech.id} value={tech.id}>
                         {tech.name}
                       </SelectItem>
@@ -368,9 +343,11 @@ export default function JobSheetPage() {
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="not_started">Not Started</SelectItem>
+                    {filterOptions.statuses.map((status) => (
+                      <SelectItem key={status.value} value={status.value}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -578,7 +555,7 @@ export default function JobSheetPage() {
                 </SelectTrigger>
                 <SelectContent className="bg-white">
                   <SelectItem value="all">All Technicians</SelectItem>
-                  {technicians.map((tech) => (
+                  {filterOptions.technicians.map((tech) => (
                     <SelectItem key={tech.id} value={tech.id}>
                       {tech.name}
                     </SelectItem>
@@ -601,9 +578,11 @@ export default function JobSheetPage() {
                 </SelectTrigger>
                 <SelectContent className="bg-white">
                   <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="not_started">Not Started</SelectItem>
+                  {filterOptions.statuses.map((status) => (
+                    <SelectItem key={status.value} value={status.value}>
+                      {status.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -761,7 +740,9 @@ export default function JobSheetPage() {
                           "bg-blue-100 text-blue-800"
                       )}
                     >
-                      {jobSheet.status}
+                      {filterOptions.statuses.find(
+                        (s) => s.value === jobSheet.status
+                      )?.label || jobSheet.status}
                     </span>
                   </td>
                 </tr>
@@ -890,7 +871,9 @@ export default function JobSheetPage() {
                       "bg-blue-100 text-blue-800"
                   )}
                 >
-                  {selectedJobSheet.status}
+                  {filterOptions.statuses.find(
+                    (s) => s.value === selectedJobSheet.status
+                  )?.label || selectedJobSheet.status}
                 </span>
               </div>
             </div>

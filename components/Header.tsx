@@ -27,16 +27,16 @@ export default function Header() {
 
       {/* Center section - Search and notifications */}
       <div className="flex-1 flex items-center justify-center max-w-3xl mx-auto">
-        <div className="flex items-center">
-          <div className="relative w-[400px]">
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+        <div className="flex items-center h-full">
+          <div className="relative w-[400px] flex items-center">
+            <Search className="absolute left-3  h-5 w-5 text-gray-400" />
             <input
               type="text"
               placeholder="Search..."
               className="w-full p-2.5 rounded-lg bg-gray-200 text-black pl-10 pr-10"
               onFocus={() => console.log("Focus search")}
             />
-            <span className="absolute right-4 top-2.5 text-gray-500">⌘ K</span>
+            <span className="absolute right-4  text-gray-500">⌘ K</span>
           </div>
           <div className="flex items-center space-x-6 ml-8">
             <div className="relative">

@@ -4,61 +4,6 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useEffect, useRef, useState } from "react";
 
-// interface CalendarCaptionProps {
-//   displayMonth: Date;
-//   onMonthChange: (date: Date) => void;
-// }
-
-// function CalendarCaption({ displayMonth, onMonthChange }: CalendarCaptionProps) {
-//   const months = [
-//     "January", "February", "March", "April", "May", "June",
-//     "July", "August", "September", "October", "November", "December"
-//   ];
-
-//   // Get a range of years (e.g., current year ± 10 years)
-//   const currentYear = new Date().getFullYear();
-//   const years = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
-
-//   const handleMonthChange = (monthIndex: number) => {
-//     const newDate = new Date(displayMonth);
-//     newDate.setMonth(monthIndex);
-//     onMonthChange(newDate);
-//   };
-
-//   const handleYearChange = (year: number) => {
-//     const newDate = new Date(displayMonth);
-//     newDate.setFullYear(year);
-//     onMonthChange(newDate);
-//   };
-
-//   return (
-//     <div className="flex justify-center items-center gap-2">
-//       <select
-//         value={displayMonth.getMonth()}
-//         onChange={(e) => handleMonthChange(parseInt(e.target.value))}
-//         className="px-2 py-1 rounded border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-//       >
-//         {months.map((month, index) => (
-//           <option key={month} value={index}>
-//             {month}
-//           </option>
-//         ))}
-//       </select>
-//       <select
-//         value={displayMonth.getFullYear()}
-//         onChange={(e) => handleYearChange(parseInt(e.target.value))}
-//         className="px-2 py-1 rounded border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-//       >
-//         {years.map((year) => (
-//           <option key={year} value={year}>
-//             {year}
-//           </option>
-//         ))}
-//       </select>
-//     </div>
-//   );
-// }
-
 interface CalendarProps {
   selectedDate: Date;
   onSelect: (date: Date | undefined) => void;
@@ -128,10 +73,10 @@ export function Calendar({
           head_row: "flex",
           head_cell: "text-gray-500 rounded-md w-9 font-normal text-[0.8rem]",
           row: "flex w-full mt-2",
-          cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-gray-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+          cell: "text-center text-sm p-0 relative first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-blue-500 [&:has([aria-selected])]:text-white [&:has([aria-selected])]:rounded-full",
           day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-full",
           day_selected:
-            "bg-blue-500 text-white hover:bg-blue-600 hover:text-white focus:bg-blue-500 focus:text-white",
+            "bg-blue-500 rounded-full hover:bg-blue-600  focus:bg-blue-500 focus:!text-white z-10",
           day_today: "bg-gray-100 text-blue-500 font-semibold",
           day_outside: "text-gray-300 opacity-40 cursor-not-allowed",
           day_disabled: "text-gray-300 opacity-40 cursor-not-allowed",

@@ -100,7 +100,7 @@ export function BookingDetailsModal({
                     Registration
                   </label>
                   <p className="mt-1 text-sm text-gray-900">
-                    {booking.car.registrationNumber}
+                    {booking.car.registrationNumber || "N/A"}
                   </p>
                 </div>
               </div>
@@ -116,10 +116,10 @@ export function BookingDetailsModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-500">
-                    Service ID
+                    Service
                   </label>
                   <p className="mt-1 text-sm text-gray-900">
-                    {booking.serviceId}
+                    {booking.serviceName}
                   </p>
                 </div>
                 <div>

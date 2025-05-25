@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Calendar } from "@/app/components/calendar";
 import { MonthView } from "@/app/components/month-view";
 import { Booking } from "@/app/models/booking";
@@ -19,8 +18,8 @@ import {
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedBay, setSelectedBay] = useState(2);
-  const [viewMode, setViewMode] = useState<"Day" | "Week" | "Month">("Week");
+  const [selectedBay, setSelectedBay] = useState<"all" | number>("all");
+  const [viewMode, setViewMode] = useState<"Day" | "Week" | "Month">("Month");
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,22 +45,21 @@ export default function SchedulePage() {
         const endDateStr = format(monthEnd, "yyyy-MM-dd");
 
         // Build query parameters
-        const params = new URLSearchParams({
-          bay: selectedBay.toString(),
+        const paramsObj: Record<string, string> = {
           startDate: startDateStr,
           endDate: endDateStr,
-          limit: "100",
-        });
-
-        console.log("API Request:", Object.fromEntries(params));
+          all: "true",
+        };
+        if (selectedBay !== "all") {
+          paramsObj.bay = selectedBay.toString();
+        }
+        const params = new URLSearchParams(paramsObj);
 
         const response = await fetch(`/api/bookings?${params.toString()}`);
-        console.log("API Response:", response);
         const data = await response.json();
-        console.log("API Response:", data);
 
         const bookingInstances = data.bookings.map(
-          (bookingData: any) => new Booking(bookingData)
+          (bookingData: Booking) => new Booking(bookingData)
         );
         setBookings(bookingInstances);
       } catch (error) {
@@ -73,6 +71,13 @@ export default function SchedulePage() {
 
     fetchBookings();
   }, [selectedDate, selectedBay]);
+
+  useEffect(() => {
+    // If 'All Bays' is selected and viewMode is not 'Month', switch to Bay 1
+    if (selectedBay === "all" && viewMode !== "Month") {
+      setSelectedBay(1);
+    }
+  }, [viewMode, selectedBay]);
 
   // Generate time slots from 8 AM to 5 PM
   const timeSlots = Array.from({ length: 10 }, (_, i) => {
@@ -97,13 +102,6 @@ export default function SchedulePage() {
       day: "numeric",
       month: "long",
       year: "numeric",
-    }).format(date);
-  };
-
-  const formatDayDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      weekday: "short",
-      day: "numeric",
     }).format(date);
   };
 
@@ -174,12 +172,21 @@ export default function SchedulePage() {
             {/* Bay selection */}
             <Select
               value={selectedBay.toString()}
-              onValueChange={(value) => setSelectedBay(parseInt(value))}
+              onValueChange={(value) =>
+                value === "all"
+                  ? setSelectedBay("all")
+                  : setSelectedBay(parseInt(value))
+              }
             >
               <SelectTrigger className="w-[180px] bg-white">
                 <SelectValue placeholder="Select bay" />
               </SelectTrigger>
               <SelectContent className="bg-white">
+                {viewMode === "Month" && (
+                  <SelectItem value="all" className="hover:bg-gray-100">
+                    All Bays
+                  </SelectItem>
+                )}
                 <SelectItem value="1" className="hover:bg-gray-100">
                   Bay 1
                 </SelectItem>
