@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Bell, Search } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
+import Image from "next/image";
 
 export default function Header() {
   const [showMessages, setShowMessages] = useState(false);
@@ -66,7 +67,20 @@ export default function Header() {
 
       {/* Right section - Profile */}
       <div className="relative flex items-center space-x-3">
-        <div className="h-10 w-10 rounded-full bg-gray-300"></div>
+        {user?.imageUrl ? (
+          <Image
+            src={user.imageUrl}
+            alt="User Avatar"
+            width={40}
+            height={40}
+            className="h-10 w-10 rounded-full object-cover"
+          />
+        ) : (
+          <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-lg font-semibold text-gray-700">
+            {user?.firstName?.[0]}
+            {user?.lastName?.[0]}
+          </div>
+        )}
         <div className="flex flex-col">
           <span>
             {user?.firstName} {user?.lastName}

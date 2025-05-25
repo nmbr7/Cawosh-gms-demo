@@ -54,12 +54,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     // Customer name filter (case-insensitive)
     const matchesCustomer =
       customerName === null ||
-      booking.customerName.toLowerCase().includes(customerName.toLowerCase());
+      booking.customer.name.toLowerCase().includes(customerName.toLowerCase());
 
     // Description filter (case-insensitive)
     const matchesDescription =
       description === null ||
-      booking.description.toLowerCase().includes(description.toLowerCase());
+      booking.serviceName.toLowerCase().includes(description.toLowerCase());
 
     return (
       isInDateRange &&
@@ -82,10 +82,10 @@ export async function GET(request: Request): Promise<NextResponse> {
         comparison = b.startTime.localeCompare(a.startTime); // Latest first by default
         break;
       case "customerName":
-        comparison = a.customerName.localeCompare(b.customerName);
+        comparison = a.customer.name.localeCompare(b.customer.name);
         break;
-      case "description":
-        comparison = a.description.localeCompare(b.description);
+      case "serviceName":
+        comparison = a.serviceName.localeCompare(b.serviceName);
         break;
       case "status":
         comparison = a.status.localeCompare(b.status);
