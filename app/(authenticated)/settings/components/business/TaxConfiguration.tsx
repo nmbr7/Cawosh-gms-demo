@@ -68,12 +68,12 @@ export default function TaxSettings({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tax Configuration</CardTitle>
+        <CardTitle className="text-2xl">Tax Configuration</CardTitle>
         <CardDescription>Configure tax rates and registration</CardDescription>
       </CardHeader>
       <hr />
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>Tax Rate (%)</Label>
             <Input type="number" value={billing.taxRate * 100} disabled />

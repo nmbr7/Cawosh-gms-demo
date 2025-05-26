@@ -35,7 +35,7 @@ export function BookingDetailsModal({
               <h3 className="text-base font-semibold text-gray-900">
                 Customer Information
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-500">
                     Name
@@ -78,7 +78,7 @@ export function BookingDetailsModal({
               <h3 className="text-base font-semibold text-gray-900">
                 Vehicle Information
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-500">
                     Make & Model
@@ -113,7 +113,7 @@ export function BookingDetailsModal({
               <h3 className="text-base font-semibold text-gray-900">
                 Service Information
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-500">
                     Service

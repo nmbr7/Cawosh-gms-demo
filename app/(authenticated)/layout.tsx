@@ -37,7 +37,7 @@ export default function AuthenticatedLayout({
       <div
         className={cn(
           "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
-          sidebarOpen ? "w-64" : "w-16"
+          sidebarOpen ? "w-64" : "w-20"
         )}
       >
         <Sidebar />
@@ -45,7 +45,7 @@ export default function AuthenticatedLayout({
       <main
         className={cn(
           "flex-1 transition-all duration-300 ease-in-out",
-          sidebarOpen ? "ml-64" : "ml-16"
+          sidebarOpen ? "ml-64" : "ml-20"
         )}
       >
         <Header />

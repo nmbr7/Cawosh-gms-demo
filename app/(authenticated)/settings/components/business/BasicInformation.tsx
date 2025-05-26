@@ -17,16 +17,16 @@ export default function BasicInformation({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Basic Information</CardTitle>
+        <CardTitle className="text-2xl">Basic Information</CardTitle>
         <CardDescription>
           Manage your garage&apos;s basic information
         </CardDescription>
       </CardHeader>
-      <hr />
       <CardContent className="space-y-4">
+        <hr />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Garage Name</Label>
+            <Label className="text-sm">Garage Name</Label>
             <Input
               placeholder="Enter garage name"
               value={garage?.name || ""}
@@ -34,7 +34,7 @@ export default function BasicInformation({
             />
           </div>
           <div className="space-y-2">
-            <Label>Business Address</Label>
+            <Label className="text-sm">Business Address</Label>
             <Input
               placeholder="Enter business address"
               value={

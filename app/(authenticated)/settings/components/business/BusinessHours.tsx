@@ -36,7 +36,7 @@ export function BusinessHours({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Business Hours</CardTitle>
+        <CardTitle className="text-2xl">Business Hours</CardTitle>
         <CardDescription>Set your operating hours</CardDescription>
       </CardHeader>
       <hr />

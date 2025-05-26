@@ -4,17 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  // LayoutDashboard,
-  ChevronLeft,
-  ChevronRight,
-  LogOut,
-  // Calendar,
-  // FileText,
-  // Receipt,
-  // HeadphonesIcon,
-  // UsersIcon,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { SignOut } from "phosphor-react";
 
 import {
   SquaresFour,
@@ -96,7 +88,11 @@ export default function Sidebar() {
                   ? "bg-blue-100 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"
               )}
-              onClick={() => href === "/settings" && toggleSidebar()}
+              onClick={() => {
+                if (href === "/settings" && sidebarOpen) {
+                  toggleSidebar();
+                }
+              }}
             >
               <Icon className="w-5 h-5 flex-shrink-0" />
               {sidebarOpen && <span className="text-sm">{name}</span>}
@@ -111,7 +107,7 @@ export default function Sidebar() {
           onClick={handleLogout}
           className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 w-full px-2 py-1"
         >
-          <LogOut className="w-4 h-4" />
+          <SignOut size={20} />
           {sidebarOpen && <span>Logout</span>}
         </button>
 

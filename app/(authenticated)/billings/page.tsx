@@ -2,10 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { FileDown, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { FileDoc, CaretLeft, CaretRight } from "phosphor-react";
 import { formatDate } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import React from "react";
 
@@ -54,7 +60,7 @@ export default function BillingsPage() {
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
-    itemsPerPage: 10
+    itemsPerPage: 10,
   });
 
   // Fetch billings from API
@@ -66,19 +72,19 @@ export default function BillingsPage() {
         limit: paginationInfo.itemsPerPage.toString(),
         search: searchTerm,
         service: serviceFilter,
-        date: dateFilter
+        date: dateFilter,
       });
 
       const response = await fetch(`/api/billings?${params.toString()}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch billings');
+        throw new Error("Failed to fetch billings");
       }
       const data: ApiResponse = await response.json();
       setBillings(data.billings);
       setPaginationInfo(data.pagination);
       setServiceTypes(data.filters.serviceTypes);
     } catch (error) {
-      console.error('Error fetching billings:', error);
+      console.error("Error fetching billings:", error);
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +96,7 @@ export default function BillingsPage() {
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= paginationInfo.totalPages) {
-      setPaginationInfo(prev => ({ ...prev, currentPage: newPage }));
+      setPaginationInfo((prev) => ({ ...prev, currentPage: newPage }));
     }
   };
 
@@ -104,7 +110,9 @@ export default function BillingsPage() {
     return (
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Billings & Invoices</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Billings & Invoices
+          </h1>
         </div>
 
         {/* Filters */}
@@ -222,7 +230,9 @@ export default function BillingsPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Billings & Invoices</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">
+          Billings & Invoices
+        </h1>
       </div>
 
       {/* Filters */}
@@ -335,7 +345,9 @@ export default function BillingsPage() {
                         </Button>
                       ) : (
                         <Button
-                          onClick={() => {/* TODO: Add create billing handler */}}
+                          onClick={() => {
+                            /* TODO: Add create billing handler */
+                          }}
                           className="mt-2"
                         >
                           Create Billing
@@ -363,7 +375,9 @@ export default function BillingsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex flex-col">
-                        <span>{billing.carDetails.make} {billing.carDetails.model}</span>
+                        <span>
+                          {billing.carDetails.make} {billing.carDetails.model}
+                        </span>
                         <span className="text-xs text-gray-500">
                           Reg: {billing.carDetails.registrationNumber}
                         </span>
@@ -382,7 +396,7 @@ export default function BillingsPage() {
                         className="flex items-center gap-2"
                         onClick={() => handleDownloadInvoice(billing)}
                       >
-                        <FileDown className="h-4 w-4" />
+                        <FileDoc size={16} />
                         Download
                       </Button>
                     </td>
@@ -397,15 +411,19 @@ export default function BillingsPage() {
       {/* Pagination */}
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          Showing{' '}
-          <span className="font-medium">{((paginationInfo.currentPage - 1) * paginationInfo.itemsPerPage) + 1}</span>
-          {' '}-{' '}
+          Showing{" "}
           <span className="font-medium">
-            {Math.min(paginationInfo.currentPage * paginationInfo.itemsPerPage, paginationInfo.totalItems)}
-          </span>
-          {' '}of{' '}
-          <span className="font-medium">{paginationInfo.totalItems}</span>
-          {' '}results
+            {(paginationInfo.currentPage - 1) * paginationInfo.itemsPerPage + 1}
+          </span>{" "}
+          -{" "}
+          <span className="font-medium">
+            {Math.min(
+              paginationInfo.currentPage * paginationInfo.itemsPerPage,
+              paginationInfo.totalItems
+            )}
+          </span>{" "}
+          of <span className="font-medium">{paginationInfo.totalItems}</span>{" "}
+          results
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -414,20 +432,26 @@ export default function BillingsPage() {
             onClick={() => handlePageChange(paginationInfo.currentPage - 1)}
             disabled={paginationInfo.currentPage === 1}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <CaretLeft className="h-4 w-4" />
           </Button>
-          
+
           {/* Page numbers */}
           <div className="flex gap-1">
-            {Array.from({ length: paginationInfo.totalPages }, (_, i) => i + 1).map((page) => (
+            {Array.from(
+              { length: paginationInfo.totalPages },
+              (_, i) => i + 1
+            ).map((page) => (
               <Button
                 key={page}
-                variant={page === paginationInfo.currentPage ? "default" : "outline"}
+                variant={
+                  page === paginationInfo.currentPage ? "default" : "outline"
+                }
                 size="sm"
                 onClick={() => handlePageChange(page)}
                 className={cn(
                   "w-8 h-8 p-0",
-                  page === paginationInfo.currentPage && "bg-blue-500 text-white hover:bg-blue-600"
+                  page === paginationInfo.currentPage &&
+                    "bg-blue-500 text-white hover:bg-blue-600"
                 )}
               >
                 {page}
@@ -441,10 +465,10 @@ export default function BillingsPage() {
             onClick={() => handlePageChange(paginationInfo.currentPage + 1)}
             disabled={paginationInfo.currentPage === paginationInfo.totalPages}
           >
-            <ChevronRight className="h-4 w-4" />
+            <CaretRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
     </div>
   );
-} 
+}

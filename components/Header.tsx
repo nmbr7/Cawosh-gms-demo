@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Bell, Search } from "lucide-react";
+// import { Search } from "lucide-react";
+import { MagnifyingGlass, ChatTeardropText, BellRinging } from "phosphor-react";
 import { useAuthStore } from "@/store/auth";
 import Image from "next/image";
 
@@ -29,7 +30,10 @@ export default function Header() {
       <div className="flex-1 flex items-center justify-center max-w-3xl mx-auto">
         <div className="flex items-center h-full">
           <div className="relative w-[400px] flex items-center">
-            <Search className="absolute left-3  h-5 w-5 text-gray-400" />
+            <MagnifyingGlass
+              className="absolute left-3 text-gray-400"
+              size={22}
+            />
             <input
               type="text"
               placeholder="Search..."
@@ -41,7 +45,7 @@ export default function Header() {
           <div className="flex items-center space-x-6 ml-8">
             <div className="relative">
               <button onClick={toggleMessages}>
-                <Mail className="h-6 w-6" />
+                <ChatTeardropText size={22} />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
               </button>
               {showMessages && (
@@ -52,7 +56,7 @@ export default function Header() {
             </div>
             <div className="relative">
               <button onClick={toggleNotifications}>
-                <Bell className="h-6 w-6" />
+                <BellRinging size={22} />
                 <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
               </button>
               {showNotifications && (
@@ -82,10 +86,10 @@ export default function Header() {
           </div>
         )}
         <div className="flex flex-col">
-          <span>
+          <span className="text-[15px] font-medium text-gray-800">
             {user?.firstName} {user?.lastName}
           </span>
-          <span className="text-sm text-gray-500">{user?.role}</span>
+          <span className="text-xs text-gray-500">{user?.role}</span>
         </div>
         <button onClick={toggleProfileMenu}>
           {showProfileMenu && (

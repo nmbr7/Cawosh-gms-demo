@@ -29,6 +29,7 @@ interface Service {
   duration: number;
   price: number;
   currency: string;
+  currencySymbol: string;
   category: string;
   isActive: boolean;
 }
@@ -57,6 +58,7 @@ export function ServiceList({
     name: "",
     description: "",
     currency: "GBP",
+    currencySymbol: "£",
     duration: 60,
     price: 0,
     category: "maintenance",
@@ -83,6 +85,7 @@ export function ServiceList({
       description: "",
       duration: 60,
       currency: "GBP",
+      currencySymbol: "£",
       price: 0,
       category: "maintenance",
       isActive: true,
@@ -97,7 +100,7 @@ export function ServiceList({
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-2">
-              <CardTitle>Service List</CardTitle>
+              <CardTitle className="text-2xl">Service List</CardTitle>
               <CardDescription>Manage your available services</CardDescription>
             </div>
             <Button
@@ -219,9 +222,9 @@ export function ServiceList({
                       </TableCell>
                       <TableCell>{service.duration} min</TableCell>
                       <TableCell>
-                        <div className="flex items-baseline gap-2">
+                        <div className="flex items-baseline gap-1">
                           <span className="text-xs font-medium">
-                            {service.currency}
+                            {service.currencySymbol}
                           </span>
                           <span className="text-md ">{service.price}</span>
                         </div>

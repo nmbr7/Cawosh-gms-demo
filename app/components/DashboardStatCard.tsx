@@ -49,6 +49,6 @@ export const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
       )}
       <div className="text-base font-medium">{label}</div>
     </div>
-    <div className="text-3xl font-bold">{value}</div>
+    <div className="text-4xl font-medium">{value}</div>
   </div>
 );
