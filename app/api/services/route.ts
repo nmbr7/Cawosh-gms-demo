@@ -8,9 +8,11 @@ export async function GET(request: Request) {
     const category = searchParams.get("category");
     const isActive = searchParams.get("isActive");
 
-    let services = db.services.filter(
-      (service) => service.tenant_id === tenantId
-    );
+    const garage = db.garages.find((g) => g.id === tenantId);
+    if (!garage) return [];
+
+    const serviceIds = garage.services.map((s) => s.serviceId);
+    let services = db.services.filter((s) => serviceIds.includes(s.id));
 
     // Apply category filter if provided
     if (category) {

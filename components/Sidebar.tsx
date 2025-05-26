@@ -1,32 +1,48 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
-  Settings,
+  // LayoutDashboard,
   ChevronLeft,
   ChevronRight,
   LogOut,
-  Calendar,
-  FileText,
-  Receipt,
-  HeadphonesIcon,
-  UsersIcon,
+  // Calendar,
+  // FileText,
+  // Receipt,
+  // HeadphonesIcon,
+  // UsersIcon,
 } from "lucide-react";
+
+import {
+  SquaresFour,
+  CalendarBlank,
+  Note,
+  Files,
+  Wallet,
+  Headphones,
+  UserList,
+  Gear,
+} from "phosphor-react";
+
 import { useUIStore } from "@/store/ui";
 import { useAuthStore } from "@/store/auth";
 
 const links = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Calendar", href: "/schedule", icon: Calendar },
-  { name: "Bookings", href: "/bookings", icon: FileText },
-  { name: "Job Sheet", href: "/job-sheet", icon: FileText },
-  { name: "Billings", href: "/billings", icon: Receipt },
-  { name: "Customer Support", href: "/customer-support", icon: HeadphonesIcon },
-  { name: "Staff Management", href: "/users", icon: UsersIcon },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/dashboard", icon: SquaresFour },
+  { name: "Calendar", href: "/schedule", icon: CalendarBlank },
+  { name: "Bookings", href: "/bookings", icon: Note },
+  { name: "Job Sheet", href: "/job-sheet", icon: Files },
+  { name: "Billings", href: "/billings", icon: Wallet },
+  {
+    name: "Customer Support",
+    href: "/customer-support",
+    icon: Headphones,
+  },
+  { name: "Staff Management", href: "/users", icon: UserList },
+  { name: "Settings", href: "/settings", icon: Gear },
 ];
 
 export default function Sidebar() {
@@ -48,25 +64,42 @@ export default function Sidebar() {
     >
       {/* Top: Logo + Nav */}
       <div>
-        <div className="p-4 text-xl font-semibold border-b">
-          {sidebarOpen ? "Cawosh Admin" : "C"}
+        <div className="p-4 text-xl font-semibold border-b flex items-center justify-center">
+          {sidebarOpen ? (
+            "Cawosh Admin"
+          ) : (
+            // <Image
+            //   src="/images/cawosh-logo-with-tm.jpg"
+            //   alt="Cawosh Logo"
+            //   width={200}
+            //   height={50}
+            //   className="object-contain"
+            // />
+            <Image
+              src="/images/cawosh-logo.jpg"
+              alt="Cawosh Logo"
+              width={100}
+              height={100}
+              className="object-contain"
+            />
+          )}
         </div>
 
-        <nav className="flex flex-col gap-3 p-3">
+        <nav className="flex flex-col gap-2 p-3">
           {links.map(({ name, href, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-4 px-4 py-3 rounded-md text-base font-medium",
+                "flex items-center gap-3 px-4 py-3 rounded-md text-base font-medium",
                 pathname === href
                   ? "bg-blue-100 text-blue-700"
                   : "text-gray-700 hover:bg-gray-100"
               )}
               onClick={() => href === "/settings" && toggleSidebar()}
             >
-              <Icon className="w-6 h-6 flex-shrink-0" />
-              {sidebarOpen && <span>{name}</span>}
+              <Icon className="w-5 h-5 flex-shrink-0" />
+              {sidebarOpen && <span className="text-sm">{name}</span>}
             </Link>
           ))}
         </nav>

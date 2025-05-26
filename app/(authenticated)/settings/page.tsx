@@ -8,31 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Settings, Building2, Wrench, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { ServiceList } from "./components/services";
-import type { Service } from "./components/services/ServiceList";
-
-interface SettingsData {
-  [key: string]: Record<string, unknown>;
-  business: {
-    garageName: string;
-    businessAddress: string;
-    contactPhone: string;
-    contactEmail: string;
-    businessHours: {
-      [key: string]: { open: string; close: string };
-    };
-    taxSettings: {
-      taxRate: number;
-      taxRegistrationNumber: string;
-    };
-  };
-  // Add other settings interfaces as needed
-}
+import { useGarageStore } from "@/store/garage";
+import { BusinessHours } from "./components/business/BusinessHours";
+import BasicInformation from "./components/business/BasicInformation";
+import TaxSettings from "./components/business/TaxConfiguration";
 
 const tabs = [
   {
@@ -79,15 +61,10 @@ const tabs = [
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("business");
   const [activeSubmenu, setActiveSubmenu] = useState("info");
-  const [settings, setSettings] = useState<SettingsData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [services, setServices] = useState([]);
   const [servicesLoading, setServicesLoading] = useState(false);
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
+  const garage = useGarageStore((state) => state.garage);
 
   useEffect(() => {
     if (activeTab === "services" && activeSubmenu === "list") {
@@ -95,21 +72,13 @@ export default function SettingsPage() {
     }
   }, [activeTab, activeSubmenu]);
 
-  const fetchSettings = async () => {
-    try {
-      const response = await fetch("/api/settings");
-      const data = await response.json();
-      setSettings(data);
-    } catch (error) {
-      toast.error(
-        `Failed to load settings: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    fetch("/api/garages")
+      .then((res) => res.json())
+      .then((data) => {
+        useGarageStore.getState().setGarage(data);
+      });
+  }, []);
 
   const fetchServices = async () => {
     setServicesLoading(true);
@@ -128,123 +97,12 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSave = async () => {
-    if (!settings) return;
-
-    setIsSaving(true);
-    try {
-      const response = await fetch("/api/settings", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(settings),
-      });
-
-      if (!response.ok) throw new Error("Failed to save settings");
-
-      toast.success("Settings saved successfully");
-    } catch (error) {
-      toast.error(
-        `Failed to save settings: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleInputChange = (
-    section: string,
-    field: string,
-    value: string | number | boolean
-  ) => {
-    if (!settings) return;
-
-    setSettings((prev) => ({
-      ...prev!,
-      [section]: {
-        ...prev![section],
-        [field]: value,
-      },
-    }));
-  };
-
-  const handleServiceAdd = async (service: Omit<Service, "id">) => {
-    try {
-      const response = await fetch("/api/services", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(service),
-      });
-      if (!response.ok) throw new Error("Failed to add service");
-      fetchServices();
-    } catch (error) {
-      toast.error(
-        `Failed to add service: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    }
-  };
-
-  const handleServiceUpdate = async (service: Service) => {
-    try {
-      const response = await fetch(`/api/services/${service.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(service),
-      });
-      if (!response.ok) throw new Error("Failed to update service");
-      fetchServices();
-    } catch (error) {
-      toast.error(
-        `Failed to update service: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    }
-  };
-
-  const handleServiceDelete = async (serviceId: string) => {
-    try {
-      const response = await fetch(`/api/services/${serviceId}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to delete service");
-      fetchServices();
-    } catch (error) {
-      toast.error(
-        `Failed to delete service: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-        </div>
-        <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-96 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
-  }
+  // Service handlers for ServiceList
 
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-        <Button onClick={handleSave} disabled={isSaving}>
-          <Settings className="w-4 h-4 mr-2" />
-          {isSaving ? "Saving..." : "Save Changes"}
-        </Button>
       </div>
 
       <div className="flex gap-6">
@@ -295,73 +153,32 @@ export default function SettingsPage() {
           {activeTab === "business" && (
             <>
               {activeSubmenu === "info" && (
-                <div className="max-w-[66.666%]">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Basic Information</CardTitle>
-                      <CardDescription>
-                        Manage your garage&apos;s basic information
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label>Garage Name</Label>
-                          <Input
-                            placeholder="Enter garage name"
-                            value={settings?.business.garageName || ""}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "business",
-                                "garageName",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Business Address</Label>
-                          <Input
-                            placeholder="Enter business address"
-                            value={settings?.business.businessAddress || ""}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "business",
-                                "businessAddress",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                <div className="max-w-[75%]">
+                  <BasicInformation garage={garage} />
                 </div>
               )}
               {activeSubmenu === "hours" && (
-                <div className="max-w-[66.666%]">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Business Hours</CardTitle>
-                      <CardDescription>
-                        Set your operating hours
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>{/* Business hours content */}</CardContent>
-                  </Card>
+                <div className="max-w-[75%]">
+                  <BusinessHours
+                    onTimeChange={() => {}}
+                    onSave={() => {}}
+                    businessHours={
+                      garage?.businessHours || {
+                        monday: { open: "", close: "" },
+                        tuesday: { open: "", close: "" },
+                        wednesday: { open: "", close: "" },
+                        thursday: { open: "", close: "" },
+                        friday: { open: "", close: "" },
+                        saturday: { open: "", close: "" },
+                        sunday: { open: "", close: "" },
+                      }
+                    }
+                  />
                 </div>
               )}
               {activeSubmenu === "tax" && (
-                <div className="max-w-[66.666%]">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Tax Settings</CardTitle>
-                      <CardDescription>
-                        Configure tax rates and registration
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>{/* Tax settings content */}</CardContent>
-                  </Card>
+                <div className="max-w-[75%]">
+                  <TaxSettings billing={garage?.billing} />
                 </div>
               )}
             </>
@@ -369,19 +186,17 @@ export default function SettingsPage() {
 
           {activeTab === "services" && (
             <>
-              {activeSubmenu === "list" &&
-                (servicesLoading ? (
-                  <div className="p-6">Loading services...</div>
-                ) : (
-                  <ServiceList
-                    services={services}
-                    onServiceAdd={handleServiceAdd}
-                    onServiceUpdate={handleServiceUpdate}
-                    onServiceDelete={handleServiceDelete}
-                  />
-                ))}
+              {activeSubmenu === "list" && (
+                <ServiceList
+                  services={services}
+                  onServiceAdd={() => {}}
+                  onServiceUpdate={() => {}}
+                  onServiceDelete={() => {}}
+                  loading={servicesLoading}
+                />
+              )}
               {activeSubmenu === "status" && (
-                <div className="max-w-[66.666%]">
+                <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
                       <CardTitle>Service Status</CardTitle>
@@ -399,7 +214,7 @@ export default function SettingsPage() {
           {activeTab === "billing" && (
             <>
               {activeSubmenu === "tax" && (
-                <div className="max-w-[66.666%]">
+                <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
                       <CardTitle>Tax Configuration</CardTitle>
@@ -412,7 +227,7 @@ export default function SettingsPage() {
                 </div>
               )}
               {activeSubmenu === "payment" && (
-                <div className="max-w-[66.666%]">
+                <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
                       <CardTitle>Payment Settings</CardTitle>
@@ -430,7 +245,7 @@ export default function SettingsPage() {
           {activeTab === "system" && (
             <>
               {activeSubmenu === "security" && (
-                <div className="max-w-[66.666%]">
+                <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
                       <CardTitle>Security Settings</CardTitle>
@@ -443,7 +258,7 @@ export default function SettingsPage() {
                 </div>
               )}
               {activeSubmenu === "notifications" && (
-                <div className="max-w-[66.666%]">
+                <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
                       <CardTitle>Notification Settings</CardTitle>
@@ -458,7 +273,7 @@ export default function SettingsPage() {
                 </div>
               )}
               {activeSubmenu === "backup" && (
-                <div className="max-w-[66.666%]">
+                <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
                       <CardTitle>Backup Settings</CardTitle>
@@ -471,7 +286,7 @@ export default function SettingsPage() {
                 </div>
               )}
               {activeSubmenu === "integrations" && (
-                <div className="max-w-[66.666%]">
+                <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
                       <CardTitle>Integration Settings</CardTitle>

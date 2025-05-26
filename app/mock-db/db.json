@@ -1328,6 +1328,7 @@
       "description": "Complete oil and filter change service",
       "duration": 60,
       "price": 150,
+      "currency": "GBP",
       "category": "maintenance",
       "isActive": true,
       "createdAt": "2024-01-01T00:00:00Z",
@@ -1340,6 +1341,7 @@
       "description": "Brake inspection, pad replacement, and fluid check",
       "duration": 90,
       "price": 300,
+      "currency": "GBP",
       "category": "repair",
       "isActive": true,
       "createdAt": "2024-01-01T00:00:00Z",
@@ -1352,6 +1354,7 @@
       "description": "Battery testing and replacement service",
       "duration": 45,
       "price": 200,
+      "currency": "GBP",
       "category": "electrical",
       "isActive": true,
       "createdAt": "2024-01-01T00:00:00Z",
@@ -1364,6 +1367,7 @@
       "description": "Transmission fluid change and inspection",
       "duration": 120,
       "price": 400,
+      "currency": "GBP",
       "category": "repair",
       "isActive": true,
       "createdAt": "2024-01-01T00:00:00Z",
@@ -1376,6 +1380,7 @@
       "description": "Four-wheel alignment and balancing",
       "duration": 60,
       "price": 250,
+      "currency": "GBP",
       "category": "maintenance",
       "isActive": true,
       "createdAt": "2024-01-01T00:00:00Z",
@@ -1385,16 +1390,18 @@
       "id": "svc_006",
       "name": "AC Service",
       "description": "AC system check and refrigerant recharge",
-      "basePrice": 180,
-      "baseDuration": 90,
+      "duration": 90,
+      "price": 180,
+      "currency": "GBP",
       "category": "ac"
     },
     {
       "id": "svc_007",
       "name": "Hybrid Battery Service",
       "description": "Hybrid battery health check and diagnostics",
-      "basePrice": 300,
-      "baseDuration": 120,
+      "duration": 120,
+      "price": 300,
+      "currency": "GBP",
       "category": "electrical"
     }
   ],
@@ -1402,6 +1409,60 @@
     {
       "id": "garage_001",
       "name": "FastFix Garage",
+      "address": {
+        "street": "123 Main St",
+        "city": "London",
+        "state": "Greater London",
+        "zip": "E1 6LT",
+        "country": "UK"
+      },
+      "contact": {
+        "phone": "+4434567890",
+        "email": "info@fastfixgarage.com",
+        "website": "https://www.fastfixgarage.com"
+      },
+      "billing": {
+        "taxRate": 0.2,
+        "taxRegistrationNumber": "1234567890",
+        "taxRegistrationName": "FastFix Garage",
+        "taxRegistrationAddress": {
+          "street": "123 Main St",
+          "city": "London",
+          "state": "Greater London",
+          "zip": "E1 6LT",
+          "country": "UK"
+        }
+      },
+      "businessHours": {
+        "monday": {
+          "open": "09:00",
+          "close": "17:00"
+        },
+        "tuesday": {
+          "open": "10:00",
+          "close": "17:00"
+        },
+        "wednesday": {
+          "open": "09:00",
+          "close": "17:00"
+        },
+        "thursday": {
+          "open": "09:00",
+          "close": "17:00"
+        },
+        "friday": {
+          "open": "09:00",
+          "close": "17:00"
+        },
+        "saturday": {
+          "open": "09:00",
+          "close": "17:00"
+        },
+        "sunday": {
+          "open": "09:00",
+          "close": "17:00"
+        }
+      },
       "services": [
         {
           "serviceId": "svc_001",

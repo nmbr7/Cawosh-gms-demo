@@ -1,8 +1,9 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, FileText, Receipt } from "lucide-react";
 import { DashboardStatCard } from "@/app/components/DashboardStatCard";
+
+import { Calendar, Note, Files } from "phosphor-react";
 
 export default function DashboardPage() {
   return (
@@ -35,12 +36,14 @@ export default function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-md font-medium">Bookings</CardTitle>
             <div className="rounded-full border border-gray-200 bg-white w-10 h-10 flex items-center justify-center">
-              <Calendar className="h-4 w-4 text-gray-500" />
+              <Calendar className="h-5 w-5 text-gray-500" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">235</div>
-            <p className="text-xs text-gray-500">+180.1% from last month</p>
+            <div className="flex flex-col gap-1">
+              <div className="text-3xl font-bold">235</div>
+              <p className="text-xs text-gray-500">+180.1% from last month</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -48,12 +51,14 @@ export default function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-md font-medium">Job Sheets</CardTitle>
             <div className="rounded-full border border-gray-200 bg-white w-10 h-10 flex items-center justify-center">
-              <FileText className="h-4 w-4 text-gray-500" />
+              <Note className="h-5 w-5 text-gray-500" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-gray-500">+19% from last month</p>
+            <div className="flex flex-col gap-1">
+              <div className="text-3xl font-bold">12</div>
+              <p className="text-xs text-gray-500">+19% from last month</p>
+            </div>
           </CardContent>
         </Card>
 
@@ -61,12 +66,14 @@ export default function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-md font-medium">Billings</CardTitle>
             <div className="rounded-full border border-gray-200 bg-white w-10 h-10 flex items-center justify-center">
-              <Receipt className="h-4 w-4 text-gray-500" />
+              <Files className="h-5 w-5 text-gray-500" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$12,234</div>
-            <p className="text-xs text-gray-500">+20.1% from last month</p>
+            <div className="flex flex-col gap-1">
+              <div className="text-3xl font-bold">$12,234</div>
+              <p className="text-xs text-gray-500">+20.1% from last month</p>
+            </div>
           </CardContent>
         </Card>
       </div>

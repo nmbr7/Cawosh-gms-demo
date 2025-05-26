@@ -34,21 +34,23 @@ export default function AuthenticatedLayout({
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <div className={cn(
-        "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
-        sidebarOpen ? "w-64" : "w-16"
-      )}>
+      <div
+        className={cn(
+          "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
+          sidebarOpen ? "w-64" : "w-16"
+        )}
+      >
         <Sidebar />
       </div>
-      <main className={cn(
-        "flex-1 transition-all duration-300 ease-in-out",
-        sidebarOpen ? "ml-64" : "ml-16"
-      )}>
+      <main
+        className={cn(
+          "flex-1 transition-all duration-300 ease-in-out",
+          sidebarOpen ? "ml-64" : "ml-16"
+        )}
+      >
         <Header />
-        <div className="p-6">
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </main>
     </div>
   );
-} 
+}

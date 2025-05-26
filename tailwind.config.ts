@@ -9,11 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'sans-serif'],
+        sans: ["Roboto", "sans-serif"],
       },
     },
   },
   plugins: [],
 };
 
-export default config; 
+export default config;
