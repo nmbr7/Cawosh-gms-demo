@@ -148,7 +148,7 @@ export function BookingDetailsModal({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-500">
-                    Status
+                    Status {booking.bookingType}
                   </label>
                   <p className="mt-1">
                     <span
@@ -167,6 +167,23 @@ export function BookingDetailsModal({
                       )}
                     >
                       {booking.status}
+                    </span>
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-500">
+                    Booking Type
+                  </label>
+                  <p className="mt-1">
+                    <span
+                      className={cn(
+                        "px-2 inline-flex text-xs leading-5 font-medium rounded-md",
+                        booking.bookingType === "app"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-amber-100 text-amber-800"
+                      )}
+                    >
+                      {booking.bookingType === "app" ? "APP" : "OFFLINE"}
                     </span>
                   </p>
                 </div>

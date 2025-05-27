@@ -77,7 +77,7 @@ export default function Sidebar() {
           )}
         </div>
 
-        <nav className="flex flex-col gap-2 p-3">
+        <nav className="flex flex-col gap-1 p-3">
           {links.map(({ name, href, icon: Icon }) => (
             <Link
               key={href}

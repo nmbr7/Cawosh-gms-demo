@@ -25,6 +25,7 @@ export interface BookingData {
   endTime: string;
   bay: number;
   status: BookingStatus;
+  bookingType: "app" | "offline";
 }
 
 export class Booking {
@@ -38,7 +39,7 @@ export class Booking {
   endTime: string;
   bay: number;
   status: BookingStatus;
-
+  bookingType: "app" | "offline";
   constructor(data: BookingData) {
     this.id = data.id;
     this.serviceId = data.serviceId;
@@ -50,6 +51,7 @@ export class Booking {
     this.endTime = data.endTime;
     this.bay = data.bay;
     this.status = data.status;
+    this.bookingType = data.bookingType;
   }
 
   getStatusColor(): string {

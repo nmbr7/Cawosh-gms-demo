@@ -127,6 +127,7 @@
       "endTime": "10:00",
       "bay": 1,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Toyota",
         "model": "Camry",
@@ -150,6 +151,7 @@
       "endTime": "12:00",
       "bay": 2,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "Honda",
         "model": "Civic",
@@ -173,6 +175,7 @@
       "endTime": "13:45",
       "bay": 3,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Ford",
         "model": "Focus",
@@ -196,6 +199,7 @@
       "endTime": "10:00",
       "bay": 1,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "BMW",
         "model": "3 Series",
@@ -219,6 +223,7 @@
       "endTime": "12:30",
       "bay": 2,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Mercedes",
         "model": "C-Class",
@@ -242,6 +247,7 @@
       "endTime": "14:00",
       "bay": 3,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "Audi",
         "model": "A4",
@@ -265,6 +271,7 @@
       "endTime": "10:30",
       "bay": 1,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Lexus",
         "model": "ES",
@@ -288,6 +295,7 @@
       "endTime": "13:00",
       "bay": 2,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "Toyota",
         "model": "Prius",
@@ -311,6 +319,7 @@
       "endTime": "10:00",
       "bay": 1,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Hyundai",
         "model": "Sonata",
@@ -334,6 +343,7 @@
       "endTime": "12:00",
       "bay": 2,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "Kia",
         "model": "Optima",
@@ -357,6 +367,7 @@
       "endTime": "13:45",
       "bay": 3,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Nissan",
         "model": "Altima",
@@ -380,6 +391,7 @@
       "endTime": "10:30",
       "bay": 1,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "Volkswagen",
         "model": "Passat",
@@ -403,6 +415,7 @@
       "endTime": "13:00",
       "bay": 2,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Toyota",
         "model": "RAV4 Hybrid",
@@ -426,6 +439,7 @@
       "endTime": "14:30",
       "bay": 3,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "Mazda",
         "model": "6",
@@ -449,6 +463,7 @@
       "endTime": "11:00",
       "bay": 1,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Subaru",
         "model": "Legacy",
@@ -472,6 +487,7 @@
       "endTime": "12:30",
       "bay": 2,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "Volvo",
         "model": "S60",
@@ -495,6 +511,7 @@
       "endTime": "14:30",
       "bay": 3,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Infiniti",
         "model": "Q50",
@@ -518,6 +535,7 @@
       "endTime": "11:00",
       "bay": 1,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "Toyota",
         "model": "Highlander Hybrid",
@@ -541,6 +559,7 @@
       "endTime": "12:30",
       "bay": 2,
       "status": "completed",
+      "bookingType": "app",
       "car": {
         "make": "Chevrolet",
         "model": "Malibu",
@@ -564,6 +583,7 @@
       "endTime": "14:30",
       "bay": 3,
       "status": "completed",
+      "bookingType": "offline",
       "car": {
         "make": "Buick",
         "model": "Regal",

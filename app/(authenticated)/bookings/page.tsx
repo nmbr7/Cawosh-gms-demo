@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import React from "react";
 import { BookingDetailsModal } from "@/app/components/booking-details-modal";
+import { BookingCreateModal } from "@/app/components/BookingCreateModal";
 
 interface PaginationInfo {
   currentPage: number;
@@ -54,6 +55,7 @@ export default function BookingsPage() {
   });
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
@@ -326,9 +328,7 @@ export default function BookingsPage() {
 
             {/* Create Booking button */}
             <Button
-              onClick={() => {
-                /* TODO: Add create booking handler */
-              }}
+              onClick={() => setIsCreateModalOpen(true)}
               className="bg-blue-500 text-white hover:bg-blue-600"
             >
               Create Booking
@@ -611,9 +611,7 @@ export default function BookingsPage() {
 
           {/* Create Booking button */}
           <Button
-            onClick={() => {
-              /* TODO: Add create booking handler */
-            }}
+            onClick={() => setIsCreateModalOpen(true)}
             className="bg-blue-500 text-white hover:bg-blue-600"
           >
             Create Booking
@@ -897,6 +895,12 @@ export default function BookingsPage() {
         booking={selectedBooking}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* Create Booking Modal */}
+      <BookingCreateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
       />
     </div>
   );
