@@ -324,7 +324,6 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
-                            mode="single"
                             selected={date}
                             onSelect={(d) => {
                               setDate(d);
@@ -334,18 +333,6 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                             disabled={(d) =>
                               isBefore(d, startOfDay(new Date()))
                             }
-                            modifiers={{
-                              today: (d) =>
-                                d.getTime() ===
-                                startOfDay(new Date()).getTime(),
-                            }}
-                            modifiersStyles={{
-                              today: {
-                                fontWeight: "bold",
-                                border: "2px solid #3b82f6",
-                                borderRadius: "50%",
-                              },
-                            }}
                           />
                         </PopoverContent>
                       </Popover>
