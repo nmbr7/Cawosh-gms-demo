@@ -1,11 +1,20 @@
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const SPECIALIZATIONS = [
   "Engine Diagnostics",
@@ -31,10 +40,10 @@ interface SpecializationSelectProps {
   disabled?: boolean;
 }
 
-export function SpecializationSelect({ 
-  selectedSpecializations, 
+export function SpecializationSelect({
+  selectedSpecializations,
   onSpecializationsChange,
-  disabled = false 
+  disabled = false,
 }: SpecializationSelectProps) {
   const [specializationInput, setSpecializationInput] = useState("");
   const [isOpenSpecialization, setIsOpenSpecialization] = useState(false);
@@ -48,20 +57,25 @@ export function SpecializationSelect({
   };
 
   const handleSpecializationRemove = (value: string) => {
-    onSpecializationsChange(selectedSpecializations.filter(s => s !== value));
+    onSpecializationsChange(selectedSpecializations.filter((s) => s !== value));
   };
 
-  const filteredSpecializations = SPECIALIZATIONS.filter(spec =>
-    spec.toLowerCase().includes(specializationInput.toLowerCase()) &&
-    !selectedSpecializations.includes(spec)
+  const filteredSpecializations = SPECIALIZATIONS.filter(
+    (spec) =>
+      spec.toLowerCase().includes(specializationInput.toLowerCase()) &&
+      !selectedSpecializations.includes(spec)
   );
 
   return (
     <div className="space-y-2">
       <Label>Specializations</Label>
       <div className="flex flex-wrap gap-2 mb-2">
-        {selectedSpecializations.map(spec => (
-          <Badge key={spec} variant="secondary" className="flex items-center gap-1">
+        {selectedSpecializations.map((spec) => (
+          <Badge
+            key={spec}
+            variant="secondary"
+            className="flex items-center gap-1"
+          >
             {spec}
             <button
               type="button"
@@ -73,9 +87,16 @@ export function SpecializationSelect({
           </Badge>
         ))}
       </div>
-      <Popover open={isOpenSpecialization} onOpenChange={setIsOpenSpecialization}>
+      <Popover
+        open={isOpenSpecialization}
+        onOpenChange={setIsOpenSpecialization}
+      >
         <PopoverTrigger asChild>
-          <Button variant="outline" className="w-full justify-start" disabled={disabled}>
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            disabled={disabled}
+          >
             Add specialization
           </Button>
         </PopoverTrigger>
@@ -88,7 +109,7 @@ export function SpecializationSelect({
             />
             <CommandEmpty>No specializations found.</CommandEmpty>
             <CommandGroup>
-              {filteredSpecializations.map(spec => (
+              {filteredSpecializations.map((spec) => (
                 <CommandItem
                   key={spec}
                   onSelect={() => handleSpecializationSelect(spec)}
@@ -102,4 +123,4 @@ export function SpecializationSelect({
       </Popover>
     </div>
   );
-} 
+}

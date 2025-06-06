@@ -1,5 +1,10 @@
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { EmploymentType } from "@/app/models/user";
 
@@ -20,7 +25,7 @@ const POSITIONS = [
   "Manager",
   "Admin",
   "Operations Manager",
-  "Service Manager"
+  "Service Manager",
 ];
 
 const DEPARTMENTS = [
@@ -28,7 +33,7 @@ const DEPARTMENTS = [
   "Operations",
   "IT",
   "Maintenance",
-  "Management"
+  "Management",
 ];
 
 export function EmploymentDetails({
@@ -40,7 +45,7 @@ export function EmploymentDetails({
   onDepartmentChange,
   onEmploymentTypeChange,
   onJoiningDateChange,
-  disabled = false
+  disabled = false,
 }: EmploymentDetailsProps) {
   return (
     <div className="space-y-4">
@@ -92,7 +97,9 @@ export function EmploymentDetails({
         </label>
         <Select
           value={employmentType}
-          onValueChange={(value) => onEmploymentTypeChange(value as EmploymentType)}
+          onValueChange={(value) =>
+            onEmploymentTypeChange(value as EmploymentType)
+          }
           disabled={disabled}
         >
           <SelectTrigger className="bg-white">
@@ -118,4 +125,4 @@ export function EmploymentDetails({
       </div>
     </div>
   );
-} 
+}

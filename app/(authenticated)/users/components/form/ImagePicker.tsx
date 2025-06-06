@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, X } from "lucide-react";
+import Image from "next/image";
 
 interface ImagePickerProps {
-  imageUrl?: string;
+  imageUrl?: string | null;
   onImageChange: (file: File | null) => void;
   disabled?: boolean;
 }
 
-export function ImagePicker({ imageUrl, onImageChange, disabled = false }: ImagePickerProps) {
+export function ImagePicker({
+  imageUrl,
+  onImageChange,
+  disabled = false,
+}: ImagePickerProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(imageUrl || null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,34 +28,19 @@ export function ImagePicker({ imageUrl, onImageChange, disabled = false }: Image
     }
   };
 
-  const handleRemoveImage = () => {
-    setPreviewUrl(null);
-    onImageChange(null);
-  };
-
   return (
     <div className="space-y-2">
       <Label>Profile Image</Label>
       <div className="flex items-center gap-4">
         <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200">
-          {previewUrl ? (
-            <>
-              <img
+          {previewUrl && (
+            <div className="relative w-32 h-32">
+              <Image
                 src={previewUrl}
-                alt="Profile preview"
-                className="w-full h-full object-cover"
+                alt="Preview"
+                fill
+                className="object-cover rounded-full"
               />
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100">
-              <ImagePlus className="h-8 w-8 text-gray-400" />
             </div>
           )}
         </div>
@@ -66,7 +55,8 @@ export function ImagePicker({ imageUrl, onImageChange, disabled = false }: Image
           <Button
             type="button"
             variant="outline"
-            onClick={() => document.getElementById('image')?.click()}
+            onClick={() => document.getElementById("image")?.click()}
+            disabled={disabled}
           >
             {previewUrl ? "Change Image" : "Upload Image"}
           </Button>
@@ -74,4 +64,4 @@ export function ImagePicker({ imageUrl, onImageChange, disabled = false }: Image
       </div>
     </div>
   );
-} 
+}

@@ -34,6 +34,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
     duration: 60,
     price: 0,
     currency: "GBP",
+    currencySymbol: "£",
     category: "maintenance",
     isActive: true,
   });
@@ -45,6 +46,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
         description: service.description,
         duration: service.duration,
         currency: service.currency,
+        currencySymbol: service.currencySymbol,
         price: service.price,
         category: service.category,
         isActive: service.isActive,
@@ -56,6 +58,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({
         duration: 60,
         price: 0,
         currency: "GBP",
+        currencySymbol: "£",
         category: "maintenance",
         isActive: true,
       });

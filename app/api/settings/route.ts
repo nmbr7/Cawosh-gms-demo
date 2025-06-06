@@ -1,25 +1,35 @@
 import { NextResponse } from "next/server";
-import settings from "@/app/data/mock-settings.json";
 
 export async function GET() {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  return NextResponse.json(settings);
+  try {
+    // Mock settings data
+    return NextResponse.json({
+      settings: {
+        // ... existing settings
+      },
+    });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to fetch settings" },
+      { status: 500 }
+    );
+  }
 }
 
-export async function PUT(request: Request) {
+export async function PUT() {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
   try {
-    const body = await request.json();
     // In a real application, you would save these settings to a database
-    return NextResponse.json({ success: true, message: "Settings updated successfully" });
-  } catch (error) {
+    return NextResponse.json({
+      success: true,
+      message: "Settings updated successfully",
+    });
+  } catch {
     return NextResponse.json(
       { success: false, message: "Failed to update settings" },
       { status: 400 }
     );
   }
-} 
+}

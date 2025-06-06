@@ -10,7 +10,9 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [verificationCode, setVerificationCode] = useState(["", "", "", "", ""]);
+  const [verificationCode, setVerificationCode] = useState<string[]>(
+    Array(6).fill("")
+  );
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -44,10 +46,10 @@ export default function ForgotPasswordPage() {
 
     try {
       // Check if email exists
-      const checkEmailResponse = await fetch('/api/auth/check-email', {
-        method: 'POST',
+      const checkEmailResponse = await fetch("/api/auth/check-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
       });
@@ -61,10 +63,10 @@ export default function ForgotPasswordPage() {
       }
 
       // Send OTP
-      const sendOtpResponse = await fetch('/api/auth/send-otp', {
-        method: 'POST',
+      const sendOtpResponse = await fetch("/api/auth/send-otp", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
       });
@@ -79,7 +81,7 @@ export default function ForgotPasswordPage() {
 
       setStep("code");
       setSuccess(sendOtpData.message);
-    } catch (error) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -119,10 +121,10 @@ export default function ForgotPasswordPage() {
   const validateVerificationCode = async (code: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/verify-otp', {
-        method: 'POST',
+      const response = await fetch("/api/auth/verify-otp", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, code }),
       });
@@ -138,7 +140,7 @@ export default function ForgotPasswordPage() {
       setStep("password");
       setError("");
       setSuccess("");
-    } catch (error) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -164,14 +166,14 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      const response = await fetch('/api/auth/update-password', {
-        method: 'POST',
+      const response = await fetch("/api/auth/update-password", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           email,
-          newPassword 
+          newPassword,
         }),
       });
 
@@ -185,11 +187,11 @@ export default function ForgotPasswordPage() {
 
       setSuccess(data.message);
       // Clear any existing token before redirecting to login
-      document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       setTimeout(() => {
         window.location.href = "/login";
       }, 2000);
-    } catch (error) {
+    } catch {
       setError("An error occurred. Please try again.");
       setIsLoading(false);
     }
@@ -198,7 +200,13 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form
-        onSubmit={step === "email" ? handleEmailSubmit : step === "password" ? handlePasswordSubmit : undefined}
+        onSubmit={
+          step === "email"
+            ? handleEmailSubmit
+            : step === "password"
+            ? handlePasswordSubmit
+            : undefined
+        }
         className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
       >
         {step !== "password" && (
@@ -208,7 +216,8 @@ export default function ForgotPasswordPage() {
         {step === "email" ? (
           <>
             <p className="text-sm text-gray-600 mb-4">
-              Enter your registered email address to receive a verification code for resetting your password
+              Enter your registered email address to receive a verification code
+              for resetting your password
             </p>
             <div className="mb-4">
               <label className="block mb-1 text-sm font-medium">Email</label>
@@ -223,7 +232,9 @@ export default function ForgotPasswordPage() {
             </div>
 
             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-            {success && <p className="text-green-500 text-sm mb-4">{success}</p>}
+            {success && (
+              <p className="text-green-500 text-sm mb-4">{success}</p>
+            )}
 
             <CustomButton type="submit" className="mb-4" disabled={isLoading}>
               {isLoading ? <LoadingSpinner /> : "Send Verification Code"}
@@ -233,9 +244,12 @@ export default function ForgotPasswordPage() {
           <>
             <div className="mb-6">
               <p className="text-sm text-gray-600 mb-4">
-                A code has been sent to your email. Enter the verification code sent to your registered email to proceed with password reset.
+                A code has been sent to your email. Enter the verification code
+                sent to your registered email to proceed with password reset.
               </p>
-              <label className="block mb-1 text-sm font-medium">Verification Code</label>
+              <label className="block mb-1 text-sm font-medium">
+                Verification Code
+              </label>
               <div className="flex gap-3">
                 {verificationCode.map((digit, index) => (
                   <Input
@@ -260,10 +274,10 @@ export default function ForgotPasswordPage() {
 
             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-            <CustomButton 
-              type="button" 
+            <CustomButton
+              type="button"
               onClick={handleContinue}
-              disabled={isLoading || verificationCode.some(digit => !digit)}
+              disabled={isLoading || verificationCode.some((digit) => !digit)}
               className="w-full"
             >
               {isLoading ? <LoadingSpinner /> : "Continue"}
@@ -273,10 +287,13 @@ export default function ForgotPasswordPage() {
           <>
             <h1 className="text-2xl font-bold mb-2">Set new password</h1>
             <p className="text-sm text-gray-600 mb-4">
-              Your new password must be at least 8 characters long. Make sure it's strong and not used elsewhere
+              Your new password must be at least 8 characters long. Make sure
+              it&apos;s strong and not used elsewhere
             </p>
             <div className="mb-4">
-              <label className="block mb-1 text-sm font-medium">New Password</label>
+              <label className="block mb-1 text-sm font-medium">
+                New Password
+              </label>
               <PasswordInput
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -287,7 +304,9 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div className="mb-4">
-              <label className="block mb-1 text-sm font-medium">Confirm Password</label>
+              <label className="block mb-1 text-sm font-medium">
+                Confirm Password
+              </label>
               <PasswordInput
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -298,7 +317,9 @@ export default function ForgotPasswordPage() {
             </div>
 
             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-            {success && <p className="text-green-500 text-sm mb-4">{success}</p>}
+            {success && (
+              <p className="text-green-500 text-sm mb-4">{success}</p>
+            )}
 
             <CustomButton type="submit" disabled={isLoading}>
               {isLoading ? <LoadingSpinner /> : "Reset Password"}
@@ -307,11 +328,14 @@ export default function ForgotPasswordPage() {
         )}
 
         <div className="text-center mt-8">
-          <Link href="/login" className="text-sm text-blue-600 hover:text-blue-800">
+          <Link
+            href="/login"
+            className="text-sm text-blue-600 hover:text-blue-800"
+          >
             Back to Login
           </Link>
         </div>
       </form>
     </div>
   );
-} 
+}

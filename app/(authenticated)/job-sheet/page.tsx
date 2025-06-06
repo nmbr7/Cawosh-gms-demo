@@ -192,7 +192,7 @@ export default function JobSheetPage() {
 
   useEffect(() => {
     fetchJobSheets();
-  }, [currentPage, filters]);
+  }, [fetchJobSheets]);
 
   const handleFilterChange = (key: keyof FilterState, value: string | null) => {
     console.log("handleFilterChange", key, value);

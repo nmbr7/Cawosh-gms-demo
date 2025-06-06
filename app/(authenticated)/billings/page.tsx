@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { FileDoc, CaretLeft, CaretRight } from "phosphor-react";
 import { formatDate } from "@/lib/utils";
@@ -63,8 +63,7 @@ export default function BillingsPage() {
     itemsPerPage: 10,
   });
 
-  // Fetch billings from API
-  const fetchBillings = async () => {
+  const fetchBillings = useCallback(async () => {
     try {
       setIsLoading(true);
       const params = new URLSearchParams({
@@ -88,11 +87,17 @@ export default function BillingsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [
+    paginationInfo.currentPage,
+    paginationInfo.itemsPerPage,
+    searchTerm,
+    serviceFilter,
+    dateFilter,
+  ]);
 
   useEffect(() => {
     fetchBillings();
-  }, [paginationInfo.currentPage, searchTerm, serviceFilter, dateFilter]);
+  }, [fetchBillings]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= paginationInfo.totalPages) {

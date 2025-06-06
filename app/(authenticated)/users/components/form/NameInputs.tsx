@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 interface NameInputsProps {
   firstName: string;
@@ -9,7 +8,13 @@ interface NameInputsProps {
   disabled?: boolean;
 }
 
-export function NameInputs({ firstName, lastName, onFirstNameChange, onLastNameChange, disabled = false }: NameInputsProps) {
+export function NameInputs({
+  firstName,
+  lastName,
+  onFirstNameChange,
+  onLastNameChange,
+  disabled = false,
+}: NameInputsProps) {
   return (
     <div className="space-y-4">
       <div>
@@ -36,4 +41,4 @@ export function NameInputs({ firstName, lastName, onFirstNameChange, onLastNameC
       </div>
     </div>
   );
-} 
+}

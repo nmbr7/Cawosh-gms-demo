@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { User, UserRole } from "@/app/models/user";
+import { useState, useEffect, useCallback } from "react";
+import { UserRole, UserStatus, EmploymentType } from "@/app/models/user";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -28,7 +28,6 @@ import { format } from "date-fns";
 import React from "react";
 import { PlusIcon } from "lucide-react";
 import { AddUserModal } from "./components/AddUserModal";
-import { toast } from "sonner";
 
 interface PaginationInfo {
   currentPage: number;
@@ -45,12 +44,47 @@ interface FilterState {
   sortOrder: "asc" | "desc";
 }
 
+interface ApiUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  role: UserRole;
+  status: UserStatus;
+  permissions?: string[];
+  accessLevel?: string;
+  employmentType?: EmploymentType;
+  employeeId?: string;
+  position?: string;
+  department?: string;
+  specialization?: string[];
+  managedDepartments?: string[];
+  lastLogin?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  role: UserRole;
+  status: UserStatus;
+  position?: string;
+  department?: string;
+  employmentType?: EmploymentType;
+  joiningDate?: string;
+  specialization?: string[];
+}
+
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<ApiUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<ApiUser | null>(null);
   const [modalMode, setModalMode] = useState<"view" | "edit" | "add">("add");
   const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
     currentPage: 1,
@@ -71,7 +105,7 @@ export default function UsersPage() {
 
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -100,18 +134,39 @@ export default function UsersPage() {
         throw new Error("Failed to fetch users");
       }
       const data = await response.json();
-      setUsers(data.users.map((user: any) => new User(user)));
+      setUsers(
+        data.users.map((user: ApiUser) => ({
+          id: user.id.toString(),
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone || "",
+          role: user.role,
+          status: user.status,
+          permissions: user.permissions || [],
+          accessLevel: user.accessLevel || "",
+          employmentType: user.employmentType || "full-time",
+          employeeId: user.employeeId,
+          position: user.position,
+          department: user.department,
+          specialization: user.specialization,
+          managedDepartments: user.managedDepartments,
+          lastLogin: user.lastLogin,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        }))
+      );
       setPaginationInfo(data.pagination);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, filters]);
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, filters]);
+  }, [fetchUsers]);
 
   const handleFilterChange = (key: keyof FilterState, value: string | null) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -133,7 +188,7 @@ export default function UsersPage() {
     }
   };
 
-  const handleAddUser = async (userData: any) => {
+  const handleAddUser = async (userData: UserData) => {
     try {
       // TODO: Implement API call to add user
       console.log("Adding user:", userData);
@@ -145,13 +200,13 @@ export default function UsersPage() {
     }
   };
 
-  const handleViewUser = (user: User) => {
+  const handleViewUser = (user: ApiUser) => {
     setSelectedUser(user);
     setModalMode("view");
     setIsAddUserModalOpen(true);
   };
 
-  const handleEditUser = (user: User) => {
+  const handleEditUser = (user: ApiUser) => {
     setSelectedUser(user);
     setModalMode("edit");
     setIsAddUserModalOpen(true);
@@ -763,7 +818,22 @@ export default function UsersPage() {
           setModalMode("add");
         }}
         onSave={handleAddUser}
-        initialData={selectedUser}
+        initialData={
+          selectedUser
+            ? {
+                firstName: selectedUser.firstName,
+                lastName: selectedUser.lastName,
+                email: selectedUser.email,
+                phone: selectedUser.phone || "",
+                role: selectedUser.role,
+                status: selectedUser.status,
+                position: selectedUser.position,
+                department: selectedUser.department,
+                employmentType: selectedUser.employmentType || "full-time",
+                specialization: selectedUser.specialization,
+              }
+            : undefined
+        }
         mode={modalMode}
       />
     </div>

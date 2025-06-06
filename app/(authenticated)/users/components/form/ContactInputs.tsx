@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { validateEmail, validatePhone } from "@/app/utils/validation";
 
 interface ContactInputsProps {
   email: string;
@@ -12,19 +11,21 @@ interface ContactInputsProps {
   disabled?: boolean;
 }
 
-export function ContactInputs({ 
-  email, 
-  phone, 
-  onEmailChange, 
+export function ContactInputs({
+  email,
+  phone,
+  onEmailChange,
   onPhoneChange,
   emailError,
   phoneError,
-  disabled = false
+  disabled = false,
 }: ContactInputsProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+        <Label htmlFor="email">
+          Email <span className="text-red-500">*</span>
+        </Label>
         <Input
           id="email"
           type="email"
@@ -35,12 +36,12 @@ export function ContactInputs({
           className={emailError ? "border-red-500" : ""}
           disabled={disabled}
         />
-        {emailError && (
-          <p className="text-sm text-red-500">{emailError}</p>
-        )}
+        {emailError && <p className="text-sm text-red-500">{emailError}</p>}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone <span className="text-red-500">*</span></Label>
+        <Label htmlFor="phone">
+          Phone <span className="text-red-500">*</span>
+        </Label>
         <div className="flex">
           <div className="flex items-center px-3 bg-gray-100 border border-r-0 rounded-l-md text-gray-500">
             +44
@@ -55,10 +56,8 @@ export function ContactInputs({
             disabled={disabled}
           />
         </div>
-        {phoneError && (
-          <p className="text-sm text-red-500">{phoneError}</p>
-        )}
+        {phoneError && <p className="text-sm text-red-500">{phoneError}</p>}
       </div>
     </div>
   );
-} 
+}

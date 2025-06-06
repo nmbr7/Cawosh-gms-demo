@@ -1,26 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
-    const { email } = await request.json();
+    // Mock OTP generation
+    const otp = Math.floor(10000 + Math.random() * 90000).toString();
 
     // In a real application, you would:
-    // 1. Generate a random OTP
-    // 2. Store it in your database with an expiration time
-    // 3. Send it via email/SMS service
-    // For this example, we'll just return a success response
+    // 1. Store the OTP in the database with an expiration time
+    // 2. Send the OTP via email
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    return NextResponse.json({ 
-      success: true,
-      message: 'Verification code has been sent to your email'
+    return NextResponse.json({
+      message: "OTP sent successfully",
+      otp, // Remove this in production
     });
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to send verification code' },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });
   }
-} 
+}

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { UserRole, UserStatus, EmploymentType } from "@/app/models/user";
 import { NameInputs } from "./form/NameInputs";
@@ -11,31 +17,62 @@ import { StatusSelect } from "./form/StatusSelect";
 import { SpecializationSelect } from "./form/SpecializationSelect";
 import { ImagePicker } from "./form/ImagePicker";
 import { EmploymentDetails } from "./form/EmploymentDetails";
-import { validateEmail, validatePhone, getValidationErrors } from "@/app/utils/validation";
+import {
+  validateEmail,
+  validatePhone,
+  getValidationErrors,
+} from "@/app/utils/validation";
 import { toast } from "sonner";
+
+interface ValidationErrors {
+  [key: string]: string;
+}
+
+interface FormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  role: UserRole;
+  status: UserStatus;
+  position: string;
+  department: string;
+  employmentType: EmploymentType;
+  joiningDate: string;
+  specialization: string[];
+  image?: File | null;
+  imageUrl?: string | null;
+}
 
 interface AddUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (userData: any) => void;
-  initialData?: any;
-  mode?: 'view' | 'edit' | 'add';
+  onSave: (userData: FormData) => void;
+  initialData?: Partial<FormData>;
+  mode?: "view" | "edit" | "add";
 }
 
-export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add' }: AddUserModalProps) {
-  const [formData, setFormData] = useState({
+export function AddUserModal({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  mode = "add",
+}: AddUserModalProps) {
+  const [formData, setFormData] = useState<FormData>({
     firstName: initialData?.firstName || "",
     lastName: initialData?.lastName || "",
     email: initialData?.email || "",
     phone: initialData?.phone || "",
-    role: initialData?.role || "staff" as UserRole,
-    status: initialData?.status || "active" as UserStatus,
+    role: initialData?.role || "staff",
+    status: initialData?.status || "active",
     position: initialData?.position || "",
     department: initialData?.department || "",
-    employmentType: initialData?.employmentType || "full-time" as EmploymentType,
-    joiningDate: initialData?.joiningDate || new Date().toISOString().split('T')[0],
+    employmentType: initialData?.employmentType || "full-time",
+    joiningDate:
+      initialData?.joiningDate || new Date().toISOString().split("T")[0],
     specialization: initialData?.specialization || [],
-    image: null as File | null,
+    image: null,
     imageUrl: initialData?.imageUrl || null,
   });
 
@@ -44,8 +81,8 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
     phone?: string;
   }>({});
 
-  const isViewMode = mode === 'view';
-  const isEditMode = mode === 'edit';
+  const isViewMode = mode === "view";
+  const isEditMode = mode === "edit";
 
   // Reset form data when initialData changes
   useEffect(() => {
@@ -60,7 +97,8 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
         position: initialData.position || "",
         department: initialData.department || "",
         employmentType: initialData.employmentType || "full-time",
-        joiningDate: initialData.joiningDate || new Date().toISOString().split('T')[0],
+        joiningDate:
+          initialData.joiningDate || new Date().toISOString().split("T")[0],
         specialization: initialData.specialization || [],
         image: null,
         imageUrl: initialData.imageUrl || null,
@@ -69,7 +107,14 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
   }, [initialData]);
 
   const validateForm = () => {
-    const validationErrors = getValidationErrors(formData);
+    const validationErrors: ValidationErrors = {
+      firstName: !formData.firstName ? "First name is required" : "",
+      lastName: !formData.lastName ? "Last name is required" : "",
+      email: !formData.email ? "Email is required" : "",
+      phone: !formData.phone ? "Phone is required" : "",
+      role: !formData.role ? "Role is required" : "",
+    };
+    const errors = getValidationErrors(validationErrors);
     const fieldErrors: { email?: string; phone?: string } = {};
 
     if (formData.email && !validateEmail(formData.email)) {
@@ -77,16 +122,17 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
     }
 
     if (formData.phone && !validatePhone(formData.phone)) {
-      fieldErrors.phone = "Please enter a valid UK phone number (e.g., 07123456789)";
+      fieldErrors.phone =
+        "Please enter a valid UK phone number (e.g., 07123456789)";
     }
 
     setErrors(fieldErrors);
 
-    if (validationErrors.length > 0 || Object.keys(fieldErrors).length > 0) {
+    if (errors.length > 0 || Object.keys(fieldErrors).length > 0) {
       toast.error("Validation Error", {
         description: (
           <ul className="list-disc list-inside">
-            {validationErrors.map((error, index) => (
+            {errors.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
             {fieldErrors.email && <li>{fieldErrors.email}</li>}
@@ -102,7 +148,7 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -115,7 +161,11 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
       <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">
-            {isViewMode ? "User Details" : isEditMode ? "Edit User" : "Add New User"}
+            {isViewMode
+              ? "User Details"
+              : isEditMode
+              ? "Edit User"
+              : "Add New User"}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -124,23 +174,33 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
             <div className="space-y-6">
               <ImagePicker
                 imageUrl={initialData?.imageUrl}
-                onImageChange={(file) => setFormData(prev => ({ ...prev, image: file }))}
+                onImageChange={(file) =>
+                  setFormData((prev) => ({ ...prev, image: file }))
+                }
                 disabled={isViewMode}
               />
 
               <NameInputs
                 firstName={formData.firstName}
                 lastName={formData.lastName}
-                onFirstNameChange={(value) => setFormData(prev => ({ ...prev, firstName: value }))}
-                onLastNameChange={(value) => setFormData(prev => ({ ...prev, lastName: value }))}
+                onFirstNameChange={(value) =>
+                  setFormData((prev) => ({ ...prev, firstName: value }))
+                }
+                onLastNameChange={(value) =>
+                  setFormData((prev) => ({ ...prev, lastName: value }))
+                }
                 disabled={isViewMode}
               />
 
               <ContactInputs
                 email={formData.email}
                 phone={formData.phone}
-                onEmailChange={(value) => setFormData(prev => ({ ...prev, email: value }))}
-                onPhoneChange={(value) => setFormData(prev => ({ ...prev, phone: value }))}
+                onEmailChange={(value) =>
+                  setFormData((prev) => ({ ...prev, email: value }))
+                }
+                onPhoneChange={(value) =>
+                  setFormData((prev) => ({ ...prev, phone: value }))
+                }
                 emailError={errors.email}
                 phoneError={errors.phone}
                 disabled={isViewMode}
@@ -152,13 +212,17 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
               <div className="grid grid-cols-2 gap-4">
                 <RoleSelect
                   role={formData.role}
-                  onRoleChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
+                  onRoleChange={(value) =>
+                    setFormData((prev) => ({ ...prev, role: value }))
+                  }
                   disabled={isViewMode}
                 />
 
                 <StatusSelect
                   status={formData.status}
-                  onStatusChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                  onStatusChange={(value) =>
+                    setFormData((prev) => ({ ...prev, status: value }))
+                  }
                   disabled={isViewMode}
                 />
               </div>
@@ -168,10 +232,18 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
                 department={formData.department}
                 employmentType={formData.employmentType}
                 joiningDate={formData.joiningDate}
-                onPositionChange={(value) => setFormData(prev => ({ ...prev, position: value }))}
-                onDepartmentChange={(value) => setFormData(prev => ({ ...prev, department: value }))}
-                onEmploymentTypeChange={(value) => setFormData(prev => ({ ...prev, employmentType: value }))}
-                onJoiningDateChange={(value) => setFormData(prev => ({ ...prev, joiningDate: value }))}
+                onPositionChange={(value) =>
+                  setFormData((prev) => ({ ...prev, position: value }))
+                }
+                onDepartmentChange={(value) =>
+                  setFormData((prev) => ({ ...prev, department: value }))
+                }
+                onEmploymentTypeChange={(value) =>
+                  setFormData((prev) => ({ ...prev, employmentType: value }))
+                }
+                onJoiningDateChange={(value) =>
+                  setFormData((prev) => ({ ...prev, joiningDate: value }))
+                }
                 disabled={isViewMode}
               />
             </div>
@@ -181,7 +253,9 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
           <div className="col-span-2">
             <SpecializationSelect
               selectedSpecializations={formData.specialization}
-              onSpecializationsChange={(value) => setFormData(prev => ({ ...prev, specialization: value }))}
+              onSpecializationsChange={(value) =>
+                setFormData((prev) => ({ ...prev, specialization: value }))
+              }
               disabled={isViewMode}
             />
           </div>
@@ -200,4 +274,4 @@ export function AddUserModal({ isOpen, onClose, onSave, initialData, mode = 'add
       </DialogContent>
     </Dialog>
   );
-} 
+}

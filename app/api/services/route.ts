@@ -9,7 +9,9 @@ export async function GET(request: Request) {
     const isActive = searchParams.get("isActive");
 
     const garage = db.garages.find((g) => g.id === tenantId);
-    if (!garage) return [];
+    if (!garage) {
+      return NextResponse.json({ services: [], filters: { categories: [] } });
+    }
 
     const serviceIds = garage.services.map((s) => s.serviceId);
     let services = db.services.filter((s) => serviceIds.includes(s.id));
