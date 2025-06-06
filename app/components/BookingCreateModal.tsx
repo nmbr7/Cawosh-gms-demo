@@ -58,6 +58,23 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<string>("");
 
+  // Add validation function
+  const isFormValid = () => {
+    return (
+      customerName.trim() !== "" &&
+      customerEmail.trim() !== "" &&
+      customerPhone.trim() !== "" &&
+      carMake.trim() !== "" &&
+      carModel.trim() !== "" &&
+      carYear.trim() !== "" &&
+      carRegistration.trim() !== "" &&
+      serviceId !== null &&
+      date !== undefined &&
+      bay !== "" &&
+      selectedSlot !== ""
+    );
+  };
+
   // Reset all form fields
   const resetForm = () => {
     setCustomerName("");
@@ -167,7 +184,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Name
+                        Name <span className="text-red-500">*</span>
                       </label>
                       <Input
                         required
@@ -178,7 +195,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Email
+                        Email <span className="text-red-500">*</span>
                       </label>
                       <Input
                         required
@@ -190,7 +207,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Phone
+                        Phone <span className="text-red-500">*</span>
                       </label>
                       <Input
                         required
@@ -208,7 +225,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Make
+                        Make <span className="text-red-500">*</span>
                       </label>
                       <Input
                         required
@@ -219,7 +236,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Model
+                        Model <span className="text-red-500">*</span>
                       </label>
                       <Input
                         required
@@ -230,7 +247,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Year
+                        Year <span className="text-red-500">*</span>
                       </label>
                       <Input
                         required
@@ -241,7 +258,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Registration
+                        Registration <span className="text-red-500">*</span>
                       </label>
                       <Input
                         placeholder="Registration Number"
@@ -259,7 +276,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                 <div>
                   <h3 className="text-sm font-semibold mb-2">Service</h3>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Service
+                    Service <span className="text-red-500">*</span>
                   </label>
                   <Select
                     value={serviceId ?? ""}
@@ -287,7 +304,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Preferred Date
+                        Preferred Date <span className="text-red-500">*</span>
                       </label>
                       <Popover
                         open={isDatePopoverOpen}
@@ -343,8 +360,8 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                         </span>
                       </div>
                       <p className="mt-1 text-xs text-gray-500">
-                        This is an offline booking that will be scheduled by the
-                        garage staff based on technician availability
+                        For walk-ins. Slot is auto-assigned based on preferred
+                        day and technician availability
                       </p>
                     </div>
                   </div>
@@ -354,7 +371,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                 <div>
                   <h3 className="text-sm font-semibold mb-2">Bay</h3>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Bay
+                    Bay <span className="text-red-500">*</span>
                   </label>
                   <Select value={bay} onValueChange={(v) => setBay(v)} required>
                     <SelectTrigger className="w-full bg-white">
@@ -444,7 +461,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
               <Button
                 type="submit"
                 className="bg-blue-500 text-white hover:bg-blue-600"
-                disabled={!selectedSlot}
+                disabled={!isFormValid()}
               >
                 Create Booking
               </Button>
