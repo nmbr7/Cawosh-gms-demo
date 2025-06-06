@@ -9,7 +9,7 @@ interface CalendarProps {
   className?: string;
   selected?: Date;
   onSelect?: (date: Date | undefined) => void;
-  disabled?: boolean;
+  disabled?: boolean | ((date: Date) => boolean);
   classNames?: Record<string, string>;
 }
 
@@ -27,6 +27,9 @@ function Calendar({
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value ? new Date(e.target.value) : undefined;
+    if (newDate && typeof disabled === "function" && disabled(newDate)) {
+      return;
+    }
     setDateValue(e.target.value);
     onSelect?.(newDate);
   };
@@ -37,7 +40,7 @@ function Calendar({
         type="date"
         value={dateValue}
         onChange={handleDateChange}
-        disabled={disabled}
+        disabled={typeof disabled === "boolean" ? disabled : false}
         className={cn(
           "w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
           classNames?.input
