@@ -13,6 +13,5 @@
       "src": "package.json",
       "use": "@vercel/next"
     }
-  ],
-  "ignoreCommand": "echo 'Skipping build'"
+  ]
 }
