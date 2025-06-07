@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-
-const API_URL = process.env.API_URL;
+import { MOCK_ADMIN } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -14,58 +13,37 @@ export async function POST(request: Request) {
       );
     }
 
-    // First API call - Login
-    const loginResponse = await fetch(`${API_URL}/api/v1/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
-
-    if (!loginResponse.ok) {
-      const errorData = await loginResponse.json();
+    // Mock login validation
+    if (email !== MOCK_ADMIN.email || password !== "password") {
       return NextResponse.json(
-        { error: errorData.message || "Login failed" },
-        { status: loginResponse.status }
+        { error: "Invalid email or password" },
+        { status: 401 }
       );
     }
 
-    const loginData = await loginResponse.json();
-
-    // Second API call - Get user details
-    const userResponse = await fetch(`${API_URL}/api/v1/users/me`, {
-      headers: {
-        Authorization: `Bearer ${loginData.data.access_token}`,
+    // Mock successful login response
+    const mockLoginData = {
+      data: {
+        access_token: "mock-jwt-token",
+        permissions: MOCK_ADMIN.permissions,
+        system_access: MOCK_ADMIN.systemAccess,
       },
-    });
+    };
 
-    if (!userResponse.ok) {
-      const errorData = await userResponse.json();
-      return NextResponse.json(
-        { error: errorData.message || "Failed to fetch user details" },
-        { status: userResponse.status }
-      );
-    }
-
-    const userData = await userResponse.json();
     // Create the response
     const response = NextResponse.json({
       success: true,
       message: "Login successful",
       data: {
-        user: userData.data,
-        token: loginData.data.access_token,
-        permissions: loginData.data.permissions,
-        systemAccess: loginData.data.system_access,
+        user: MOCK_ADMIN,
+        token: mockLoginData.data.access_token,
+        permissions: mockLoginData.data.permissions,
+        systemAccess: mockLoginData.data.system_access,
       },
     });
 
     // Set the access token in an HTTP-only cookie
-    response.cookies.set("access_token", loginData.data.access_token, {
+    response.cookies.set("access_token", mockLoginData.data.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
