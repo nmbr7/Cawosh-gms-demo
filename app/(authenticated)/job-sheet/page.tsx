@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -133,7 +133,7 @@ export default function JobSheetPage() {
     }
   };
 
-  const fetchJobSheets = async () => {
+  const fetchJobSheets = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -175,7 +175,11 @@ export default function JobSheetPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, filters]);
+
+  useEffect(() => {
+    fetchJobSheets();
+  }, [fetchJobSheets]);
 
   const handleRefresh = async () => {
     try {
@@ -189,10 +193,6 @@ export default function JobSheetPage() {
       setIsRefreshing(false);
     }
   };
-
-  useEffect(() => {
-    fetchJobSheets();
-  }, [fetchJobSheets]);
 
   const handleFilterChange = (key: keyof FilterState, value: string | null) => {
     console.log("handleFilterChange", key, value);
