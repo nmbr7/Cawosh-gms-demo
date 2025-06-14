@@ -17,6 +17,7 @@ import {
   Headphones,
   UserList,
   Gear,
+  Package,
 } from "phosphor-react";
 
 import { useUIStore } from "@/store/ui";
@@ -28,6 +29,7 @@ const links = [
   { name: "Bookings", href: "/bookings", icon: Note },
   { name: "Job Sheet", href: "/job-sheet", icon: Files },
   { name: "Billings", href: "/billings", icon: Wallet },
+  { name: "Stock Management", href: "/inventory", icon: Package },
   {
     name: "Customer Support",
     href: "/customer-support",

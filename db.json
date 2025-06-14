@@ -1,0 +1,77 @@
+{
+  "inventory": [
+    {
+      "id": "1",
+      "name": "Engine Oil 5W-30",
+      "sku": "EO-5W30-1L",
+      "category": "Lubricants",
+      "description": "Synthetic engine oil 5W-30, 1L bottle",
+      "quantity": 50,
+      "unit": "bottle",
+      "reorderLevel": 10,
+      "costPrice": 15.99,
+      "sellingPrice": 24.99,
+      "supplier": "AutoParts Ltd",
+      "location": "Warehouse A",
+      "lastRestocked": "2024-03-15T10:00:00Z",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-03-15T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "name": "Brake Pads",
+      "sku": "BP-FRONT-001",
+      "category": "Brakes",
+      "description": "Front brake pads for standard vehicles",
+      "quantity": 25,
+      "unit": "pair",
+      "reorderLevel": 5,
+      "costPrice": 45.99,
+      "sellingPrice": 79.99,
+      "supplier": "BrakeTech Inc",
+      "location": "Warehouse B",
+      "lastRestocked": "2024-03-10T14:30:00Z",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-03-10T14:30:00Z"
+    },
+    {
+      "id": "3",
+      "name": "Air Filter",
+      "sku": "AF-001",
+      "category": "Filters",
+      "description": "Standard air filter for most vehicles",
+      "quantity": 30,
+      "unit": "piece",
+      "reorderLevel": 8,
+      "costPrice": 12.99,
+      "sellingPrice": 19.99,
+      "supplier": "FilterPro",
+      "location": "Warehouse A",
+      "lastRestocked": "2024-03-12T09:15:00Z",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-03-12T09:15:00Z"
+    }
+  ],
+  "stockMovements": [
+    {
+      "id": "1",
+      "itemId": "1",
+      "type": "purchase",
+      "quantity": 20,
+      "reference": "PO-001",
+      "notes": "Initial stock purchase",
+      "date": "2024-03-15T10:00:00Z",
+      "createdBy": "admin"
+    },
+    {
+      "id": "2",
+      "itemId": "2",
+      "type": "sale",
+      "quantity": -2,
+      "reference": "INV-001",
+      "notes": "Sold to customer",
+      "date": "2024-03-16T14:30:00Z",
+      "createdBy": "staff"
+    }
+  ]
+}
