@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { useGarageStore } from "@/store/garage";
 import type { BusinessHours as BusinessHoursType } from "@/app/models/garage";
 
 interface BusinessHoursProps {
@@ -38,6 +40,35 @@ export function BusinessHours({
   onSave,
   saving = false,
 }: BusinessHoursProps) {
+  const handleSave = async () => {
+    try {
+      const response = await fetch("/api/garage-settings/hours", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          businessHours,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save business hours");
+      }
+
+      const data = await response.json();
+      useGarageStore.getState().setGarage(data.data);
+      toast.success("Business hours updated successfully");
+      onSave();
+    } catch (error) {
+      toast.error(
+        `Failed to save business hours: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -86,7 +117,7 @@ export function BusinessHours({
           })}
         </div>
         <div className="flex justify-end mt-6">
-          <Button onClick={onSave} disabled={saving}>
+          <Button onClick={handleSave} disabled={saving}>
             {saving ? "Saving..." : "Save"}
           </Button>
         </div>
