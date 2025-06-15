@@ -39,7 +39,7 @@ export default function BasicInformation({
               placeholder="Enter business address"
               value={
                 garage
-                  ? `${garage.address.street}, ${garage.address.city}, ${garage.address.state}, ${garage.address.zip}, ${garage.address.country}`
+                  ? `${garage.address.street}, ${garage.address.city}, ${garage.address.state}, ${garage.address.zipCode}, ${garage.address.country}`
                   : ""
               }
               disabled

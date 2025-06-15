@@ -15,6 +15,7 @@ import { useGarageStore } from "@/store/garage";
 import { BusinessHours } from "./components/business/BusinessHours";
 import BasicInformation from "./components/business/BasicInformation";
 import TaxSettings from "./components/business/TaxConfiguration";
+import type { BusinessHours as BusinessHoursType } from "@/app/models/garage";
 
 const tabs = [
   {
@@ -63,22 +64,92 @@ export default function SettingsPage() {
   const [activeSubmenu, setActiveSubmenu] = useState("info");
   const [services, setServices] = useState([]);
   const [servicesLoading, setServicesLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [businessHours, setBusinessHours] = useState<BusinessHoursType>([]);
 
   const garage = useGarageStore((state) => state.garage);
+
+  useEffect(() => {
+    fetchGarageSettings();
+  }, []);
+
+  const fetchGarageSettings = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/garage-settings");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch garage settings");
+      }
+
+      useGarageStore.getState().setGarage(data.data);
+      setBusinessHours(data.data.businessHours);
+    } catch (error) {
+      toast.error(
+        `Failed to fetch garage settings: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTimeChange = (
+    day: string,
+    type: "open" | "close" | "isClosed",
+    value: string
+  ) => {
+    setBusinessHours((prev) =>
+      prev.map((hour) =>
+        hour.day === day
+          ? {
+              ...hour,
+              [type]: type === "isClosed" ? value === "true" : value,
+            }
+          : hour
+      )
+    );
+  };
+
+  const handleSaveBusinessHours = async () => {
+    setSaving(true);
+    try {
+      const response = await fetch("/api/garage-settings", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          businessHours,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save business hours");
+      }
+
+      const data = await response.json();
+      useGarageStore.getState().setGarage(data.data);
+      toast.success("Business hours updated successfully");
+    } catch (error) {
+      toast.error(
+        `Failed to save business hours: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
 
   useEffect(() => {
     if (activeTab === "services" && activeSubmenu === "list") {
       fetchServices();
     }
   }, [activeTab, activeSubmenu]);
-
-  useEffect(() => {
-    fetch("/api/garages")
-      .then((res) => res.json())
-      .then((data) => {
-        useGarageStore.getState().setGarage(data);
-      });
-  }, []);
 
   const fetchServices = async () => {
     setServicesLoading(true);
@@ -97,7 +168,13 @@ export default function SettingsPage() {
     }
   };
 
-  // Service handlers for ServiceList
+  if (loading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -160,25 +237,16 @@ export default function SettingsPage() {
               {activeSubmenu === "hours" && (
                 <div className="max-w-[75%]">
                   <BusinessHours
-                    onTimeChange={() => {}}
-                    onSave={() => {}}
-                    businessHours={
-                      garage?.businessHours || {
-                        monday: { open: "", close: "" },
-                        tuesday: { open: "", close: "" },
-                        wednesday: { open: "", close: "" },
-                        thursday: { open: "", close: "" },
-                        friday: { open: "", close: "" },
-                        saturday: { open: "", close: "" },
-                        sunday: { open: "", close: "" },
-                      }
-                    }
+                    onTimeChange={handleTimeChange}
+                    onSave={handleSaveBusinessHours}
+                    businessHours={businessHours}
+                    saving={saving}
                   />
                 </div>
               )}
               {activeSubmenu === "tax" && (
                 <div className="max-w-[75%]">
-                  <TaxSettings billing={garage?.billing} />
+                  <TaxSettings garage={garage || undefined} />
                 </div>
               )}
             </>

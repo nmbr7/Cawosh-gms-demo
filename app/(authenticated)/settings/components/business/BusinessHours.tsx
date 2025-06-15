@@ -8,23 +8,28 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import type { BusinessHours as BusinessHoursType } from "@/app/models/garage";
 
 interface BusinessHoursProps {
   businessHours: BusinessHoursType;
-  onTimeChange: (day: string, type: "open" | "close", value: string) => void;
+  onTimeChange: (
+    day: string,
+    type: "open" | "close" | "isClosed",
+    value: string
+  ) => void;
   onSave: () => void;
   saving?: boolean;
 }
 
 const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
 ];
 
 export function BusinessHours({
@@ -42,47 +47,43 @@ export function BusinessHours({
       <hr />
       <CardContent>
         <div className="space-y-4">
-          {DAYS.map((day) => (
-            <div key={day} className="grid grid-cols-3 gap-4 items-center">
-              <Label className="text-right">{day}</Label>
-              <div className="space-y-2">
-                <Label className="text-xs font-medium">Open</Label>
-                <Input
-                  type="time"
-                  className="[&::-webkit-calendar-picker-indicator]:hidden pr-16"
-                  value={
-                    businessHours[day.toLowerCase() as keyof BusinessHoursType]
-                      ?.open || ""
-                  }
-                  onChange={(e) =>
-                    onTimeChange(
-                      day.toLowerCase() as keyof BusinessHoursType,
-                      "open",
-                      e.target.value
-                    )
-                  }
-                />
+          {DAYS.map((day) => {
+            const dayData = businessHours.find((h) => h.day === day);
+            if (!dayData) return null;
+
+            return (
+              <div key={day} className="grid grid-cols-4 gap-4 items-center">
+                <Label className="text-right capitalize">{day}</Label>
+                <div>
+                  <Input
+                    type="time"
+                    className="[&::-webkit-calendar-picker-indicator]:hidden pr-16"
+                    value={dayData.open}
+                    onChange={(e) => onTimeChange(day, "open", e.target.value)}
+                    disabled={dayData.isClosed}
+                  />
+                </div>
+                <div>
+                  <Input
+                    type="time"
+                    className="[&::-webkit-calendar-picker-indicator]:hidden pr-16"
+                    value={dayData.close}
+                    onChange={(e) => onTimeChange(day, "close", e.target.value)}
+                    disabled={dayData.isClosed}
+                  />
+                </div>
+                <div className="flex items-center space-x-2 h-[72px]">
+                  <Switch
+                    checked={!dayData.isClosed}
+                    onCheckedChange={(checked) => {
+                      onTimeChange(day, "isClosed", (!checked).toString());
+                    }}
+                  />
+                  <Label>{dayData.isClosed ? "Closed" : "Open"}</Label>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label className="text-xs font-medium">Close</Label>
-                <Input
-                  type="time"
-                  className="[&::-webkit-calendar-picker-indicator]:hidden pr-16"
-                  value={
-                    businessHours[day.toLowerCase() as keyof BusinessHoursType]
-                      ?.close || ""
-                  }
-                  onChange={(e) =>
-                    onTimeChange(
-                      day.toLowerCase() as keyof BusinessHoursType,
-                      "close",
-                      e.target.value
-                    )
-                  }
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="flex justify-end mt-6">
           <Button onClick={onSave} disabled={saving}>
@@ -91,21 +92,5 @@ export function BusinessHours({
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-export function BusinessHoursCard({
-  businessHours,
-}: {
-  businessHours: BusinessHoursType | undefined;
-}) {
-  if (!businessHours) return null;
-  return (
-    <div>
-      <div>
-        Monday: {businessHours.monday.open} - {businessHours.monday.close}
-      </div>
-      {/* Repeat for other days */}
-    </div>
   );
 }

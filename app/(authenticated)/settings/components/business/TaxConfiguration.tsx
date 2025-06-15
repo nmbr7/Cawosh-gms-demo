@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Billing } from "@/app/models/garage";
+import type { Garage } from "@/app/models/garage";
 
 interface TaxSettingsProps {
   taxSettings: {
@@ -60,11 +60,14 @@ export function EditableTaxSettings({
 }
 
 export default function TaxSettings({
-  billing,
+  garage,
 }: {
-  billing: Billing | undefined;
+  garage: Garage | undefined;
 }) {
-  if (!billing) return null;
+  if (!garage) return null;
+
+  const { settings, billing } = garage;
+
   return (
     <Card>
       <CardHeader>
@@ -72,26 +75,72 @@ export default function TaxSettings({
         <CardDescription>Configure tax rates and registration</CardDescription>
       </CardHeader>
       <hr />
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>Tax Rate (%)</Label>
-            <Input type="number" value={billing.taxRate * 100} disabled />
+            <Input type="number" value={settings.taxRate * 100} disabled />
           </div>
           <div className="space-y-2">
-            <Label>Tax Registration Number</Label>
-            <Input value={billing.taxRegistrationNumber} disabled />
+            <Label>Currency</Label>
+            <Input value={settings.currency} disabled />
           </div>
           <div className="space-y-2">
-            <Label>Tax Registration Name</Label>
-            <Input value={billing.taxRegistrationName} disabled />
+            <Label>Timezone</Label>
+            <Input value={settings.timezone} disabled />
           </div>
-          <div className="space-y-2 md:col-span-2">
-            <Label>Tax Registration Address</Label>
+          <div className="space-y-2">
+            <Label>Online Booking</Label>
             <Input
-              value={`${billing.taxRegistrationAddress.street}, ${billing.taxRegistrationAddress.city}, ${billing.taxRegistrationAddress.state}, ${billing.taxRegistrationAddress.zip}, ${billing.taxRegistrationAddress.country}`}
+              value={settings.allowOnlineBooking ? "Enabled" : "Disabled"}
               disabled
             />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Tax Registration</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label>Registration Number</Label>
+              <Input value={billing.taxRegistrationNumber} disabled />
+            </div>
+            <div className="space-y-2">
+              <Label>Registration Name</Label>
+              <Input value={billing.taxRegistrationName} disabled />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-md font-medium">Registration Address</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label>Street</Label>
+                <Input value={billing.taxRegistrationAddress.street} disabled />
+              </div>
+              <div className="space-y-2">
+                <Label>City</Label>
+                <Input value={billing.taxRegistrationAddress.city} disabled />
+              </div>
+              <div className="space-y-2">
+                <Label>State</Label>
+                <Input value={billing.taxRegistrationAddress.state} disabled />
+              </div>
+              <div className="space-y-2">
+                <Label>ZIP Code</Label>
+                <Input
+                  value={billing.taxRegistrationAddress.zipCode}
+                  disabled
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Country</Label>
+                <Input
+                  value={billing.taxRegistrationAddress.country}
+                  disabled
+                />
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
