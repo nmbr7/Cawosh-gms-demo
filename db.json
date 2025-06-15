@@ -1,7 +1,148 @@
 {
+  "garages": [
+    {
+      "_id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "name": "AutoCare Pro",
+      "address": {
+        "street": "123 Main Street",
+        "city": "San Francisco",
+        "state": "CA",
+        "zipCode": "94105"
+      },
+      "phone": "+1 (555) 123-4567",
+      "email": "contact@autocarepro.com",
+      "businessHours": [
+        {
+          "day": "monday",
+          "open": "09:00",
+          "close": "18:00",
+          "isClosed": false
+        },
+        {
+          "day": "tuesday",
+          "open": "09:00",
+          "close": "18:00",
+          "isClosed": false
+        },
+        {
+          "day": "wednesday",
+          "open": "09:00",
+          "close": "18:00",
+          "isClosed": false
+        },
+        {
+          "day": "thursday",
+          "open": "09:00",
+          "close": "18:00",
+          "isClosed": false
+        },
+        {
+          "day": "friday",
+          "open": "09:00",
+          "close": "18:00",
+          "isClosed": false
+        },
+        {
+          "day": "saturday",
+          "open": "10:00",
+          "close": "16:00",
+          "isClosed": false
+        },
+        {
+          "day": "sunday",
+          "open": "00:00",
+          "close": "00:00",
+          "isClosed": true
+        }
+      ],
+      "settings": {
+        "currency": "USD",
+        "timezone": "America/Los_Angeles",
+        "taxRate": 8.5,
+        "allowOnlineBooking": true
+      },
+      "isActive": true,
+      "createdAt": "2024-03-15T00:00:00.000Z",
+      "updatedAt": "2024-03-15T00:00:00.000Z"
+    }
+  ],
+  "users": [
+    {
+      "_id": "65f1a2b3c4d5e6f7g8h9i0j2",
+      "name": "John Admin",
+      "email": "admin@autocarepro.com",
+      "password": "$2b$10$YourHashedPasswordHere",
+      "role": "admin",
+      "garage_id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "phone": "+1 (555) 987-6543",
+      "address": {
+        "street": "456 Admin Ave",
+        "city": "San Francisco",
+        "state": "CA",
+        "zipCode": "94105"
+      },
+      "isActive": true,
+      "lastLogin": "2024-03-15T00:00:00.000Z",
+      "passwordHistory": [],
+      "failedLoginAttempts": {
+        "count": 0,
+        "lastAttempt": null
+      },
+      "createdAt": "2024-03-15T00:00:00.000Z",
+      "updatedAt": "2024-03-15T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a2b3c4d5e6f7g8h9i0j3",
+      "name": "Sarah Manager",
+      "email": "manager@autocarepro.com",
+      "password": "$2b$10$YourHashedPasswordHere",
+      "role": "manager",
+      "garage_id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "phone": "+1 (555) 234-5678",
+      "address": {
+        "street": "789 Manager St",
+        "city": "San Francisco",
+        "state": "CA",
+        "zipCode": "94105"
+      },
+      "isActive": true,
+      "lastLogin": "2024-03-15T00:00:00.000Z",
+      "passwordHistory": [],
+      "failedLoginAttempts": {
+        "count": 0,
+        "lastAttempt": null
+      },
+      "createdAt": "2024-03-15T00:00:00.000Z",
+      "updatedAt": "2024-03-15T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a2b3c4d5e6f7g8h9i0j4",
+      "name": "Mike Staff",
+      "email": "staff@autocarepro.com",
+      "password": "$2b$10$YourHashedPasswordHere",
+      "role": "staff",
+      "garage_id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "phone": "+1 (555) 345-6789",
+      "address": {
+        "street": "321 Staff Rd",
+        "city": "San Francisco",
+        "state": "CA",
+        "zipCode": "94105"
+      },
+      "isActive": true,
+      "lastLogin": "2024-03-15T00:00:00.000Z",
+      "passwordHistory": [],
+      "failedLoginAttempts": {
+        "count": 0,
+        "lastAttempt": null
+      },
+      "createdAt": "2024-03-15T00:00:00.000Z",
+      "updatedAt": "2024-03-15T00:00:00.000Z"
+    }
+  ],
   "inventory": [
     {
-      "id": "1",
+      "_id": "65f1a2b3c4d5e6f7g8h9i0j5",
       "name": "Engine Oil 5W-30",
       "sku": "EO-5W30-1L",
       "category": "Lubricants",
@@ -9,69 +150,162 @@
       "quantity": 50,
       "unit": "bottle",
       "reorderLevel": 10,
-      "costPrice": 15.99,
-      "sellingPrice": 24.99,
-      "supplier": "AutoParts Ltd",
-      "location": "Warehouse A",
-      "lastRestocked": "2024-03-15T10:00:00Z",
-      "createdAt": "2024-01-01T00:00:00Z",
-      "updatedAt": "2024-03-15T10:00:00Z"
+      "costPrice": 8.99,
+      "sellingPrice": 12.99,
+      "supplier": "OilCo Inc",
+      "location": "Shelf A1",
+      "garage_id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "lastRestocked": "2024-03-15T00:00:00.000Z",
+      "stockHistory": [
+        {
+          "quantity": 50,
+          "type": "in",
+          "date": "2024-03-15T00:00:00.000Z",
+          "reference": "PO-001"
+        }
+      ],
+      "createdAt": "2024-03-15T00:00:00.000Z",
+      "updatedAt": "2024-03-15T00:00:00.000Z"
     },
     {
-      "id": "2",
+      "_id": "65f1a2b3c4d5e6f7g8h9i0j6",
       "name": "Brake Pads",
       "sku": "BP-FRONT-001",
       "category": "Brakes",
-      "description": "Front brake pads for standard vehicles",
-      "quantity": 25,
+      "description": "Front brake pads, ceramic",
+      "quantity": 20,
       "unit": "pair",
       "reorderLevel": 5,
-      "costPrice": 45.99,
-      "sellingPrice": 79.99,
-      "supplier": "BrakeTech Inc",
-      "location": "Warehouse B",
-      "lastRestocked": "2024-03-10T14:30:00Z",
-      "createdAt": "2024-01-01T00:00:00Z",
-      "updatedAt": "2024-03-10T14:30:00Z"
-    },
-    {
-      "id": "3",
-      "name": "Air Filter",
-      "sku": "AF-001",
-      "category": "Filters",
-      "description": "Standard air filter for most vehicles",
-      "quantity": 30,
-      "unit": "piece",
-      "reorderLevel": 8,
-      "costPrice": 12.99,
-      "sellingPrice": 19.99,
-      "supplier": "FilterPro",
-      "location": "Warehouse A",
-      "lastRestocked": "2024-03-12T09:15:00Z",
-      "createdAt": "2024-01-01T00:00:00Z",
-      "updatedAt": "2024-03-12T09:15:00Z"
+      "costPrice": 25.99,
+      "sellingPrice": 39.99,
+      "supplier": "BrakeTech",
+      "location": "Shelf B2",
+      "garage_id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "lastRestocked": "2024-03-15T00:00:00.000Z",
+      "stockHistory": [
+        {
+          "quantity": 20,
+          "type": "in",
+          "date": "2024-03-15T00:00:00.000Z",
+          "reference": "PO-002"
+        }
+      ],
+      "createdAt": "2024-03-15T00:00:00.000Z",
+      "updatedAt": "2024-03-15T00:00:00.000Z"
     }
   ],
-  "stockMovements": [
+  "bookings": [
     {
-      "id": "1",
-      "itemId": "1",
-      "type": "purchase",
-      "quantity": 20,
-      "reference": "PO-001",
-      "notes": "Initial stock purchase",
-      "date": "2024-03-15T10:00:00Z",
-      "createdBy": "admin"
-    },
+      "_id": "65f1a2b3c4d5e6f7g8h9i0j7",
+      "customer": {
+        "name": "John Doe",
+        "phone": "+1 (555) 111-2222",
+        "email": "john.doe@example.com"
+      },
+      "vehicle": {
+        "make": "Toyota",
+        "model": "Camry",
+        "year": 2020,
+        "license": "ABC123",
+        "vin": "1HGCM82633A123456"
+      },
+      "serviceType": "Oil Change",
+      "bookingDate": "2024-03-20T10:00:00.000Z",
+      "status": "confirmed",
+      "assignedStaff": "65f1a2b3c4d5e6f7g8h9i0j4",
+      "garage_id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "notes": "Regular maintenance",
+      "history": [
+        {
+          "status": "pending",
+          "changedBy": "65f1a2b3c4d5e6f7g8h9i0j2",
+          "changedAt": "2024-03-15T00:00:00.000Z",
+          "notes": "Booking created"
+        },
+        {
+          "status": "confirmed",
+          "changedBy": "65f1a2b3c4d5e6f7g8h9i0j3",
+          "changedAt": "2024-03-15T01:00:00.000Z",
+          "notes": "Booking confirmed"
+        }
+      ],
+      "createdAt": "2024-03-15T00:00:00.000Z",
+      "updatedAt": "2024-03-15T01:00:00.000Z"
+    }
+  ],
+  "jobSheets": [
     {
-      "id": "2",
-      "itemId": "2",
-      "type": "sale",
-      "quantity": -2,
-      "reference": "INV-001",
-      "notes": "Sold to customer",
-      "date": "2024-03-16T14:30:00Z",
-      "createdBy": "staff"
+      "_id": "65f1a2b3c4d5e6f7g8h9i0j8",
+      "booking": "65f1a2b3c4d5e6f7g8h9i0j7",
+      "services": [
+        {
+          "name": "Oil Change",
+          "description": "Full synthetic oil change with filter",
+          "cost": 49.99,
+          "laborHours": 1
+        }
+      ],
+      "parts": [
+        {
+          "item": "65f1a2b3c4d5e6f7g8h9i0j5",
+          "quantity": 1,
+          "cost": 12.99
+        }
+      ],
+      "laborRate": 75,
+      "totalCost": 137.98,
+      "status": "in-progress",
+      "garage_id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "assignedTo": "65f1a2b3c4d5e6f7g8h9i0j4",
+      "notes": "Regular maintenance service",
+      "customerSignature": null,
+      "completedAt": null,
+      "createdAt": "2024-03-15T00:00:00.000Z",
+      "updatedAt": "2024-03-15T00:00:00.000Z"
+    }
+  ],
+  "staff": [
+    {
+      "_id": "65f1a2b3c4d5e6f7g8h9i0j9",
+      "user": "65f1a2b3c4d5e6f7g8h9i0j4",
+      "role": "mechanic",
+      "specializations": ["Engine", "Transmission"],
+      "availability": [
+        {
+          "day": "monday",
+          "startTime": "09:00",
+          "endTime": "18:00"
+        },
+        {
+          "day": "tuesday",
+          "startTime": "09:00",
+          "endTime": "18:00"
+        },
+        {
+          "day": "wednesday",
+          "startTime": "09:00",
+          "endTime": "18:00"
+        },
+        {
+          "day": "thursday",
+          "startTime": "09:00",
+          "endTime": "18:00"
+        },
+        {
+          "day": "friday",
+          "startTime": "09:00",
+          "endTime": "18:00"
+        }
+      ],
+      "performance": {
+        "jobsCompleted": 150,
+        "averageRating": 4.8,
+        "efficiency": 0.95
+      },
+      "garage_id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "isAvailable": true,
+      "createdAt": "2024-03-15T00:00:00.000Z",
+      "updatedAt": "2024-03-15T00:00:00.000Z"
     }
   ]
 }
