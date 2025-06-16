@@ -42,18 +42,39 @@ export function BusinessHours({
 }: BusinessHoursProps) {
   const handleSave = async () => {
     try {
+      // Ensure all days are present and properly formatted
+      const formattedBusinessHours = DAYS.map((day) => {
+        const existingDay = businessHours.find((h) => h.day === day);
+        if (existingDay) {
+          return {
+            day,
+            open: existingDay.open || "09:00",
+            close: existingDay.close || "17:00",
+            isClosed: existingDay.isClosed ?? false,
+          };
+        }
+        // Default values for missing days
+        return {
+          day,
+          open: "09:00",
+          close: "17:00",
+          isClosed: false,
+        };
+      });
+
       const response = await fetch("/api/garage-settings/hours", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          businessHours,
+          businessHours: formattedBusinessHours,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save business hours");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save business hours");
       }
 
       const data = await response.json();
