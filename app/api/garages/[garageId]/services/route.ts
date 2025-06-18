@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import type { BusinessHours, Billing } from "@/app/models/garage";
+import type { GarageService } from "@/app/models/garage";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("access_token")?.value;
@@ -11,8 +11,13 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Extract garageId from the URL
+    const url = new URL(request.url);
+    const garageId = url.pathname.split("/")[3]; // /api/garages/[garageId]/services
+
+    // Get the garage's services with full details
     const response = await fetch(
-      `${process.env.BACKEND_URL}/api/garages/settings`,
+      `${process.env.BACKEND_URL}/api/garages/${garageId}/services`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -21,17 +26,16 @@ export async function GET() {
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Backend response:", errorText);
-      throw new Error("Failed to fetch garage settings");
+      throw new Error("Failed to fetch garage services");
     }
 
-    const data = await response.json();
-    return NextResponse.json(data);
+    const { data } = await response.json();
+    console.log("data", data);
+    return NextResponse.json({ services: data });
   } catch (error) {
-    console.error("Error fetching garage settings:", error);
+    console.error("Error fetching garage services:", error);
     return NextResponse.json(
-      { error: "Failed to fetch garage settings" },
+      { error: "Failed to fetch garage services" },
       { status: 500 }
     );
   }
@@ -41,41 +45,40 @@ export async function PATCH(request: Request) {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("access_token")?.value;
+
     if (!accessToken) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Extract garageId from the URL
+    const url = new URL(request.url);
+    const garageId = url.pathname.split("/")[3]; // /api/garages/[garageId]/services
+
     const body = await request.json();
-    const { businessHours, billing } = body as {
-      businessHours?: BusinessHours;
-      billing?: Billing;
-    };
+    const { services } = body as { services: GarageService[] };
 
     const response = await fetch(
-      `${process.env.BACKEND_URL}/api/garages/settings`,
+      `${process.env.BACKEND_URL}/api/garages/${garageId}/services`,
       {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({
-          businessHours,
-          billing,
-        }),
+        body: JSON.stringify({ services }),
       }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to update garage settings");
+      throw new Error("Failed to update garage services");
     }
 
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error updating garage settings:", error);
+    console.error("Error updating garage services:", error);
     return NextResponse.json(
-      { error: "Failed to update garage settings" },
+      { error: "Failed to update garage services" },
       { status: 500 }
     );
   }

@@ -154,7 +154,13 @@ export default function SettingsPage() {
   const fetchServices = async () => {
     setServicesLoading(true);
     try {
-      const response = await fetch("/api/services");
+      const garage = useGarageStore.getState().garage;
+      if (!garage) {
+        throw new Error("No garage selected");
+      }
+
+      const response = await fetch(`/api/garages/${garage.id}/services`);
+      console.log("response", response);
       const data = await response.json();
       setServices(data.services || []);
     } catch (error) {
