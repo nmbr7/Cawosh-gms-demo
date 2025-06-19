@@ -98,8 +98,9 @@ export function ServiceModal({
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              disabled={mode === "view"}
+              disabled={mode === "view" || mode === "edit"}
               required
+              autoFocus={false}
             />
           </div>
           <div className="space-y-2">
@@ -110,7 +111,8 @@ export function ServiceModal({
               onChange={(e) =>
                 setFormData({ ...formData, category: e.target.value })
               }
-              disabled={mode === "view"}
+              disabled={mode === "view" || mode === "edit"}
+              autoFocus={false}
             />
           </div>
           <div className="space-y-2">
@@ -126,6 +128,7 @@ export function ServiceModal({
                 })
               }
               disabled={mode === "view"}
+              autoFocus={false}
             />
           </div>
           <div className="space-y-2">
@@ -141,6 +144,7 @@ export function ServiceModal({
                 })
               }
               disabled={mode === "view"}
+              autoFocus={false}
             />
           </div>
           <div className="space-y-2">
@@ -151,8 +155,9 @@ export function ServiceModal({
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              disabled={mode === "view"}
+              disabled={mode === "view" || mode === "edit"}
               required
+              autoFocus={false}
             />
           </div>
           <div className="flex items-center gap-2 mt-4">

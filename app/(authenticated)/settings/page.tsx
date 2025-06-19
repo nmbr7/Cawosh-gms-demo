@@ -16,6 +16,7 @@ import { BusinessHours } from "./components/business/BusinessHours";
 import BasicInformation from "./components/business/BasicInformation";
 import TaxSettings from "./components/business/TaxConfiguration";
 import type { BusinessHours as BusinessHoursType } from "@/app/models/garage";
+import type { Service } from "@/app/models/service";
 
 const tabs = [
   {
@@ -32,10 +33,7 @@ const tabs = [
     id: "services",
     label: "Services",
     icon: Wrench,
-    submenus: [
-      { id: "list", label: "Service List" },
-      { id: "status", label: "Service Status" },
-    ],
+    submenus: [],
   },
   {
     id: "billing",
@@ -62,7 +60,7 @@ const tabs = [
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("business");
   const [activeSubmenu, setActiveSubmenu] = useState("info");
-  const [services, setServices] = useState([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [servicesLoading, setServicesLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -146,10 +144,10 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    if (activeTab === "services" && activeSubmenu === "list") {
+    if (activeTab === "services") {
       fetchServices();
     }
-  }, [activeTab, activeSubmenu]);
+  }, [activeTab]);
 
   const fetchServices = async () => {
     setServicesLoading(true);
@@ -160,7 +158,6 @@ export default function SettingsPage() {
       }
 
       const response = await fetch(`/api/garages/${garage.id}/services`);
-      console.log("response", response);
       const data = await response.json();
       setServices(data.services || []);
     } catch (error) {
@@ -171,6 +168,46 @@ export default function SettingsPage() {
       );
     } finally {
       setServicesLoading(false);
+    }
+  };
+
+  const handleServiceUpdate = async (
+    updatedFields: Omit<Service, "serviceId"> & { serviceId: string }
+  ) => {
+    const garage = useGarageStore.getState().garage;
+    if (!garage) return;
+    const { serviceId, customPrice, duration, isActive } = updatedFields;
+    try {
+      const response = await fetch(
+        `/api/garages/${garage.id}/services/${serviceId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customPrice,
+            customDuration: duration,
+            isActive,
+          }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update service");
+      }
+      // Optimistically update the local state
+      setServices((prev) =>
+        prev.map((service) =>
+          service.serviceId === serviceId
+            ? { ...service, customPrice, duration, isActive }
+            : service
+        )
+      );
+      toast.success("Service updated successfully!");
+    } catch (error) {
+      toast.error(
+        `Failed to update service: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   };
 
@@ -198,7 +235,9 @@ export default function SettingsPage() {
                 <button
                   onClick={() => {
                     setActiveTab(tab.id);
-                    setActiveSubmenu(tab.submenus[0].id);
+                    if (tab.submenus.length > 0) {
+                      setActiveSubmenu(tab.submenus[0].id);
+                    }
                   }}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === tab.id
@@ -259,30 +298,13 @@ export default function SettingsPage() {
           )}
 
           {activeTab === "services" && (
-            <>
-              {activeSubmenu === "list" && (
-                <ServiceList
-                  services={services}
-                  onServiceAdd={() => {}}
-                  onServiceUpdate={() => {}}
-                  onServiceDelete={() => {}}
-                  loading={servicesLoading}
-                />
-              )}
-              {activeSubmenu === "status" && (
-                <div className="max-w-[75%]">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Service Status</CardTitle>
-                      <CardDescription>
-                        Enable or disable services
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>{/* Service status content */}</CardContent>
-                  </Card>
-                </div>
-              )}
-            </>
+            <ServiceList
+              services={services}
+              onServiceAdd={() => {}}
+              onServiceUpdate={handleServiceUpdate}
+              onServiceDelete={() => {}}
+              loading={servicesLoading}
+            />
           )}
 
           {activeTab === "billing" && (

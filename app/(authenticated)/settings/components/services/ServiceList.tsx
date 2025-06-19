@@ -17,14 +17,7 @@ import {
 } from "@/app/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Plus,
-  Pencil,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  Wrench,
-} from "lucide-react";
+import { Pencil, ChevronLeft, ChevronRight, Eye, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { ServiceModal } from "./ServiceModal";
 import ServiceListSkeleton from "./ServiceListSkeleton";
@@ -100,16 +93,6 @@ export function ServiceList({
               <CardTitle className="text-2xl">Service List</CardTitle>
               <CardDescription>Manage your available services</CardDescription>
             </div>
-            <Button
-              onClick={() => {
-                setModalMode("add");
-                setSelectedService(null);
-                setModalOpen(true);
-              }}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Service
-            </Button>
           </div>
         </CardHeader>
         <hr />
