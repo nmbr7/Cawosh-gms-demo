@@ -26,7 +26,6 @@ const tabs = [
     submenus: [
       { id: "info", label: "Basic Information" },
       { id: "hours", label: "Business Hours" },
-      { id: "tax", label: "Tax Settings" },
     ],
   },
   {
@@ -311,15 +310,7 @@ export default function SettingsPage() {
             <>
               {activeSubmenu === "tax" && (
                 <div className="max-w-[75%]">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Tax Configuration</CardTitle>
-                      <CardDescription>
-                        Manage tax settings and rates
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>{/* Tax configuration content */}</CardContent>
-                  </Card>
+                  <TaxSettings garage={garage || undefined} />
                 </div>
               )}
               {activeSubmenu === "payment" && (
