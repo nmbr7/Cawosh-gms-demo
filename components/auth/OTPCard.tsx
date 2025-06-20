@@ -73,7 +73,7 @@ export const OTPCard: React.FC<OTPCardProps> = ({ email, onSubmit }) => {
     <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
       <h2 className="text-2xl font-bold mb-4">Enter OTP</h2>
       <p className="text-sm text-gray-600 mb-4">
-        We've sent a 6-digit code to {email}
+        We&apos;ve sent a 6-digit code to {email}
       </p>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">

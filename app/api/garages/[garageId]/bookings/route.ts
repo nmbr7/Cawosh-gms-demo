@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { BookingData, BookingStatus } from "@/app/models/booking";
 import { generateId } from "@/lib/utils";
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { garageId: string } }
-) {
+export async function POST(request: Request) {
   try {
-    const garageId = params.garageId;
+    const garageId = request.url.split("/").pop();
     const body = await request.json();
 
     // Validate required fields
@@ -34,7 +31,7 @@ export async function POST(
     // Create new booking
     const newBooking: BookingData & { tenant_id: string } = {
       id: generateId("BK"),
-      tenant_id: garageId,
+      tenant_id: garageId || "",
       serviceId: body.serviceId,
       serviceName: body.serviceName,
       customer: {
@@ -79,11 +76,11 @@ export async function POST(
 
 // GET endpoint to fetch bookings
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { garageId: string } }
+  request: Request,
+  { params }: { params: Promise<{ garageId: string }> }
 ) {
   try {
-    const garageId = params.garageId;
+    const { garageId } = await params;
     console.log("garageId", garageId);
 
     // TODO: Fetch from database
