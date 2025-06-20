@@ -7,6 +7,7 @@ import { useUIStore } from "@/store/ui";
 import Sidebar from "@/components/Sidebar";
 import { cn } from "@/lib/utils";
 import Header from "@/components/Header";
+import { FormOptionsProvider } from "@/app/contexts/FormOptionsContext";
 
 export default function AuthenticatedLayout({
   children,
@@ -33,24 +34,26 @@ export default function AuthenticatedLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <div
-        className={cn(
-          "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
-          sidebarOpen ? "w-64" : "w-20"
-        )}
-      >
-        <Sidebar />
+    <FormOptionsProvider>
+      <div className="flex min-h-screen bg-gray-100">
+        <div
+          className={cn(
+            "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
+            sidebarOpen ? "w-64" : "w-20"
+          )}
+        >
+          <Sidebar />
+        </div>
+        <main
+          className={cn(
+            "flex-1 transition-all duration-300 ease-in-out",
+            sidebarOpen ? "ml-64" : "ml-20"
+          )}
+        >
+          <Header />
+          <div className="p-6">{children}</div>
+        </main>
       </div>
-      <main
-        className={cn(
-          "flex-1 transition-all duration-300 ease-in-out",
-          sidebarOpen ? "ml-64" : "ml-20"
-        )}
-      >
-        <Header />
-        <div className="p-6">{children}</div>
-      </main>
-    </div>
+    </FormOptionsProvider>
   );
 }

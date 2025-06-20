@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { EmploymentType } from "@/app/models/user";
+import { useFormOptions } from "@/app/contexts/FormOptionsContext";
 
 interface EmploymentDetailsProps {
   position: string;
@@ -20,22 +21,6 @@ interface EmploymentDetailsProps {
   disabled?: boolean;
 }
 
-const POSITIONS = [
-  "Service Technician",
-  "Manager",
-  "Admin",
-  "Operations Manager",
-  "Service Manager",
-];
-
-const DEPARTMENTS = [
-  "Service",
-  "Operations",
-  "IT",
-  "Maintenance",
-  "Management",
-];
-
 export function EmploymentDetails({
   position,
   department,
@@ -47,6 +32,24 @@ export function EmploymentDetails({
   onJoiningDateChange,
   disabled = false,
 }: EmploymentDetailsProps) {
+  const { formOptions, isLoading: isLoadingOptions } = useFormOptions();
+
+  // Ensure current values are always in the lists
+  const displayPositions = [...formOptions.positions];
+  if (position && !formOptions.positions.includes(position)) {
+    displayPositions.push(position);
+  }
+
+  const displayDepartments = [...formOptions.departments];
+  if (department && !formOptions.departments.includes(department)) {
+    displayDepartments.push(department);
+  }
+
+  console.log("position", position);
+  console.log("department", department);
+  console.log("employmentType", employmentType);
+  console.log("joiningDate", joiningDate);
+
   return (
     <div className="space-y-4">
       <div>
@@ -56,13 +59,15 @@ export function EmploymentDetails({
         <Select
           value={position}
           onValueChange={onPositionChange}
-          disabled={disabled}
+          disabled={disabled || isLoadingOptions}
         >
           <SelectTrigger className="bg-white">
-            <SelectValue placeholder="Select position" />
+            <SelectValue
+              placeholder={isLoadingOptions ? "Loading..." : "Select position"}
+            />
           </SelectTrigger>
           <SelectContent className="bg-white">
-            {POSITIONS.map((pos) => (
+            {displayPositions.map((pos) => (
               <SelectItem key={pos} value={pos}>
                 {pos}
               </SelectItem>
@@ -77,13 +82,17 @@ export function EmploymentDetails({
         <Select
           value={department}
           onValueChange={onDepartmentChange}
-          disabled={disabled}
+          disabled={disabled || isLoadingOptions}
         >
           <SelectTrigger className="bg-white">
-            <SelectValue placeholder="Select department" />
+            <SelectValue
+              placeholder={
+                isLoadingOptions ? "Loading..." : "Select department"
+              }
+            />
           </SelectTrigger>
           <SelectContent className="bg-white">
-            {DEPARTMENTS.map((dept) => (
+            {displayDepartments.map((dept) => (
               <SelectItem key={dept} value={dept}>
                 {dept}
               </SelectItem>

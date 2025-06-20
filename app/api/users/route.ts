@@ -1,137 +1,97 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import mockUsers from "@/app/data/mock-users.json";
 
 export async function GET(request: Request): Promise<NextResponse> {
-  // Add 1 second delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  // Parse query params
+  const { searchParams } = new URL(request.url);
+  const page = searchParams.get("page") || "1";
+  const limit = searchParams.get("limit") || "10";
+  const role = searchParams.get("role");
+  const status = searchParams.get("status");
+  const search = searchParams.get("search");
+  const sortBy = searchParams.get("sortBy") || "name";
+  const sortOrder = searchParams.get("sortOrder") || "asc";
+  const department = searchParams.get("department");
 
-  const { searchParams }: URL = new URL(request.url);
+  // Build backend API URL
+  const backendUrl = new URL(
+    `${process.env.BACKEND_URL}/api/users` || "http://localhost:3000/api/users"
+  );
+  backendUrl.searchParams.set("page", page);
+  backendUrl.searchParams.set("limit", limit);
+  backendUrl.searchParams.set("sortBy", sortBy);
+  backendUrl.searchParams.set("sortOrder", sortOrder);
+  if (role) backendUrl.searchParams.set("role", role);
+  if (status) backendUrl.searchParams.set("status", status);
+  if (search) backendUrl.searchParams.set("search", search);
+  if (department) backendUrl.searchParams.set("department", department);
 
-  // Pagination parameters
-  const page: number = parseInt(searchParams.get("page") || "1");
-  const limit: number = parseInt(searchParams.get("limit") || "10");
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
 
-  // Filter parameters
-  const role: string | null = searchParams.get("role") || null;
-  const status: string | null = searchParams.get("status") || null;
-  const search: string | null = searchParams.get("search") || null;
-
-  // Sort parameters
-  const sortBy: string = searchParams.get("sortBy") || "name";
-  const sortOrder: "asc" | "desc" = (searchParams.get("sortOrder") || "asc") as
-    | "asc"
-    | "desc";
-
-  // Log request parameters
-  console.log("API Request:", {
-    page,
-    limit,
-    filters: {
-      role,
-      status,
-      search,
-    },
-    sort: {
-      by: sortBy,
-      order: sortOrder,
-    },
-  });
-
-  // Apply filters
-  let filteredUsers = mockUsers.users.filter((user) => {
-    // Role filter
-    const matchesRole = role === null || user.role === role;
-
-    // Status filter
-    const matchesStatus = status === null || user.status === status;
-
-    // Search filter (case-insensitive)
-    const matchesSearch =
-      search === null ||
-      `${user.firstName} ${user.lastName}`
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase()) ||
-      user.position.toLowerCase().includes(search.toLowerCase());
-
-    return matchesRole && matchesStatus && matchesSearch;
-  });
-
-  // Apply search filter if provided
-  if (search) {
-    filteredUsers = filteredUsers.filter((user) => {
-      const searchLower = search.toLowerCase();
-      const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-      const email = user.email.toLowerCase();
-      const employeeId = user.employeeId?.toLowerCase() ?? "";
-      const position = user.position?.toLowerCase() ?? "";
-
-      return (
-        fullName.includes(searchLower) ||
-        email.includes(searchLower) ||
-        employeeId.includes(searchLower) ||
-        position.includes(searchLower)
-      );
+  try {
+    const backendRes = await fetch(backendUrl.toString(), {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
     });
-  }
+    const backendData = await backendRes.json();
 
-  // Sort users
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
-    let comparison = 0;
-    switch (sortBy) {
-      case "name":
-        // Compare by full name (firstName + lastName)
-        const nameA = `${a.firstName} ${a.lastName}`;
-        const nameB = `${b.firstName} ${b.lastName}`;
-        comparison = nameA.localeCompare(nameB);
-        break;
-      case "email":
-        comparison = a.email.localeCompare(b.email);
-        break;
-      case "role":
-        comparison = a.role.localeCompare(b.role);
-        break;
-      case "status":
-        comparison = a.status.localeCompare(b.status);
-        break;
-      case "department":
-        comparison = (a.department || "").localeCompare(b.department || "");
-        break;
-      case "position":
-        comparison = a.position.localeCompare(b.position);
-        break;
-      case "lastLogin":
-        comparison =
-          new Date(a.lastLogin).getTime() - new Date(b.lastLogin).getTime();
-        break;
-      default:
-        comparison = 0;
+    // If backend already returns the correct structure, just forward it
+    if (
+      backendData &&
+      typeof backendData.success === "boolean" &&
+      Array.isArray(backendData.data) &&
+      backendData.pagination
+    ) {
+      return NextResponse.json(backendData, { status: backendRes.status });
     }
-    return sortOrder === "asc" ? comparison : -comparison;
-  });
 
-  // Calculate pagination
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-  const paginatedUsers = sortedUsers.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(sortedUsers.length / limit);
+    // Otherwise, map the response to the expected structure
+    return NextResponse.json(
+      {
+        success: backendRes.ok,
+        data: backendData.users || [],
+        pagination: backendData.pagination || {},
+      },
+      { status: backendRes.status }
+    );
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch users from backend" },
+      { status: 500 }
+    );
+  }
+}
 
-  const response = {
-    users: paginatedUsers,
-    pagination: {
-      currentPage: page,
-      totalPages,
-      totalItems: sortedUsers.length,
-      itemsPerPage: limit,
-    },
-  };
+export async function POST(request: Request): Promise<NextResponse> {
+  try {
+    const body = await request.json();
 
-  // Log response
-  console.log("API Response:", {
-    totalItems: sortedUsers.length,
-    returnedItems: paginatedUsers.length,
-    pagination: response.pagination,
-  });
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("access_token")?.value;
 
-  return NextResponse.json(response);
+    const backendUrl =
+      `${process.env.BACKEND_URL}/api/users` ||
+      "http://localhost:3000/api/users";
+
+    const backendRes = await fetch(backendUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await backendRes.json();
+    return NextResponse.json(data, { status: backendRes.status });
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Failed to create user" },
+      { status: 500 }
+    );
+  }
 }
