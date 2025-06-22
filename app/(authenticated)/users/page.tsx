@@ -176,7 +176,14 @@ export default function UsersPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, filters]);
+  }, [
+    currentPage,
+    filters.role,
+    filters.status,
+    filters.search,
+    filters.sortBy,
+    filters.sortOrder,
+  ]);
 
   useEffect(() => {
     fetchUsers();
@@ -215,18 +222,12 @@ export default function UsersPage() {
   };
 
   const handleViewUser = (user: ApiUser) => {
-    console.log("=== VIEW USER ===");
-    console.log("user", user);
-    console.warn("Selected user for viewing:", user.firstName, user.lastName);
     setSelectedUser(user);
     setModalMode("view");
     setIsAddUserModalOpen(true);
   };
 
   const handleEditUser = (user: ApiUser) => {
-    console.log("=== EDIT USER ===");
-    console.log("user", user);
-    console.warn("Selected user for editing:", user.firstName, user.lastName);
     setSelectedUser(user);
     setModalMode("edit");
     setIsAddUserModalOpen(true);

@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useMemo,
 } from "react";
 
 interface FormOptions {
@@ -83,10 +84,14 @@ export function FormOptionsProvider({ children }: { children: ReactNode }) {
     await fetchFormOptions();
   };
 
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({ formOptions, isLoading, error, refetch }),
+    [formOptions, isLoading, error, refetch]
+  );
+
   return (
-    <FormOptionsContext.Provider
-      value={{ formOptions, isLoading, error, refetch }}
-    >
+    <FormOptionsContext.Provider value={contextValue}>
       {children}
     </FormOptionsContext.Provider>
   );

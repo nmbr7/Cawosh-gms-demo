@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -94,13 +94,13 @@ export function AddUserModal({
     certifications: initialData?.certifications || [],
     workingHours: initialData?.workingHours
       ? {
-          start: initialData.workingHours.start || "",
-          end: initialData.workingHours.end || "",
+          start: initialData.workingHours.start || "10:00",
+          end: initialData.workingHours.end || "18:00",
           days: initialData.workingHours.days || [],
         }
       : {
-          start: "",
-          end: "",
+          start: "10:00",
+          end: "18:00",
           days: [],
         },
     systemAccess: initialData?.systemAccess || {
@@ -112,12 +112,6 @@ export function AddUserModal({
     image: null,
     imageUrl: initialData?.imageUrl || null,
   });
-
-  const [errors, setErrors] = useState<{
-    email?: string;
-    phone?: string;
-    password?: string;
-  }>({});
 
   const isViewMode = mode === "view";
   const isEditMode = mode === "edit";
@@ -144,13 +138,13 @@ export function AddUserModal({
         certifications: initialData.certifications || [],
         workingHours: initialData.workingHours
           ? {
-              start: initialData.workingHours.start || "",
-              end: initialData.workingHours.end || "",
+              start: initialData.workingHours.start || "10:00",
+              end: initialData.workingHours.end || "18:00",
               days: initialData.workingHours.days || [],
             }
           : {
-              start: "",
-              end: "",
+              start: "10:00",
+              end: "18:00",
               days: [],
             },
         systemAccess: initialData.systemAccess || {
@@ -180,8 +174,8 @@ export function AddUserModal({
         skills: [],
         certifications: [],
         workingHours: {
-          start: "",
-          end: "",
+          start: "10:00",
+          end: "18:00",
           days: [],
         },
         systemAccess: {
@@ -196,6 +190,56 @@ export function AddUserModal({
     }
   }, [initialData, mode]);
 
+  // Memoized callback functions to prevent unnecessary re-renders
+  const handlePositionChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, position: value }));
+  }, []);
+
+  const handleDepartmentChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, department: value }));
+  }, []);
+
+  const handleEmploymentTypeChange = useCallback((value: EmploymentType) => {
+    setFormData((prev) => ({ ...prev, employmentType: value }));
+  }, []);
+
+  const handleJoiningDateChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, joiningDate: value }));
+  }, []);
+
+  // Memoized callbacks for other form components
+  const handleFirstNameChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, firstName: value }));
+  }, []);
+
+  const handleLastNameChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, lastName: value }));
+  }, []);
+
+  const handleEmailChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, email: value }));
+  }, []);
+
+  const handlePhoneChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, phone: value }));
+  }, []);
+
+  const handleRoleChange = useCallback((value: UserRole) => {
+    setFormData((prev) => ({ ...prev, role: value }));
+  }, []);
+
+  const handleStatusChange = useCallback((value: UserStatus) => {
+    setFormData((prev) => ({ ...prev, status: value }));
+  }, []);
+
+  const handleSkillsChange = useCallback((value: string[]) => {
+    setFormData((prev) => ({ ...prev, skills: value }));
+  }, []);
+
+  const handleImageChange = useCallback((file: File | null) => {
+    setFormData((prev) => ({ ...prev, image: file }));
+  }, []);
+
   const validateForm = () => {
     const validationErrors: ValidationErrors = {
       firstName: !formData.firstName ? "First name is required" : "",
@@ -204,36 +248,37 @@ export function AddUserModal({
       password: !formData.password ? "Password is required" : "",
       phone: !formData.phone ? "Phone is required" : "",
       role: !formData.role ? "Role is required" : "",
+      position: !formData.position ? "Position is required" : "",
+      department: !formData.department ? "Department is required" : "",
     };
+
     const errors = getValidationErrors(validationErrors);
-    const fieldErrors: { email?: string; phone?: string; password?: string } =
-      {};
+    const formatErrors: string[] = [];
 
     if (formData.email && !validateEmail(formData.email)) {
-      fieldErrors.email = "Please enter a valid email address";
+      formatErrors.push("Please enter a valid email address");
     }
 
     if (formData.phone && !validatePhone(formData.phone)) {
-      fieldErrors.phone =
-        "Please enter a valid UK phone number (e.g., 07123456789)";
+      formatErrors.push(
+        "Please enter a valid UK phone number (e.g., 07123456789)"
+      );
     }
 
     if (formData.password && formData.password.length < 8) {
-      fieldErrors.password = "Password must be at least 8 characters long";
+      formatErrors.push("Password must be at least 8 characters long");
     }
 
-    setErrors(fieldErrors);
+    // Combine all validation errors for Sonner display
+    const allErrors = [...errors, ...formatErrors];
 
-    if (errors.length > 0 || Object.keys(fieldErrors).length > 0) {
-      toast.error("Validation Error", {
+    if (allErrors.length > 0) {
+      toast.error("Please fix below errors", {
         description: (
           <ul className="list-disc list-inside">
-            {errors.map((error, index) => (
+            {allErrors.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
-            {fieldErrors.email && <li>{fieldErrors.email}</li>}
-            {fieldErrors.phone && <li>{fieldErrors.phone}</li>}
-            {fieldErrors.password && <li>{fieldErrors.password}</li>}
           </ul>
         ),
       });
@@ -276,6 +321,7 @@ export function AddUserModal({
           </DialogTitle>
         </DialogHeader>
         <form
+          id="user-form"
           onSubmit={handleSubmit}
           className="flex-1 overflow-y-auto px-6 space-y-6"
         >
@@ -284,35 +330,23 @@ export function AddUserModal({
             <div className="space-y-6">
               <ImagePicker
                 imageUrl={initialData?.imageUrl}
-                onImageChange={(file) =>
-                  setFormData((prev) => ({ ...prev, image: file }))
-                }
+                onImageChange={handleImageChange}
                 disabled={isViewMode}
               />
 
               <NameInputs
                 firstName={formData.firstName}
                 lastName={formData.lastName}
-                onFirstNameChange={(value) =>
-                  setFormData((prev) => ({ ...prev, firstName: value }))
-                }
-                onLastNameChange={(value) =>
-                  setFormData((prev) => ({ ...prev, lastName: value }))
-                }
+                onFirstNameChange={handleFirstNameChange}
+                onLastNameChange={handleLastNameChange}
                 disabled={isViewMode}
               />
 
               <ContactInputs
                 email={formData.email}
                 phone={formData.phone}
-                onEmailChange={(value) =>
-                  setFormData((prev) => ({ ...prev, email: value }))
-                }
-                onPhoneChange={(value) =>
-                  setFormData((prev) => ({ ...prev, phone: value }))
-                }
-                emailError={errors.email}
-                phoneError={errors.phone}
+                onEmailChange={handleEmailChange}
+                onPhoneChange={handlePhoneChange}
                 disabled={isViewMode}
               />
 
@@ -332,7 +366,6 @@ export function AddUserModal({
                     }
                     placeholder="Enter password"
                     disabled={isViewMode}
-                    required
                   />
                 </div>
               )}
@@ -360,17 +393,13 @@ export function AddUserModal({
               <div className="grid grid-cols-2 gap-4">
                 <RoleSelect
                   role={formData.role}
-                  onRoleChange={(value) =>
-                    setFormData((prev) => ({ ...prev, role: value }))
-                  }
+                  onRoleChange={handleRoleChange}
                   disabled={isViewMode}
                 />
 
                 <StatusSelect
                   status={formData.status}
-                  onStatusChange={(value) =>
-                    setFormData((prev) => ({ ...prev, status: value }))
-                  }
+                  onStatusChange={handleStatusChange}
                   disabled={isViewMode}
                 />
               </div>
@@ -380,18 +409,10 @@ export function AddUserModal({
                 department={formData.department}
                 employmentType={formData.employmentType}
                 joiningDate={formData.joiningDate}
-                onPositionChange={(value) =>
-                  setFormData((prev) => ({ ...prev, position: value }))
-                }
-                onDepartmentChange={(value) =>
-                  setFormData((prev) => ({ ...prev, department: value }))
-                }
-                onEmploymentTypeChange={(value) =>
-                  setFormData((prev) => ({ ...prev, employmentType: value }))
-                }
-                onJoiningDateChange={(value) =>
-                  setFormData((prev) => ({ ...prev, joiningDate: value }))
-                }
+                onPositionChange={handlePositionChange}
+                onDepartmentChange={handleDepartmentChange}
+                onEmploymentTypeChange={handleEmploymentTypeChange}
+                onJoiningDateChange={handleJoiningDateChange}
                 disabled={isViewMode}
               />
 
@@ -521,9 +542,7 @@ export function AddUserModal({
           <div className="col-span-2">
             <SpecializationSelect
               selectedSpecializations={formData.skills}
-              onSpecializationsChange={(value) =>
-                setFormData((prev) => ({ ...prev, skills: value }))
-              }
+              onSpecializationsChange={handleSkillsChange}
               disabled={isViewMode}
             />
           </div>

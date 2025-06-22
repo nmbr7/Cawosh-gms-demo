@@ -8,6 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { EmploymentType } from "@/app/models/user";
 import { useFormOptions } from "@/app/contexts/FormOptionsContext";
+import { memo, useMemo } from "react";
 
 interface EmploymentDetailsProps {
   position: string;
@@ -21,7 +22,7 @@ interface EmploymentDetailsProps {
   disabled?: boolean;
 }
 
-export function EmploymentDetails({
+export const EmploymentDetails = memo(function EmploymentDetails({
   position,
   department,
   employmentType,
@@ -34,21 +35,27 @@ export function EmploymentDetails({
 }: EmploymentDetailsProps) {
   const { formOptions, isLoading: isLoadingOptions } = useFormOptions();
 
-  // Ensure current values are always in the lists
-  const displayPositions = [...formOptions.positions];
-  if (position && !formOptions.positions.includes(position)) {
-    displayPositions.push(position);
-  }
+  // Memoize the computed arrays to prevent unnecessary re-renders
+  const displayPositions = useMemo(() => {
+    const positions = [...formOptions.positions];
+    if (position && !formOptions.positions.includes(position)) {
+      positions.push(position);
+    }
+    return positions;
+  }, [formOptions.positions, position]);
 
-  const displayDepartments = [...formOptions.departments];
-  if (department && !formOptions.departments.includes(department)) {
-    displayDepartments.push(department);
-  }
+  const displayDepartments = useMemo(() => {
+    const departments = [...formOptions.departments];
+    if (department && !formOptions.departments.includes(department)) {
+      departments.push(department);
+    }
+    return departments;
+  }, [formOptions.departments, department]);
 
-  console.log("position", position);
-  console.log("department", department);
-  console.log("employmentType", employmentType);
-  console.log("joiningDate", joiningDate);
+  console.log("EmploymentDetails render - position:", position);
+  console.log("EmploymentDetails render - department:", department);
+  console.log("EmploymentDetails render - employmentType:", employmentType);
+  console.log("EmploymentDetails render - joiningDate:", joiningDate);
 
   return (
     <div className="space-y-4">
@@ -60,6 +67,7 @@ export function EmploymentDetails({
           value={position}
           onValueChange={onPositionChange}
           disabled={disabled || isLoadingOptions}
+          required
         >
           <SelectTrigger className="bg-white">
             <SelectValue
@@ -83,6 +91,7 @@ export function EmploymentDetails({
           value={department}
           onValueChange={onDepartmentChange}
           disabled={disabled || isLoadingOptions}
+          required
         >
           <SelectTrigger className="bg-white">
             <SelectValue
@@ -134,4 +143,6 @@ export function EmploymentDetails({
       </div>
     </div>
   );
-}
+});
+
+EmploymentDetails.displayName = "EmploymentDetails";
