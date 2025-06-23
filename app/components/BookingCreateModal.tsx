@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/popover";
 import { addDays, startOfDay, format, isBefore } from "date-fns";
 import { Slot } from "../models/slot";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface BookingCreateModalProps {
   isOpen: boolean;
@@ -114,7 +115,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
         return;
       }
       const dateStr = format(date, "yyyy-MM-dd");
-      const res = await fetch(
+      const res = await fetchWithAuth(
         `/api/bookings/slots?serviceId=${serviceId}&date=${dateStr}&bay=${bay}`
       );
       console.log(res);

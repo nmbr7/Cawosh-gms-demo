@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useGarageStore } from "@/store/garage";
 import type { BusinessHours as BusinessHoursType } from "@/app/models/garage";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface BusinessHoursProps {
   businessHours: BusinessHoursType;
@@ -62,7 +63,7 @@ export function BusinessHours({
         };
       });
 
-      const response = await fetch("/api/garage-settings/hours", {
+      const response = await fetchWithAuth("/api/garage-settings/hours", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

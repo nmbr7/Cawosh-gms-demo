@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import React from "react";
 import { BookingDetailsModal } from "@/app/components/booking-details-modal";
 import { BookingCreateModal } from "@/app/components/BookingCreateModal";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface PaginationInfo {
   currentPage: number;
@@ -103,7 +104,9 @@ export default function BookingsPage() {
 
         // console.log("API Request:", Object.fromEntries(params));
 
-        const response = await fetch(`/api/bookings?${params.toString()}`);
+        const response = await fetchWithAuth(
+          `/api/bookings?${params.toString()}`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch bookings");
         }
@@ -176,7 +179,9 @@ export default function BookingsPage() {
         params.append("serviceId", filters.serviceId);
       }
 
-      const response = await fetch(`/api/bookings?${params.toString()}`);
+      const response = await fetchWithAuth(
+        `/api/bookings?${params.toString()}`
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch bookings");
       }

@@ -17,6 +17,7 @@ import BasicInformation from "./components/business/BasicInformation";
 import TaxSettings from "./components/business/TaxConfiguration";
 import type { BusinessHours as BusinessHoursType } from "@/app/models/garage";
 import type { Service } from "@/app/models/service";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 const tabs = [
   {
@@ -74,7 +75,7 @@ export default function SettingsPage() {
   const fetchGarageSettings = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/garage-settings");
+      const response = await fetchWithAuth("/api/garage-settings");
       const data = await response.json();
 
       if (!response.ok) {
@@ -114,7 +115,7 @@ export default function SettingsPage() {
   const handleSaveBusinessHours = async () => {
     setSaving(true);
     try {
-      const response = await fetch("/api/garage-settings", {
+      const response = await fetchWithAuth("/api/garage-settings", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -156,7 +157,9 @@ export default function SettingsPage() {
         throw new Error("No garage selected");
       }
 
-      const response = await fetch(`/api/garages/${garage.id}/services`);
+      const response = await fetchWithAuth(
+        `/api/garages/${garage.id}/services`
+      );
       const data = await response.json();
       setServices(data.services || []);
     } catch (error) {
@@ -177,7 +180,7 @@ export default function SettingsPage() {
     if (!garage) return;
     const { serviceId, customPrice, duration, isActive } = updatedFields;
     try {
-      const response = await fetch(
+      const response = await fetchWithAuth(
         `/api/garages/${garage.id}/services/${serviceId}`,
         {
           method: "PATCH",
@@ -299,6 +302,7 @@ export default function SettingsPage() {
           {activeTab === "services" && (
             <ServiceList
               services={services}
+              garageId={garage?.id || ""}
               onServiceAdd={() => {}}
               onServiceUpdate={handleServiceUpdate}
               onServiceDelete={() => {}}

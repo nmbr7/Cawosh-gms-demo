@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -55,7 +56,9 @@ export default function SchedulePage() {
         }
         const params = new URLSearchParams(paramsObj);
 
-        const response = await fetch(`/api/bookings?${params.toString()}`);
+        const response = await fetchWithAuth(
+          `/api/bookings?${params.toString()}`
+        );
         const data = await response.json();
 
         const bookingInstances = data.bookings.map(

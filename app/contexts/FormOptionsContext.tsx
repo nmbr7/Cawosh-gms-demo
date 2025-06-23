@@ -8,6 +8,7 @@ import React, {
   ReactNode,
   useMemo,
 } from "react";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface FormOptions {
   positions: string[];
@@ -48,7 +49,7 @@ export function FormOptionsProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch("/api/form-options");
+      const response = await fetchWithAuth("/api/form-options");
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data) {

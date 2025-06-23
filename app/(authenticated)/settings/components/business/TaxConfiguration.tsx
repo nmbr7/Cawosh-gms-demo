@@ -14,6 +14,7 @@ import type { Garage } from "@/app/models/garage";
 import type { TaxForm } from "@/app/models/taxform";
 import { toast } from "sonner";
 import { useGarageStore } from "@/store/garage";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export default function TaxSettings({
   garage,
@@ -91,15 +92,17 @@ export default function TaxSettings({
           country: form.country,
         },
       };
-      const response = await fetch(`/api/garages/${garage.id}/tax`, {
+      const response = await fetchWithAuth(`/api/garages/${garage.id}/tax`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
       if (!response.ok) {
         throw new Error("Failed to update tax configuration");
       }
-      const garageResponse = await fetch(`/api/garage-settings`);
+      const garageResponse = await fetchWithAuth(`/api/garage-settings`);
       const garageData = await garageResponse.json();
       console.log(
         "Fetched taxRate from backend:",

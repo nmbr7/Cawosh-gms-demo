@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useGarageStore } from "@/store/garage";
 import type { Garage } from "@/app/models/garage";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 export default function BasicInformation({
   garage,
@@ -42,7 +43,7 @@ export default function BasicInformation({
 
   const handleSave = async () => {
     try {
-      const response = await fetch("/api/garage-settings/basic", {
+      const response = await fetchWithAuth("/api/garage-settings/basic", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

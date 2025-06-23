@@ -24,10 +24,11 @@ import {
   Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import React from "react";
 import { PlusIcon } from "lucide-react";
 import { AddUserModal } from "./components/AddUserModal";
+import { toast } from "sonner";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface PaginationInfo {
   currentPage: number;
@@ -136,7 +137,7 @@ export default function UsersPage() {
         params.append("search", filters.search);
       }
 
-      const response = await fetch(`/api/users?${params.toString()}`);
+      const response = await fetchWithAuth(`/api/users?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
@@ -211,12 +212,21 @@ export default function UsersPage() {
 
   const handleAddUser = async (userData: UserData) => {
     try {
-      // TODO: Implement API call to add user
-      console.log("Adding user:", userData);
+      const response = await fetchWithAuth("/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create user");
+      }
+      toast.success("User created successfully");
       setIsAddUserModalOpen(false);
-      // Refresh the users list
       fetchUsers();
     } catch (error) {
+      toast.error("Failed to create user");
       console.error("Error adding user:", error);
     }
   };
@@ -417,9 +427,6 @@ export default function UsersPage() {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Specialization
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Login
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
@@ -685,9 +692,7 @@ export default function UsersPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Specialization
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Login
-                </th>
+
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
@@ -762,11 +767,11 @@ export default function UsersPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {user.lastLogin
                       ? format(new Date(user.lastLogin), "MMM dd, yyyy HH:mm")
                       : "-"}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex items-center gap-1">
                       <Button

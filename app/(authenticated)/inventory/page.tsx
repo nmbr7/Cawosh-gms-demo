@@ -23,6 +23,7 @@ import {
 import { DataTable } from "@/components/ui/data-table";
 import { ItemDetailsModal } from "@/components/modals/item-details-modal";
 import { ItemCreateModal } from "@/components/modals/item-create-modal";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface InventoryItem {
   id: string;
@@ -102,7 +103,9 @@ export default function InventoryPage() {
         params.append("search", filters.search);
       }
 
-      const response = await fetch(`/api/inventory?${params.toString()}`);
+      const response = await fetchWithAuth(
+        `/api/inventory?${params.toString()}`
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch inventory");
       }

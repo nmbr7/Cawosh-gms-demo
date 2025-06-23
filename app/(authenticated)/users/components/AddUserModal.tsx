@@ -261,7 +261,7 @@ export function AddUserModal({
 
     if (formData.phone && !validatePhone(formData.phone)) {
       formatErrors.push(
-        "Please enter a valid UK phone number (e.g., 07123456789)"
+        "Please enter a valid UK phone number (e.g., 7123456789)"
       );
     }
 

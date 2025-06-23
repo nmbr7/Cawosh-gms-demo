@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { ServiceModal } from "./ServiceModal";
 import ServiceListSkeleton from "./ServiceListSkeleton";
 import type { Service } from "@/app/models/service";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface ServiceListProps {
   services: Service[];
@@ -31,6 +32,7 @@ interface ServiceListProps {
   onServiceDelete: (serviceId: string) => void;
   onServiceAdd: (service: Omit<Service, "serviceId">) => void;
   loading?: boolean;
+  garageId: string;
 }
 
 export function ServiceList({
@@ -38,6 +40,7 @@ export function ServiceList({
   onServiceUpdate,
   onServiceAdd,
   loading = false,
+  garageId,
 }: ServiceListProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,25 +66,38 @@ export function ServiceList({
   const endIndex = startIndex + itemsPerPage;
   const currentServices = services.slice(startIndex, endIndex);
 
-  const handleAddService = () => {
+  const handleAddService = async () => {
     if (!newService.name || !newService.description) {
       toast.error("Please fill in all required fields");
       return;
     }
-    onServiceAdd(newService);
-    setNewService({
-      name: "",
-      description: "",
-      duration: 60,
-      currency: "GBP",
-      currencySymbol: "£",
-      defaultPrice: 0,
-      customPrice: 0,
-      category: "maintenance",
-      isActive: true,
+    const response = await fetchWithAuth(`/api/garages/${garageId}/services`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newService),
     });
-    setIsAdding(false);
-    toast.success("Service added successfully");
+
+    if (response.ok) {
+      const data = await response.json();
+      onServiceAdd(data);
+      setNewService({
+        name: "",
+        description: "",
+        duration: 60,
+        currency: "GBP",
+        currencySymbol: "£",
+        defaultPrice: 0,
+        customPrice: 0,
+        category: "maintenance",
+        isActive: true,
+      });
+      setIsAdding(false);
+      toast.success("Service added successfully");
+    } else {
+      toast.error("Failed to add service");
+    }
   };
 
   return (
