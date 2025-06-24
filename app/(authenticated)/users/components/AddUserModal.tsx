@@ -35,7 +35,7 @@ interface FormData {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
+  password?: string;
   phone: string;
   address: string;
   role: UserRole;
@@ -245,12 +245,16 @@ export function AddUserModal({
       firstName: !formData.firstName ? "First name is required" : "",
       lastName: !formData.lastName ? "Last name is required" : "",
       email: !formData.email ? "Email is required" : "",
-      password: !formData.password ? "Password is required" : "",
       phone: !formData.phone ? "Phone is required" : "",
       role: !formData.role ? "Role is required" : "",
       position: !formData.position ? "Position is required" : "",
       department: !formData.department ? "Department is required" : "",
     };
+
+    // Password is only required in add mode
+    if (mode === "add" && !formData.password) {
+      validationErrors.password = "Password is required";
+    }
 
     const errors = getValidationErrors(validationErrors);
     const formatErrors: string[] = [];
@@ -265,6 +269,7 @@ export function AddUserModal({
       );
     }
 
+    // Password validation only applies if password is provided
     if (formData.password && formData.password.length < 8) {
       formatErrors.push("Password must be at least 8 characters long");
     }
@@ -353,7 +358,9 @@ export function AddUserModal({
               {/* Password Field */}
               {!isViewMode && (
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">
+                    Password {isEditMode && "(leave blank to keep current)"}
+                  </Label>
                   <Input
                     id="password"
                     type="password"
@@ -364,7 +371,11 @@ export function AddUserModal({
                         password: e.target.value,
                       }))
                     }
-                    placeholder="Enter password"
+                    placeholder={
+                      isEditMode
+                        ? "Leave blank to keep current password"
+                        : "Enter password"
+                    }
                     disabled={isViewMode}
                   />
                 </div>

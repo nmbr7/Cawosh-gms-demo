@@ -212,22 +212,45 @@ export default function UsersPage() {
 
   const handleAddUser = async (userData: UserData) => {
     try {
-      const response = await fetchWithAuth("/api/users", {
-        method: "POST",
+      const method = modalMode === "edit" && selectedUser ? "PUT" : "POST";
+      const url =
+        modalMode === "edit" && selectedUser
+          ? `/api/users?id=${selectedUser._id}`
+          : "/api/users";
+
+      const response = await fetchWithAuth(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify({
+          ...userData,
+          ...(modalMode === "edit" &&
+            selectedUser && { _id: selectedUser._id }),
+        }),
       });
+
       if (!response.ok) {
-        throw new Error("Failed to create user");
+        throw new Error(
+          `Failed to ${modalMode === "edit" ? "update" : "create"} user`
+        );
       }
-      toast.success("User created successfully");
+
+      toast.success(
+        `User ${modalMode === "edit" ? "updated" : "created"} successfully`
+      );
       setIsAddUserModalOpen(false);
+      setSelectedUser(null);
+      setModalMode("add");
       fetchUsers();
     } catch (error) {
-      toast.error("Failed to create user");
-      console.error("Error adding user:", error);
+      toast.error(
+        `Failed to ${modalMode === "edit" ? "update" : "create"} user`
+      );
+      console.error(
+        `Error ${modalMode === "edit" ? "updating" : "adding"} user:`,
+        error
+      );
     }
   };
 

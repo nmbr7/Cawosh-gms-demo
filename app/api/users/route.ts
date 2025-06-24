@@ -95,3 +95,42 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 }
+
+export async function PUT(request: Request): Promise<NextResponse> {
+  try {
+    const body = await request.json();
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("id");
+
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, error: "User ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("access_token")?.value;
+
+    const backendUrl =
+      `${process.env.BACKEND_URL}/api/users/${userId}` ||
+      `http://localhost:3000/api/users/${userId}`;
+
+    const backendRes = await fetch(backendUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await backendRes.json();
+    return NextResponse.json(data, { status: backendRes.status });
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "Failed to update user" },
+      { status: 500 }
+    );
+  }
+}

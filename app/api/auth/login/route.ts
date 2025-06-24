@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.error || "Invalid email or password" },
+        { error: data.error || data.message || "Invalid email or password" },
         { status: response.status }
       );
     }
