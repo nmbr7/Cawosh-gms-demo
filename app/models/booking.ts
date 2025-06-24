@@ -1,115 +1,207 @@
-import { CarData } from "./car";
-
 export type BookingStatus =
-  | "scheduled"
-  | "ongoing"
+  | "pending"
+  | "confirmed"
+  | "in-progress"
   | "completed"
-  | "blocked"
-  | "break";
+  | "cancelled";
 
 interface CustomerData {
   name: string;
+  phone: string;
+  email: string;
+}
+
+interface VehicleData {
+  make: string;
+  model: string;
+  year: number;
+  license: string;
+  vin: string;
+}
+
+interface ServiceReference {
+  _id: string;
+  name: string;
+  description: string;
+  category: string;
+}
+
+export interface BookingService {
+  serviceId: ServiceReference;
+  name: string;
+  description: string;
+  duration: number;
+  price: number;
+  currency: string;
+  currencySymbol: string;
+  status: BookingStatus;
+  startTime: string;
+  endTime: string;
+  _id?: string;
+}
+
+interface HistoryEntry {
+  status: BookingStatus;
+  changedBy: string;
+  changedAt: string;
+  notes: string;
+  _id?: string;
+}
+
+interface AssignedStaff {
+  _id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
-  notes: string;
+  role: string;
+}
+
+interface GarageInfo {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
 }
 
 export interface BookingData {
-  id: string;
-  serviceId: string;
-  serviceName: string;
+  _id?: string;
+  bookingId?: string;
   customer: CustomerData;
-  car: CarData;
-  date: string;
-  startTime: string;
-  endTime: string;
-  bay: number;
+  vehicle: VehicleData;
+  services: BookingService[];
+  bookingDate: string;
+  totalDuration: number;
+  totalPrice: number;
   status: BookingStatus;
-  bookingType: "app" | "offline";
+  assignedStaff: AssignedStaff;
+  assignedBay: string;
+  garage_id: GarageInfo;
+  notes?: string;
+  history: HistoryEntry[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export class Booking {
-  id: string;
-  serviceId: string;
-  serviceName: string;
+  _id?: string;
+  bookingId?: string;
   customer: CustomerData;
-  car: CarData;
-  date: string;
-  startTime: string;
-  endTime: string;
-  bay: number;
+  vehicle: VehicleData;
+  services: BookingService[];
+  bookingDate: Date;
+  totalDuration: number;
+  totalPrice: number;
   status: BookingStatus;
-  bookingType: "app" | "offline";
+  assignedStaff: AssignedStaff;
+  assignedBay: string;
+  garage_id: GarageInfo;
+  notes?: string;
+  history: HistoryEntry[];
+  createdAt?: Date;
+  updatedAt?: Date;
+
   constructor(data: BookingData) {
-    this.id = data.id;
-    this.serviceId = data.serviceId;
-    this.serviceName = data.serviceName;
+    this._id = data._id;
+    this.bookingId = data.bookingId;
     this.customer = data.customer;
-    this.car = data.car;
-    this.date = data.date;
-    this.startTime = data.startTime;
-    this.endTime = data.endTime;
-    this.bay = data.bay;
+    this.vehicle = data.vehicle;
+    this.services = data.services;
+    this.bookingDate = new Date(data.bookingDate);
+    this.totalDuration = data.totalDuration;
+    this.totalPrice = data.totalPrice;
     this.status = data.status;
-    this.bookingType = data.bookingType;
+    this.assignedStaff = data.assignedStaff;
+    this.assignedBay = data.assignedBay;
+    this.garage_id = data.garage_id;
+    this.notes = data.notes;
+    this.history = data.history;
+    this.createdAt = data.createdAt ? new Date(data.createdAt) : undefined;
+    this.updatedAt = data.updatedAt ? new Date(data.updatedAt) : undefined;
   }
 
   getStatusColor(): string {
     switch (this.status) {
-      case "scheduled":
-        return "bg-purple-100 text-purple-800";
-      case "ongoing":
+      case "pending":
         return "bg-yellow-100 text-yellow-800";
+      case "confirmed":
+        return "bg-blue-100 text-blue-800";
+      case "in-progress":
+        return "bg-orange-100 text-orange-800";
       case "completed":
         return "bg-green-100 text-green-800";
-      case "blocked":
+      case "cancelled":
         return "bg-red-100 text-red-800";
-      case "break":
-        return "bg-gray-200 text-gray-600";
       default:
         return "bg-gray-100 text-gray-800";
     }
   }
 
-  isBlocked(): boolean {
-    return this.status === "blocked" || this.status === "break";
+  isActive(): boolean {
+    return (
+      this.status === "pending" ||
+      this.status === "confirmed" ||
+      this.status === "in-progress"
+    );
   }
 
-  isBreak(): boolean {
-    return this.status === "break";
+  isCompleted(): boolean {
+    return this.status === "completed";
   }
 
-  getDuration(): number {
-    const start: number = parseInt(this.startTime.split(":")[0]);
-    const end: number = parseInt(this.endTime.split(":")[0]);
-    return end - start;
+  isCancelled(): boolean {
+    return this.status === "cancelled";
   }
 
-  getTopPosition(): number {
-    const startHour: number = parseInt(this.startTime.split(":")[0]);
-    return (startHour - 8) * 60; // Assuming 8 AM is the start time
+  getPrimaryService(): BookingService | undefined {
+    return this.services[0];
   }
 
-  getHeight(): number {
-    return this.getDuration() * 60;
+  getFormattedDate(): string {
+    return this.bookingDate.toLocaleDateString();
   }
 
-  // Helper method to convert time string to minutes since 8 AM
-  private timeToMinutes(time: string): number {
-    const [hours, minutes]: number[] = time.split(":").map(Number);
-    return (hours - 8) * 60 + minutes;
+  getFormattedTime(): string {
+    const primaryService = this.getPrimaryService();
+    if (!primaryService) return "";
+
+    const startTime = new Date(primaryService.startTime);
+    const endTime = new Date(primaryService.endTime);
+
+    return `${startTime.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })} - ${endTime.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+  }
+
+  getLatestHistoryEntry(): HistoryEntry | undefined {
+    return this.history.length > 0
+      ? this.history[this.history.length - 1]
+      : undefined;
   }
 
   // Check if this booking overlaps with another booking
   overlapsWith(other: Booking): boolean {
-    if (this.date !== other.date || this.bay !== other.bay) {
+    if (this.assignedBay !== other.assignedBay) {
       return false;
     }
 
-    const thisStart: number = this.timeToMinutes(this.startTime);
-    const thisEnd: number = this.timeToMinutes(this.endTime);
-    const otherStart: number = this.timeToMinutes(other.startTime);
-    const otherEnd: number = this.timeToMinutes(other.endTime);
+    const thisStart = this.bookingDate;
+    const thisEnd = new Date(thisStart.getTime() + this.totalDuration * 60000);
+    const otherStart = other.bookingDate;
+    const otherEnd = new Date(
+      otherStart.getTime() + other.totalDuration * 60000
+    );
 
     return (
       (thisStart >= otherStart && thisStart < otherEnd) ||
@@ -120,8 +212,9 @@ export class Booking {
 
   // Validate if the booking times are valid
   isValid(): boolean {
-    const start: number = this.timeToMinutes(this.startTime);
-    const end: number = this.timeToMinutes(this.endTime);
-    return start >= 0 && end <= 540 && start < end; // 540 minutes = 9 hours (8 AM to 5 PM)
+    const now = new Date();
+    return (
+      this.bookingDate >= now && this.totalDuration > 0 && this.totalPrice >= 0
+    );
   }
 }

@@ -24,10 +24,13 @@ import {
 import { addDays, startOfDay, format, isBefore } from "date-fns";
 import { Slot } from "../models/slot";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { toast } from "sonner";
+import { useGarageStore } from "@/store/garage";
 
 interface BookingCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onBookingCreated?: () => void;
 }
 
 // Mock data for services and bays
@@ -41,7 +44,11 @@ const mockBays = [1, 2, 3];
 export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
   isOpen,
   onClose,
+  onBookingCreated,
 }) => {
+  // Get garage from store
+  const garage = useGarageStore((state) => state.garage);
+
   // Form state
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -58,6 +65,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Add validation function
   const isFormValid = () => {
@@ -132,10 +140,93 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
   }, [serviceId, date, bay]);
 
   // For now, just close on submit
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSlot) return;
-    onClose();
+
+    try {
+      // Parse the selected slot to get start and end times
+      const [startTime, endTime] = selectedSlot.split("-");
+
+      // Get service name from the selected service
+      const selectedService = mockServices.find(
+        (service) => service.id === serviceId
+      );
+
+      // Create booking data in the new MongoDB format
+      const bookingData = {
+        customer: {
+          name: customerName,
+          email: customerEmail,
+          phone: customerPhone,
+        },
+        vehicle: {
+          make: carMake,
+          model: carModel,
+          year: parseInt(carYear),
+          license: carRegistration,
+          vin: "", // Optional field
+        },
+        services: [
+          {
+            serviceId: serviceId,
+            name: selectedService?.name || "Unknown Service",
+            description: selectedService?.name || "Service description",
+            duration: 60, // Default duration in minutes
+            price: 49.99, // Default price
+            currency: "GBP",
+            currencySymbol: "£",
+            status: "pending",
+            startTime: date
+              ? new Date(
+                  `${format(date, "yyyy-MM-dd")}T${startTime}`
+                ).toISOString()
+              : "",
+            endTime: date
+              ? new Date(
+                  `${format(date, "yyyy-MM-dd")}T${endTime}`
+                ).toISOString()
+              : "",
+          },
+        ],
+        bookingDate: date
+          ? new Date(`${format(date, "yyyy-MM-dd")}T${startTime}`).toISOString()
+          : "",
+        totalDuration: 60, // Default duration
+        totalPrice: 49.99, // Default price
+        status: "pending",
+        assignedStaff: "", // Will be assigned by backend
+        assignedBay: bay,
+        garage_id: garage!.id,
+        notes: notes,
+      };
+
+      setIsSubmitting(true);
+      const res = await fetchWithAuth("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (res.ok) {
+        toast.success("Booking created successfully!");
+        resetForm();
+        onBookingCreated?.();
+        onClose();
+      } else {
+        const errorData = await res.json();
+        toast.error(
+          errorData.error || "Failed to create booking. Please try again later."
+        );
+      }
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      toast.error("An error occurred. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Track if form is dirty
@@ -443,15 +534,20 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
             </div>
 
             <DialogFooter className="flex justify-end gap-2 mt-6 pt-4 border-t bg-white">
-              <Button type="button" variant="outline" onClick={handleCancel}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-blue-500 text-white hover:bg-blue-600"
-                disabled={!isFormValid()}
+                disabled={!isFormValid() || isSubmitting}
               >
-                Create Booking
+                {isSubmitting ? "Creating..." : "Create Booking"}
               </Button>
             </DialogFooter>
           </form>

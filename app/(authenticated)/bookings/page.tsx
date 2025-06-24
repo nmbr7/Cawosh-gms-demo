@@ -24,6 +24,8 @@ import React from "react";
 import { BookingDetailsModal } from "@/app/components/booking-details-modal";
 import { BookingCreateModal } from "@/app/components/BookingCreateModal";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { useGarageStore } from "@/store/garage";
+import { DataTable } from "@/components/ui/data-table";
 
 interface PaginationInfo {
   currentPage: number;
@@ -37,6 +39,11 @@ interface FilterState {
   status: BookingStatus | "all";
   customerName: string | null;
   serviceId: string | null;
+  serviceStatus: string | null;
+  minPrice: string | null;
+  maxPrice: string | null;
+  startDate: string | null;
+  endDate: string | null;
   sortBy: string;
   sortOrder: "asc" | "desc";
 }
@@ -63,65 +70,218 @@ export default function BookingsPage() {
     status: "all",
     customerName: null,
     serviceId: null,
+    serviceStatus: null,
+    minPrice: null,
+    maxPrice: null,
+    startDate: null,
+    endDate: null,
     sortBy: "date",
     sortOrder: "desc",
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  // Get garage from store
+  const garage = useGarageStore((state) => state.garage);
 
-        // Build query parameters
-        const params = new URLSearchParams({
-          page: currentPage.toString(),
-          limit: "10",
-          sortBy: filters.sortBy,
-          sortOrder: filters.sortOrder,
-        });
-
-        // Add bay filter if selected
-        if (selectedBay !== "all") {
-          params.append("bay", selectedBay.toString());
+  // Define table columns
+  const columns = [
+    {
+      header: "Booking ID",
+      accessorKey: "bookingId" as keyof Booking,
+      cell: (booking: Booking) => (
+        <span className="font-medium text-gray-900">
+          {booking.bookingId || booking._id || "N/A"}
+        </span>
+      ),
+    },
+    {
+      header: "Customer",
+      accessorKey: "customer" as keyof Booking,
+      cell: (booking: Booking) => (
+        <div>
+          <div className="font-medium">{booking.customer.name}</div>
+          <div className="text-xs text-gray-400">{booking.customer.email}</div>
+        </div>
+      ),
+    },
+    {
+      header: "Service & Vehicle",
+      accessorKey: "services" as keyof Booking,
+      cell: (booking: Booking) => (
+        <div>
+          <div className="font-medium">
+            {booking.services?.[0]?.name || "Unknown Service"}
+          </div>
+          <div className="mt-1 text-xs text-gray-400">
+            {booking.vehicle.make} {booking.vehicle.model} (
+            {booking.vehicle.year})
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: "Date",
+      accessorKey: "bookingDate" as keyof Booking,
+      cell: (booking: Booking) => {
+        try {
+          const date = new Date(booking.bookingDate);
+          if (isNaN(date.getTime())) {
+            return <span className="text-red-500">Invalid Date</span>;
+          }
+          return format(date, "MMM dd, yyyy");
+        } catch {
+          return <span className="text-red-500">Invalid Date</span>;
         }
-
-        // Add status filter if not "all"
-        if (filters.status !== "all") {
-          params.append("status", filters.status);
+      },
+    },
+    {
+      header: "Time",
+      accessorKey: "services" as keyof Booking,
+      cell: (booking: Booking) => {
+        try {
+          return booking.getFormattedTime();
+        } catch {
+          // Fallback if getFormattedTime is not available
+          const primaryService = booking.services?.[0];
+          if (primaryService?.startTime && primaryService?.endTime) {
+            const startTime = new Date(
+              primaryService.startTime
+            ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+            const endTime = new Date(primaryService.endTime).toLocaleTimeString(
+              [],
+              { hour: "2-digit", minute: "2-digit" }
+            );
+            return `${startTime} - ${endTime}`;
+          }
+          return "N/A";
         }
+      },
+    },
+    {
+      header: "Bay",
+      accessorKey: "assignedBay" as keyof Booking,
+    },
+    {
+      header: "Status",
+      accessorKey: "status" as keyof Booking,
+      cell: (booking: Booking) => {
+        try {
+          return (
+            <span
+              className={cn(
+                "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
+                booking.getStatusColor()
+              )}
+            >
+              {booking.status}
+            </span>
+          );
+        } catch {
+          // Fallback if getStatusColor is not available
+          const getStatusColor = (status: string) => {
+            switch (status) {
+              case "pending":
+                return "bg-yellow-100 text-yellow-800";
+              case "confirmed":
+                return "bg-blue-100 text-blue-800";
+              case "in-progress":
+                return "bg-orange-100 text-orange-800";
+              case "completed":
+                return "bg-green-100 text-green-800";
+              case "cancelled":
+                return "bg-red-100 text-red-800";
+              default:
+                return "bg-gray-100 text-gray-800";
+            }
+          };
 
-        // Add customer name filter if exists
-        if (filters.customerName) {
-          params.append("customerName", filters.customerName);
+          return (
+            <span
+              className={cn(
+                "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
+                getStatusColor(booking.status)
+              )}
+            >
+              {booking.status}
+            </span>
+          );
         }
+      },
+    },
+  ];
 
-        // Add service ID filter if exists
-        if (filters.serviceId) {
-          params.append("serviceId", filters.serviceId);
-        }
+  const fetchBookings = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        // console.log("API Request:", Object.fromEntries(params));
-
-        const response = await fetchWithAuth(
-          `/api/bookings?${params.toString()}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch bookings");
-        }
-        const data = await response.json();
-        // console.log("API Response:", data);
-
-        setBookings(data.bookings);
-        setPaginationInfo(data.pagination);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setIsLoading(false);
+      // Check if garage is available
+      if (!garage?.id) {
+        setError("Garage information not available");
+        return;
       }
-    };
 
+      // Build query parameters
+      const params = new URLSearchParams({
+        garageId: garage.id,
+        page: currentPage.toString(),
+        limit: "10",
+        sortBy: filters.sortBy,
+        sortOrder: filters.sortOrder,
+      });
+
+      // Add bay filter if selected
+      if (selectedBay !== "all") {
+        params.append("bay", selectedBay.toString());
+      }
+
+      // Add status filter if not "all"
+      if (filters.status !== "all") {
+        params.append("status", filters.status);
+      }
+
+      // Add service status filter if exists
+      if (filters.serviceStatus) {
+        params.append("serviceStatus", filters.serviceStatus);
+      }
+
+      // Add price range filters if exist
+      if (filters.minPrice) {
+        params.append("minPrice", filters.minPrice);
+      }
+      if (filters.maxPrice) {
+        params.append("maxPrice", filters.maxPrice);
+      }
+
+      // Add date range filters if exist
+      if (filters.startDate) {
+        params.append("startDate", filters.startDate);
+      }
+      if (filters.endDate) {
+        params.append("endDate", filters.endDate);
+      }
+
+      // console.log("API Request:", Object.fromEntries(params));
+
+      const response = await fetchWithAuth(
+        `/api/bookings?${params.toString()}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch bookings");
+      }
+      const data = await response.json();
+      // console.log("API Response:", data);
+
+      setBookings(data.bookings);
+      setPaginationInfo(data.pagination);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchBookings();
   }, [currentPage, selectedBay, filters]);
 
@@ -151,8 +311,15 @@ export default function BookingsPage() {
       setError(null);
       setCurrentPage(1); // Reset to first page
 
+      // Check if garage is available
+      if (!garage?.id) {
+        setError("Garage information not available");
+        return;
+      }
+
       // Build query parameters
       const params = new URLSearchParams({
+        garageId: garage.id,
         page: "1",
         limit: "10",
         sortBy: filters.sortBy,
@@ -169,14 +336,25 @@ export default function BookingsPage() {
         params.append("status", filters.status);
       }
 
-      // Add customer name filter if exists
-      if (filters.customerName) {
-        params.append("customerName", filters.customerName);
+      // Add service status filter if exists
+      if (filters.serviceStatus) {
+        params.append("serviceStatus", filters.serviceStatus);
       }
 
-      // Add service ID filter if exists
-      if (filters.serviceId) {
-        params.append("serviceId", filters.serviceId);
+      // Add price range filters if exist
+      if (filters.minPrice) {
+        params.append("minPrice", filters.minPrice);
+      }
+      if (filters.maxPrice) {
+        params.append("maxPrice", filters.maxPrice);
+      }
+
+      // Add date range filters if exist
+      if (filters.startDate) {
+        params.append("startDate", filters.startDate);
+      }
+      if (filters.endDate) {
+        params.append("endDate", filters.endDate);
       }
 
       const response = await fetchWithAuth(
@@ -391,9 +569,11 @@ export default function BookingsPage() {
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="scheduled">Scheduled</SelectItem>
-                    <SelectItem value="ongoing">Ongoing</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="in-progress">In Progress</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -674,9 +854,11 @@ export default function BookingsPage() {
                 </SelectTrigger>
                 <SelectContent className="bg-white">
                   <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="scheduled">Scheduled</SelectItem>
-                  <SelectItem value="ongoing">Ongoing</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="in-progress">In Progress</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -685,165 +867,49 @@ export default function BookingsPage() {
       )}
 
       {/* Bookings table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Booking ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Customer
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Service
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Time
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Bay
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {bookings.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-6 py-12 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-4">
-                    <div className="p-4 bg-gray-50 rounded-full">
-                      <svg
-                        className="w-8 h-8 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                    </div>
-                    <div className="text-center">
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {filters.status !== "all" ||
-                        filters.customerName ||
-                        filters.serviceId
-                          ? "No bookings match your filters"
-                          : "No bookings found"}
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {filters.status !== "all" ||
-                        filters.customerName ||
-                        filters.serviceId
-                          ? "Try adjusting your filters or search criteria"
-                          : "Get started by creating a new booking"}
-                      </p>
-                    </div>
-                    {filters.status !== "all" ||
-                    filters.customerName ||
-                    filters.serviceId ? (
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setFilters({
-                            status: "all",
-                            customerName: null,
-                            serviceId: null,
-                            sortBy: "date",
-                            sortOrder: "desc",
-                          });
-                        }}
-                        className="mt-2"
-                      >
-                        Clear filters
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() => {
-                          /* TODO: Add create booking handler */
-                        }}
-                        className="mt-2"
-                      >
-                        Create Booking
-                      </Button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              bookings.map((booking) => (
-                <tr
-                  key={booking.id}
-                  className="hover:bg-gray-50 cursor-pointer"
-                  onClick={() => {
-                    setSelectedBooking(booking);
-                    setIsModalOpen(true);
-                  }}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {booking.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="font-medium">{booking.customer.name}</div>
-                    <div className="text-xs text-gray-400">
-                      {booking.customer.email}
-                      {/* <br />
-                      {booking.customer.phone} */}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <div className="font-medium">{booking.serviceName}</div>
-                    <div className="mt-1 text-xs text-gray-400">
-                      {booking.car.make} {booking.car.model} ({booking.car.year}
-                      )
-                      {/* <br />
-                      {booking.car.registration} */}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {format(new Date(booking.date), "MMM dd, yyyy")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {booking.startTime} - {booking.endTime}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Bay {booking.bay}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={cn(
-                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                        booking.status === "completed" &&
-                          "bg-green-100 text-green-800",
-                        booking.status === "ongoing" &&
-                          "bg-amber-100 text-amber-800",
-                        booking.status === "scheduled" &&
-                          "bg-blue-100 text-blue-800",
-                        booking.status === "blocked" &&
-                          "bg-red-100 text-red-800",
-                        booking.status === "break" &&
-                          "bg-gray-100 text-gray-800"
-                      )}
-                    >
-                      {booking.status}
-                    </span>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={bookings}
+        isLoading={isLoading}
+        onRowClick={(booking) => {
+          setSelectedBooking(booking);
+          setIsModalOpen(true);
+        }}
+        emptyMessage={
+          filters.status !== "all" || filters.customerName || filters.serviceId
+            ? "No bookings match your filters"
+            : "No bookings found"
+        }
+        emptySubMessage={
+          filters.status !== "all" || filters.customerName || filters.serviceId
+            ? "Try adjusting your filters or search criteria"
+            : "Get started by creating a new booking"
+        }
+        emptyAction={
+          filters.status !== "all" || filters.customerName || filters.serviceId
+            ? {
+                label: "Clear filters",
+                onClick: () => {
+                  setFilters({
+                    status: "all",
+                    customerName: null,
+                    serviceId: null,
+                    serviceStatus: null,
+                    minPrice: null,
+                    maxPrice: null,
+                    startDate: null,
+                    endDate: null,
+                    sortBy: "date",
+                    sortOrder: "desc",
+                  });
+                },
+              }
+            : {
+                label: "Create Booking",
+                onClick: () => setIsCreateModalOpen(true),
+              }
+        }
+      />
 
       {/* Pagination */}
       <div className="mt-4 flex items-center justify-between">
@@ -906,6 +972,7 @@ export default function BookingsPage() {
       <BookingCreateModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
+        onBookingCreated={fetchBookings}
       />
     </div>
   );
