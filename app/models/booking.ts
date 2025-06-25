@@ -239,4 +239,23 @@ export class Booking {
       this.bookingDate >= now && this.totalDuration > 0 && this.totalPrice >= 0
     );
   }
+
+  getTopPosition(): number {
+    // Example: calculate top position based on start time (customize as needed)
+    // Let's say your schedule starts at 8:00 AM
+    const startHour = 8;
+    const date =
+      this.bookingDate instanceof Date
+        ? this.bookingDate
+        : new Date(this.bookingDate);
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+    return (hour - startHour) * 60 + minute; // 1px per minute, adjust as needed
+  }
+
+  getHeight(): number {
+    // Example: return height based on totalDuration (in minutes)
+    // 1 minute = 1px, so 60 minutes = 60px (adjust as needed)
+    return this.totalDuration || 60;
+  }
 }

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { BookingData, BookingStatus } from "@/app/models/booking";
-import { generateId } from "@/lib/utils";
 
 export async function POST(request: Request) {
   try {
@@ -9,10 +8,9 @@ export async function POST(request: Request) {
 
     // Validate required fields
     const requiredFields = [
-      "serviceId",
-      "serviceName",
+      "services",
       "customer",
-      "car",
+      "vehicle",
       "date",
       "startTime",
       "endTime",
@@ -30,36 +28,28 @@ export async function POST(request: Request) {
 
     // Create new booking
     const newBooking: BookingData & { tenant_id: string } = {
-      id: generateId("BK"),
       tenant_id: garageId || "",
-      serviceId: body.serviceId,
-      serviceName: body.serviceName,
+      services: body.services,
       customer: {
         name: body.customer.name,
         email: body.customer.email,
         phone: body.customer.phone,
-        notes: body.customer.notes || "",
       },
-      car: {
-        id: generateId("CAR"),
-        make: body.car.make,
-        model: body.car.model,
-        year: body.car.year,
-        registrationNumber: body.car.registration,
-        taxStatus: "taxed",
-        motStatus: "valid",
-        firstRegistrationDate: new Date().toISOString(),
-        yearOfManufacture: body.car.year,
-        engineCapacity: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+      vehicle: {
+        make: body.vehicle.make,
+        model: body.vehicle.model,
+        year: body.vehicle.year,
+        license: body.vehicle.registration,
+        vin: body.vehicle.vin,
       },
-      date: body.date,
-      startTime: body.startTime,
-      endTime: body.endTime,
-      bay: body.bay,
+      bookingDate: body.date,
+      assignedBay: body.bay,
       status: "scheduled" as BookingStatus,
-      bookingType: "offline", // Default to offline booking for now
+      totalDuration: body.totalDuration,
+      totalPrice: body.totalPrice,
+      assignedStaff: body.assignedStaff,
+      garage_id: garageId || "",
+      history: [],
     };
 
     // TODO: Save to database

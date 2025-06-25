@@ -20,8 +20,8 @@ export function DayView({
   const getBookingsForDay = (date: Date) => {
     const dayStr = date.toISOString().split("T")[0];
     return bookings.filter((booking) => {
-      const bookingDateStr = booking.date;
-      return bookingDateStr === dayStr && booking.bay === selectedBay;
+      const bookingDateStr = booking.bookingDate.toISOString().split("T")[0];
+      return bookingDateStr === dayStr && booking.assignedBay === selectedBay;
     });
   };
 
@@ -50,12 +50,12 @@ export function DayView({
           {/* Bookings */}
           {getBookingsForDay(selectedDate).map((booking) => (
             <div
-              key={booking.id}
+              key={booking._id}
               className={cn(
                 "absolute w-full px-2",
                 booking.status === "completed"
                   ? "bg-green-100 text-green-700"
-                  : booking.status === "ongoing"
+                  : booking.status === "in-progress"
                   ? "bg-amber-100 text-amber-700"
                   : "bg-blue-100 text-blue-700"
               )}
@@ -67,14 +67,14 @@ export function DayView({
               <div className="p-2 flex flex-col h-full">
                 <div className="text-sm font-medium pb-2">
                   <div className="flex space-x-2 items-center">
-                    <div className="text-sm font-medium">{booking.id}</div>
+                    <div className="text-sm font-medium">{booking._id}</div>
                     <div className="text-xs text-gray-600">
-                      BAY {booking.bay}
+                      BAY {booking.assignedBay}
                     </div>
                   </div>
                 </div>
                 <div className="text-sm text-gray-600">
-                  {booking.serviceName}
+                  {booking.services.map((service) => service.name).join(", ")}
                 </div>
               </div>
             </div>

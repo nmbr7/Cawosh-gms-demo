@@ -67,8 +67,8 @@ export function MonthView({
 
     const dayBookings = bookings.filter((booking: Booking) => {
       const matches =
-        booking.date === dayStr &&
-        (booking.bay === selectedBay || selectedBay === "all");
+        booking.bookingDate.toISOString().split("T")[0] === dayStr &&
+        (booking.assignedBay === selectedBay || selectedBay === "all");
 
       console.log("matches", matches);
       return matches;
@@ -127,18 +127,24 @@ export function MonthView({
                       <div className="space-y-1">
                         {dayBookings.slice(0, 2).map((booking: Booking) => (
                           <div
-                            key={booking.id}
+                            key={booking._id}
                             className={cn(
                               "text-xs p-1 mb-1 rounded truncate",
                               booking.status === "completed"
                                 ? "bg-green-100 text-green-700"
-                                : booking.status === "ongoing"
+                                : booking.status === "in-progress"
                                 ? "bg-amber-100 text-amber-700"
                                 : "bg-blue-100 text-blue-700"
                             )}
-                            title={`${booking.serviceName} - ${booking.startTime} to ${booking.endTime}`}
+                            title={`${booking.services
+                              .map((service) => service.name)
+                              .join(", ")} - ${
+                              booking.services[0]?.startTime || ""
+                            } to ${booking.services[0]?.endTime || ""}`}
                           >
-                            {booking.serviceName}
+                            {booking.services
+                              .map((service) => service.name)
+                              .join(", ")}
                           </div>
                         ))}
                         {dayBookings.length > 2 && (
