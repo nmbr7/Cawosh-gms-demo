@@ -27,7 +27,7 @@ interface ServiceReference {
 }
 
 export interface BookingService {
-  serviceId: ServiceReference;
+  serviceId: string | ServiceReference;
   name: string;
   description: string;
   duration: number;
@@ -42,7 +42,14 @@ export interface BookingService {
 
 interface HistoryEntry {
   status: BookingStatus;
-  changedBy: string;
+  changedBy:
+    | string
+    | {
+        _id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+      };
   changedAt: string;
   notes: string;
   _id?: string;
@@ -83,7 +90,7 @@ export interface BookingData {
   status: BookingStatus;
   assignedStaff: AssignedStaff;
   assignedBay: string;
-  garage_id: GarageInfo;
+  garage_id: string | GarageInfo;
   notes?: string;
   history: HistoryEntry[];
   createdAt?: string;
@@ -102,7 +109,7 @@ export class Booking {
   status: BookingStatus;
   assignedStaff: AssignedStaff;
   assignedBay: string;
-  garage_id: GarageInfo;
+  garage_id: string | GarageInfo;
   notes?: string;
   history: HistoryEntry[];
   createdAt?: Date;
@@ -120,7 +127,22 @@ export class Booking {
     this.status = data.status;
     this.assignedStaff = data.assignedStaff;
     this.assignedBay = data.assignedBay;
-    this.garage_id = data.garage_id;
+    this.garage_id =
+      typeof data.garage_id === "string"
+        ? {
+            _id: data.garage_id,
+            name: "",
+            email: "",
+            phone: "",
+            address: {
+              street: "",
+              city: "",
+              state: "",
+              zipCode: "",
+              country: "",
+            },
+          }
+        : data.garage_id;
     this.notes = data.notes;
     this.history = data.history;
     this.createdAt = data.createdAt ? new Date(data.createdAt) : undefined;

@@ -61,7 +61,9 @@ export default function BookingsPage() {
     totalItems: 0,
     itemsPerPage: 10,
   });
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -872,7 +874,7 @@ export default function BookingsPage() {
         data={bookings}
         isLoading={isLoading}
         onRowClick={(booking) => {
-          setSelectedBooking(booking);
+          setSelectedBookingId(booking._id || null);
           setIsModalOpen(true);
         }}
         emptyMessage={
@@ -963,7 +965,7 @@ export default function BookingsPage() {
 
       {/* Booking Details Modal */}
       <BookingDetailsModal
-        booking={selectedBooking}
+        bookingId={selectedBookingId}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
