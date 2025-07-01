@@ -45,6 +45,12 @@ interface FilterState {
   sortOrder: "asc" | "desc";
 }
 
+interface ISkillRef {
+  _id?: string;
+  code: string;
+  displayName: string;
+}
+
 interface ApiUser {
   _id: string;
   firstName: string;
@@ -60,7 +66,7 @@ interface ApiUser {
   position?: string;
   department?: string;
   specialization?: string[];
-  skills?: string[];
+  skills?: ISkillRef[];
   managedDepartments?: string[];
   lastLogin?: string;
   createdAt: string;
@@ -83,7 +89,7 @@ interface UserData {
   department?: string;
   employmentType?: EmploymentType;
   joiningDate?: string;
-  skills?: string[];
+  skills?: ISkillRef[];
 }
 
 export default function UsersPage() {
@@ -158,7 +164,7 @@ export default function UsersPage() {
           position: user.position,
           department: user.department,
           specialization: user.specialization,
-          skills: user.skills,
+          skills: user.skills || [],
           managedDepartments: user.managedDepartments,
           lastLogin: user.lastLogin,
           createdAt: user.createdAt,
@@ -777,10 +783,10 @@ export default function UsersPage() {
                     <div className="flex flex-wrap gap-1">
                       {user.skills?.map((spec) => (
                         <span
-                          key={spec}
+                          key={spec.code}
                           className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
                         >
-                          {spec}
+                          {spec.displayName}
                         </span>
                       ))}
                       {!user.skills && user.role === "manager" && (

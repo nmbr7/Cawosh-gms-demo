@@ -31,6 +31,12 @@ interface ValidationErrors {
   [key: string]: string;
 }
 
+interface ISkillRef {
+  _id?: string;
+  code: string;
+  displayName: string;
+}
+
 interface FormData {
   firstName: string;
   lastName: string;
@@ -44,7 +50,7 @@ interface FormData {
   department: string;
   employmentType: EmploymentType;
   joiningDate: string;
-  skills: string[];
+  skills: ISkillRef[];
   certifications: string[];
   workingHours: {
     start: string;
@@ -232,7 +238,7 @@ export function AddUserModal({
     setFormData((prev) => ({ ...prev, status: value }));
   }, []);
 
-  const handleSkillsChange = useCallback((value: string[]) => {
+  const handleSkillsChange = useCallback((value: ISkillRef[]) => {
     setFormData((prev) => ({ ...prev, skills: value }));
   }, []);
 
