@@ -33,12 +33,22 @@ interface BookingCreateModalProps {
   onBookingCreated?: () => void;
 }
 
-// Mock data for services and bays
-const mockServices = [
-  { id: "1", name: "Oil Change" },
-  { id: "2", name: "Tire Rotation" },
-  { id: "3", name: "Brake Inspection" },
-];
+interface Service {
+  serviceId: string;
+  isActive: boolean;
+  customPrice?: number;
+  customDuration?: number;
+  name: string;
+  description?: string;
+  category: string;
+  duration: number;
+  price: number;
+  currency: string;
+  currencySymbol: string;
+  isActiveMaster: boolean;
+}
+
+// Mock data for bays
 const mockBays = [1, 2, 3];
 
 export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
@@ -67,6 +77,43 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
   const [selectedSlot, setSelectedSlot] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Services state
+  const [services, setServices] = useState<Service[]>([]);
+  const [isLoadingServices, setIsLoadingServices] = useState(false);
+
+  // Fetch services when modal opens
+  useEffect(() => {
+    if (isOpen && garage) {
+      fetchServices();
+    }
+  }, [isOpen, garage]);
+
+  const fetchServices = async () => {
+    if (!garage) return;
+
+    try {
+      setIsLoadingServices(true);
+      const response = await fetchWithAuth(
+        `/api/garages/${garage.id}/services/active`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("data", data.services);
+        setServices(data.services || []);
+      } else {
+        toast.error("Failed to load services");
+        setServices([]);
+      }
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      toast.error("Failed to load services");
+      setServices([]);
+    } finally {
+      setIsLoadingServices(false);
+    }
+  };
+
   // Add validation function
   const isFormValid = () => {
     return (
@@ -79,7 +126,6 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
       carRegistration.trim() !== "" &&
       serviceId !== null &&
       date !== undefined &&
-      bay !== "" &&
       selectedSlot !== ""
     );
   };
@@ -148,9 +194,9 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
       // Parse the selected slot to get start and end times
       const [startTime, endTime] = selectedSlot.split("-");
 
-      // Get service name from the selected service
-      const selectedService = mockServices.find(
-        (service) => service.id === serviceId
+      // Get service details from the selected service
+      const selectedService = services.find(
+        (service) => service.serviceId === serviceId
       );
 
       // Create booking data in the new MongoDB format
@@ -171,11 +217,11 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
           {
             serviceId: serviceId,
             name: selectedService?.name || "Unknown Service",
-            description: selectedService?.name || "Service description",
-            duration: 60, // Default duration in minutes
-            price: 49.99, // Default price
-            currency: "GBP",
-            currencySymbol: "£",
+            description: selectedService?.description || "Service description",
+            duration: selectedService?.duration || 60, // Use service duration or default
+            price: selectedService?.price || 49.99, // Use service price or default
+            currency: selectedService?.currency || "GBP",
+            currencySymbol: selectedService?.currencySymbol || "£",
             status: "pending",
             startTime: date
               ? new Date(
@@ -192,8 +238,8 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
         bookingDate: date
           ? new Date(`${format(date, "yyyy-MM-dd")}T${startTime}`).toISOString()
           : "",
-        totalDuration: 60, // Default duration
-        totalPrice: 49.99, // Default price
+        totalDuration: selectedService?.duration || 60,
+        totalPrice: selectedService?.price || 49.99,
         status: "pending",
         assignedStaff: "", // Will be assigned by backend
         assignedBay: bay,
@@ -374,18 +420,52 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                     value={serviceId ?? ""}
                     onValueChange={setServiceId}
                     required
+                    disabled={isLoadingServices}
                   >
                     <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Select service" />
+                      <SelectValue
+                        placeholder={
+                          isLoadingServices
+                            ? "Loading services..."
+                            : "Select service"
+                        }
+                      >
+                        {serviceId &&
+                          services.find((s) => s.serviceId === serviceId)?.name}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="bg-white">
-                      {mockServices.map((service) => (
-                        <SelectItem key={service.id} value={service.id}>
-                          {service.name}
+                      {services.map((service) => (
+                        <SelectItem
+                          key={service.serviceId}
+                          value={service.serviceId}
+                        >
+                          <div className="flex flex-col">
+                            <div className="font-medium">{service.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {service.description}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {service.duration} minutes
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {service.price} {service.currencySymbol}
+                            </div>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {serviceId && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded-md">
+                      <div className="text-xs text-gray-600">
+                        {
+                          services.find((s) => s.serviceId === serviceId)
+                            ?.description
+                        }
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Date & Status */}
@@ -450,9 +530,9 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                 <div>
                   <h3 className="text-sm font-semibold mb-2">Bay</h3>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Bay <span className="text-red-500">*</span>
+                    Bay
                   </label>
-                  <Select value={bay} onValueChange={(v) => setBay(v)} required>
+                  <Select value={bay} onValueChange={(v) => setBay(v)}>
                     <SelectTrigger className="w-full bg-white">
                       <SelectValue placeholder="Select bay" />
                     </SelectTrigger>
@@ -482,11 +562,11 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                     </div>
                   ) : (
                     <div className="flex flex-wrap gap-2">
-                      {slots.map((slot) => {
+                      {slots.map((slot, index) => {
                         const slotValue = `${slot.start}-${slot.end}`;
                         return (
                           <label
-                            key={slotValue}
+                            key={`${slotValue}-${index}`}
                             className={`cursor-pointer px-3 py-2 border rounded-md text-xs ${
                               selectedSlot === slotValue
                                 ? "bg-blue-500 text-white border-blue-500"
