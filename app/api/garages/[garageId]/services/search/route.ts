@@ -12,11 +12,16 @@ export async function GET(request: Request) {
 
     // Extract garageId from the URL
     const url = new URL(request.url);
-    const garageId = url.pathname.split("/")[3]; // /api/garages/[garageId]/services/active
+    const garageId = url.pathname.split("/")[3]; // /api/garages/[garageId]/services/search
+    const query = url.searchParams.get("query") || "";
 
-    // Get the garage's active services
+    // Call the backend API for service search
     const response = await fetch(
-      `${process.env.BACKEND_URL}/api/garages/${garageId}/services/active`,
+      `${
+        process.env.BACKEND_URL
+      }/api/garages/${garageId}/services/search?query=${encodeURIComponent(
+        query
+      )}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -25,15 +30,15 @@ export async function GET(request: Request) {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch active garage services");
+      throw new Error("Failed to fetch services by name");
     }
 
-    const { data } = await response.json();
-    return NextResponse.json({ services: data });
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Error fetching active garage services:", error);
+    console.error("Error fetching services by name:", error);
     return NextResponse.json(
-      { error: "Failed to fetch active garage services" },
+      { error: "Failed to fetch services by name" },
       { status: 500 }
     );
   }
