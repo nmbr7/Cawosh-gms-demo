@@ -65,7 +65,7 @@ interface HistoryEntry {
   _id?: string;
 }
 
-interface GarageInfo {
+export interface GarageInfo {
   _id: string;
   name: string;
   subdomain?: string;
@@ -132,7 +132,7 @@ export interface BookingData {
   totalDuration: number;
   totalPrice: number;
   status: BookingStatus;
-  garage_id: GarageInfo;
+  garage_id: string;
   notes?: string;
   history: HistoryEntry[];
   createdAt?: string;

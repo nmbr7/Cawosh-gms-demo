@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Calendar } from "@/app/components/calendar";
 import { MonthView } from "@/app/components/month-view";
-import { Booking, BookingData } from "@/app/models/booking";
+import { Booking } from "@/app/models/booking";
 import { format } from "date-fns";
 import { DayView } from "@/app/components/day-view";
 import { WeekView } from "@/app/components/week-view";

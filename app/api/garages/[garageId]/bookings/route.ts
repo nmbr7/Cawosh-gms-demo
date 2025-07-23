@@ -43,7 +43,6 @@ export async function POST(request: Request) {
         vin: body.vehicle.vin,
       },
       bookingDate: body.date,
-      assignedBay: body.bay,
       status: "scheduled" as BookingStatus,
       totalDuration: body.totalDuration,
       totalPrice: body.totalPrice,
