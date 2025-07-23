@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Booking, BookingStatus } from "@/app/models/booking";
+import { Booking, BookingStatus, BookingUtil } from "@/app/models/booking";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -112,11 +112,22 @@ export default function BookingsPage() {
       cell: (booking: Booking) => (
         <div>
           <div className="font-medium">
-            {booking.services?.[0]?.name || "Unknown Service"}
-          </div>
-          <div className="mt-1 text-xs text-gray-400">
             {booking.vehicle.make} {booking.vehicle.model} (
             {booking.vehicle.year})
+          </div>
+          <div className="mt-1 text-xs text-gray-400">
+            {booking.services && booking.services.length
+              ? (() => {
+                  const names = booking.services.map((svc) => svc.name);
+                  if (names.length <= 2) {
+                    return names.join(", ");
+                  } else {
+                    return `${names.slice(0, 2).join(", ")} +${
+                      names.length - 2
+                    } more`;
+                  }
+                })()
+              : "Unknown Service"}
           </div>
         </div>
       ),
@@ -140,74 +151,67 @@ export default function BookingsPage() {
       header: "Time",
       accessorKey: "services" as keyof Booking,
       cell: (booking: Booking) => {
-        try {
-          return booking.getFormattedTime();
-        } catch {
-          // Fallback if getFormattedTime is not available
-          const primaryService = booking.services?.[0];
-          if (primaryService?.startTime && primaryService?.endTime) {
-            const startTime = new Date(
-              primaryService.startTime
-            ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-            const endTime = new Date(primaryService.endTime).toLocaleTimeString(
-              [],
-              { hour: "2-digit", minute: "2-digit" }
-            );
-            return `${startTime} - ${endTime}`;
-          }
-          return "N/A";
-        }
+        if (!booking.services || booking.services.length === 0) return "N/A";
+        const sorted = [...booking.services].sort(
+          (a, b) =>
+            new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        );
+        const first = sorted[0];
+        const last = sorted[sorted.length - 1];
+        const start = new Date(first.startTime).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const end = new Date(last.endTime).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return `${start} - ${end}`;
       },
     },
     {
       header: "Bay",
-      accessorKey: "assignedBay" as keyof Booking,
+      accessorKey: "services" as keyof Booking,
+      cell: (booking: Booking) => {
+        if (!booking.services?.length) return "";
+        // Get unique bay IDs from all services
+        const uniqueBays = [
+          ...new Set(booking.services.map((svc) => svc.bayId)),
+        ];
+        return uniqueBays.join(", ");
+      },
+    },
+    {
+      header: "Technician",
+      accessorKey: "services" as keyof Booking,
+      cell: (booking: Booking) => {
+        if (!booking.services?.length) return "";
+        // Get unique technicians from all services
+        const technicians = booking.services
+          .map((svc) => {
+            if (typeof svc.technicianId === "object" && svc.technicianId) {
+              return `${svc.technicianId.firstName} ${svc.technicianId.lastName}`;
+            }
+            return svc.technicianId || "Not assigned";
+          })
+          .filter((tech, index, arr) => arr.indexOf(tech) === index); // Remove duplicates
+        return technicians.join(", ");
+      },
     },
     {
       header: "Status",
       accessorKey: "status" as keyof Booking,
       cell: (booking: Booking) => {
-        try {
-          return (
-            <span
-              className={cn(
-                "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                booking.getStatusColor()
-              )}
-            >
-              {booking.status}
-            </span>
-          );
-        } catch {
-          // Fallback if getStatusColor is not available
-          const getStatusColor = (status: string) => {
-            switch (status) {
-              case "pending":
-                return "bg-yellow-100 text-yellow-800";
-              case "confirmed":
-                return "bg-blue-100 text-blue-800";
-              case "in-progress":
-                return "bg-orange-100 text-orange-800";
-              case "completed":
-                return "bg-green-100 text-green-800";
-              case "cancelled":
-                return "bg-red-100 text-red-800";
-              default:
-                return "bg-gray-100 text-gray-800";
-            }
-          };
-
-          return (
-            <span
-              className={cn(
-                "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                getStatusColor(booking.status)
-              )}
-            >
-              {booking.status}
-            </span>
-          );
-        }
+        return (
+          <span
+            className={cn(
+              "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
+              BookingUtil.getStatusColor(booking.status)
+            )}
+          >
+            {booking.status}
+          </span>
+        );
       },
     },
   ];
@@ -595,7 +599,7 @@ export default function BookingsPage() {
                   Customer
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Service
+                  Service & Vehicle
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
@@ -607,6 +611,9 @@ export default function BookingsPage() {
                   Bay
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Technician
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
               </tr>
@@ -614,7 +621,7 @@ export default function BookingsPage() {
             <tbody className="bg-white">
               {/* Progress bar as divider */}
               <tr>
-                <td colSpan={7} className="p-0">
+                <td colSpan={8} className="p-0">
                   <div className="h-1 bg-blue-500 animate-pulse"></div>
                 </td>
               </tr>
@@ -637,10 +644,19 @@ export default function BookingsPage() {
                     <td className="px-6 py-4">
                       <div className="h-4 bg-gray-200 rounded w-20"></div>
                     </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-16"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-32"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-20"></div>
+                    </td>
                   </tr>
                   {row < 3 && (
                     <tr>
-                      <td colSpan={7} className="p-0">
+                      <td colSpan={8} className="p-0">
                         <div className="h-px bg-gray-200"></div>
                       </td>
                     </tr>

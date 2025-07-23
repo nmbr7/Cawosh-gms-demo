@@ -67,8 +67,11 @@ export function MonthView({
 
     const dayBookings = bookings.filter((booking: Booking) => {
       const matches =
-        booking.bookingDate.toISOString().split("T")[0] === dayStr &&
-        (booking.assignedBay === selectedBay || selectedBay === "all");
+        booking.bookingDate.split("T")[0] === dayStr &&
+        (selectedBay === "all" ||
+          booking.services.some(
+            (service) => service.bayId === selectedBay.toString()
+          ));
 
       console.log("matches", matches);
       return matches;

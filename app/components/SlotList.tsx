@@ -29,14 +29,14 @@ export interface Slot {
 
 interface SlotListProps {
   slots: Slot[];
-  selectedSlot: string;
-  setSelectedSlot: (slotValue: string) => void;
+  selectedSlotIndex: number | null;
+  setSelectedSlotIndex: (index: number) => void;
 }
 
 export const SlotList: React.FC<SlotListProps> = ({
   slots,
-  selectedSlot,
-  setSelectedSlot,
+  selectedSlotIndex,
+  setSelectedSlotIndex,
 }) => {
   if (slots.length === 0) {
     return (
@@ -47,20 +47,16 @@ export const SlotList: React.FC<SlotListProps> = ({
   }
   return (
     <div className="flex flex-wrap gap-2">
-      {slots.map((slot) => {
-        // Combine all services in this slot into a single block
+      {slots.map((slot, idx) => {
         if (!slot.services.length) return null;
-        // Find earliest start time and latest end time
         const sortedSvcs = [...slot.services].sort((a, b) =>
           a.startTime.localeCompare(b.startTime)
         );
         const startTime = sortedSvcs[0].startTime;
         const endTime = sortedSvcs[sortedSvcs.length - 1].endTime;
-        // Combine all service names
         const serviceNames = slot.services
           .map((s) => s.service.name)
           .join(", ");
-        // Combine all unique technicians
         const techs = Array.from(
           new Map(
             slot.services.map((s) => [
@@ -69,17 +65,22 @@ export const SlotList: React.FC<SlotListProps> = ({
             ])
           ).values()
         ).join(", ");
-        // Compose a slotValue that encodes all service ids for this block
-        const slotValue = `${slot.bay.id}|${slot.services
-          .map((s) => s.service.id)
-          .join(",")}|${startTime}-${endTime}`;
+        // Format times
+        const start = new Date(startTime).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "2-digit",
+        });
+        const end = new Date(endTime).toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "2-digit",
+        });
         return (
           <div key={slot.bay.id + slot.date} className="flex flex-col gap-1">
             <div className="font-semibold text-xs mb-1">{slot.bay.name}</div>
             <label
-              key={slotValue}
+              key={slot.bay.id + slot.date}
               className={`cursor-pointer px-3 py-2 border rounded-md text-xs min-w-[220px] ${
-                selectedSlot === slotValue
+                selectedSlotIndex === idx
                   ? "bg-blue-500 text-white border-blue-500"
                   : "bg-white text-gray-700 border-gray-300"
               }`}
@@ -87,14 +88,14 @@ export const SlotList: React.FC<SlotListProps> = ({
               <input
                 type="radio"
                 name="slot"
-                value={slotValue}
-                checked={selectedSlot === slotValue}
-                onChange={() => setSelectedSlot(slotValue)}
+                value={idx}
+                checked={selectedSlotIndex === idx}
+                onChange={() => setSelectedSlotIndex(idx)}
                 className="hidden"
                 disabled={!slot.isAvailable}
               />
               <div className="font-semibold">
-                {startTime} - {endTime}
+                {start} - {end}
               </div>
               <div className="text-xs">Services: {serviceNames}</div>
               <div className="text-xs">Techs: {techs}</div>

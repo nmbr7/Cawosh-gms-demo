@@ -76,7 +76,9 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [selectedSlot, setSelectedSlot] = useState<string>("");
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
+    null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Services state
@@ -94,7 +96,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
   useEffect(() => {
     if (!selectedServices.length || !date || !garage) {
       setSlots([]);
-      setSelectedSlot("");
+      setSelectedSlotIndex(null);
       return;
     }
 
@@ -111,14 +113,14 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
         if (res.ok) {
           const data = await res.json();
           setSlots(data.data || []);
-          setSelectedSlot("");
+          setSelectedSlotIndex(null);
         } else {
           setSlots([]);
-          setSelectedSlot("");
+          setSelectedSlotIndex(null);
         }
       } catch {
         setSlots([]);
-        setSelectedSlot("");
+        setSelectedSlotIndex(null);
       }
     };
 
@@ -137,7 +139,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
       carRegistration.trim() !== "" &&
       selectedServices.length > 0 &&
       date !== undefined &&
-      selectedSlot !== ""
+      selectedSlotIndex !== null
     );
   };
 
@@ -154,24 +156,27 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
     setBay("");
     setNotes("");
     setSlots([]);
-    setSelectedSlot("");
+    setSelectedSlotIndex(null);
     setSelectedServices([]);
+    setIsDatePopoverOpen(false);
   };
 
   // For now, just close on submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedSlot) return;
-
-    // Parse selectedSlot: bayId|serviceId|startTime-endTime
-    const [bayId, , timeRange] = selectedSlot.split("|");
-    const [startTime, endTime] = timeRange.split("-");
+    if (selectedSlotIndex === null || !slots[selectedSlotIndex]) {
+      toast.error("Could not find selected slot details.");
+      return;
+    }
+    const slotObj = slots[selectedSlotIndex];
 
     try {
-      // Create booking data in the new MongoDB format
+      // Create booking data in the backend API format
       const bookingData = {
+        date: date ? format(date, "yyyy-MM-dd") : "",
         customer: {
-          name: customerName,
+          firstName: customerName.split(" ")[0] || customerName,
+          lastName: customerName.split(" ").slice(1).join(" ") || "",
           email: customerEmail,
           phone: customerPhone,
         },
@@ -179,44 +184,22 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
           make: carMake,
           model: carModel,
           year: parseInt(carYear),
-          license: carRegistration,
+          licensePlate: carRegistration,
           vin: "", // Optional field
         },
-        services: selectedServices.map((service) => ({
-          serviceId: service.id,
-          name: service.name,
-          description: service.description,
-          duration: service.duration,
-          price: service.price,
-          currency: service.currency,
-          currencySymbol: service.currencySymbol,
+        services: slotObj.services.map((svc) => ({
+          serviceId: svc.service.id,
+          technicianId: svc.technician.id,
+          bayId: slotObj.bay.id,
+          startTime: svc.startTime,
+          endTime: svc.endTime,
           status: "pending",
-          startTime: date
-            ? new Date(
-                `${format(date, "yyyy-MM-dd")}T${startTime}`
-              ).toISOString()
-            : "",
-          endTime: date
-            ? new Date(`${format(date, "yyyy-MM-dd")}T${endTime}`).toISOString()
-            : "",
+          notes: notes || "",
         })),
-        bookingDate: date
-          ? new Date(`${format(date, "yyyy-MM-dd")}T${startTime}`).toISOString()
-          : "",
-        totalDuration: selectedServices.reduce(
-          (total, service) => total + (service.duration ?? 0),
-          0
-        ),
-        totalPrice: selectedServices.reduce(
-          (total, service) => total + (service.price ?? 0),
-          0
-        ),
-        status: "pending",
-        assignedStaff: "", // Will be assigned by backend
-        assignedBay: bayId,
-        garage_id: garage!.id,
         notes: notes,
       };
+
+      console.log("Creating booking with data:", bookingData);
 
       setIsSubmitting(true);
       const res = await fetchWithAuth("/api/bookings", {
@@ -487,10 +470,10 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                   </h3>
                   <SlotList
                     slots={slots}
-                    selectedSlot={selectedSlot}
-                    setSelectedSlot={setSelectedSlot}
+                    selectedSlotIndex={selectedSlotIndex}
+                    setSelectedSlotIndex={setSelectedSlotIndex}
                   />
-                  {!selectedSlot && slots.length > 0 && (
+                  {selectedSlotIndex === null && slots.length > 0 && (
                     <div className="text-xs text-red-500 mt-1">
                       Please select a slot to continue.
                     </div>

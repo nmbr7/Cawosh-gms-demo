@@ -34,6 +34,37 @@ const safeFormatDate = (
   }
 };
 
+// Helper function to safely get technician name
+const getTechnicianName = (technicianId: unknown): string => {
+  if (!technicianId) return "Not assigned";
+
+  if (typeof technicianId === "string") {
+    return technicianId;
+  }
+
+  if (typeof technicianId === "object" && technicianId !== null) {
+    const tech = technicianId as Record<string, unknown>;
+    console.log("Processing technician object:", tech);
+
+    if (tech.firstName && tech.lastName) {
+      const fullName = `${tech.firstName} ${tech.lastName}`;
+      console.log("Found full name:", fullName);
+      return fullName;
+    }
+    if (tech.name) {
+      console.log("Found name field:", tech.name);
+      return String(tech.name);
+    }
+    if (tech._id) {
+      console.log("Found only ID:", tech._id);
+      return String(tech._id);
+    }
+  }
+
+  console.log("No technician data found, returning 'Not assigned'");
+  return "Not assigned";
+};
+
 export function BookingDetailsModal({
   bookingId,
   isOpen,
@@ -69,9 +100,21 @@ export function BookingDetailsModal({
       }
 
       const result = await response.json();
+      console.log("Booking details response:", result);
 
       if (result.success && result.data) {
-        setBooking(new Booking(result.data));
+        console.log("Setting booking data:", {
+          bookingId: result.data.bookingId,
+          customerName: result.data.customer?.name,
+          servicesCount: result.data.services?.length,
+          firstServiceTechnician: result.data.services?.[0]?.technicianId,
+          firstServiceTechnicianType:
+            typeof result.data.services?.[0]?.technicianId,
+          firstServiceTechnicianKeys: result.data.services?.[0]?.technicianId
+            ? Object.keys(result.data.services[0].technicianId)
+            : [],
+        });
+        setBooking(result.data);
       } else {
         throw new Error("Invalid response format");
       }
@@ -239,10 +282,28 @@ export function BookingDetailsModal({
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <label className="block text-xs font-medium text-gray-500">
+                            Service
+                          </label>
+                          <p className="mt-1 text-gray-900">
+                            {service.serviceId?.name}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-500">
+                            Category
+                          </label>
+                          <p className="mt-1 text-gray-900">
+                            {service.serviceId?.category}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-500">
                             Description
                           </label>
                           <p className="mt-1 text-gray-900">
-                            {service.description || "No description"}
+                            {service.description ||
+                              service.serviceId?.description ||
+                              "No description"}
                           </p>
                         </div>
                         <div>
@@ -267,8 +328,47 @@ export function BookingDetailsModal({
                             Time
                           </label>
                           <p className="mt-1 text-gray-900">
-                            {safeFormatDate(service.startTime, "HH:mm")} -{" "}
-                            {safeFormatDate(service.endTime, "HH:mm")}
+                            {safeFormatDate(
+                              service.startTime,
+                              "MMM dd, yyyy HH:mm"
+                            )}{" "}
+                            -{" "}
+                            {safeFormatDate(
+                              service.endTime,
+                              "MMM dd, yyyy HH:mm"
+                            )}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-500">
+                            Bay
+                          </label>
+                          <p className="mt-1 text-gray-900">
+                            {(() => {
+                              // Try to find bay name from garage bays
+                              if (
+                                booking.garage_id &&
+                                typeof booking.garage_id === "object" &&
+                                "bays" in booking.garage_id
+                              ) {
+                                const garage = booking.garage_id as {
+                                  bays?: Array<{ _id: string; name: string }>;
+                                };
+                                const bay = garage.bays?.find(
+                                  (b) => b._id === service.bayId
+                                );
+                                return bay ? bay.name : service.bayId;
+                              }
+                              return service.bayId;
+                            })()}
+                          </p>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-500">
+                            Technician
+                          </label>
+                          <p className="mt-1 text-gray-900">
+                            {getTechnicianName(service.technicianId)}
                           </p>
                         </div>
                       </div>
@@ -290,15 +390,27 @@ export function BookingDetailsModal({
                       Booking Date
                     </label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {format(booking.bookingDate, "MMM dd, yyyy")}
+                      {safeFormatDate(booking.bookingDate, "MMM dd, yyyy")}
                     </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-500">
-                      Bay
+                      Garage
                     </label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {booking.assignedBay}
+                      {booking.garage_id?.name}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-500">
+                      Garage Address
+                    </label>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {booking.garage_id?.address?.street},{" "}
+                      {booking.garage_id?.address?.city},{" "}
+                      {booking.garage_id?.address?.state},{" "}
+                      {booking.garage_id?.address?.zipCode},{" "}
+                      {booking.garage_id?.address?.country}
                     </p>
                   </div>
                   <div>
@@ -314,7 +426,8 @@ export function BookingDetailsModal({
                       Total Price
                     </label>
                     <p className="mt-1 text-sm text-gray-900 font-medium">
-                      £{booking.totalPrice}
+                      {booking.services[0]?.currencySymbol}
+                      {booking.totalPrice}
                     </p>
                   </div>
                   <div>
@@ -341,15 +454,6 @@ export function BookingDetailsModal({
                       </span>
                     </p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500">
-                      Assigned Staff
-                    </label>
-                    <p className="mt-1 text-sm text-gray-900">
-                      {booking.assignedStaff.firstName}{" "}
-                      {booking.assignedStaff.lastName}
-                    </p>
-                  </div>
                 </div>
               </div>
 
@@ -369,7 +473,21 @@ export function BookingDetailsModal({
                         >
                           <div className="flex-1">
                             <div className="flex items-center justify-between">
-                              <span className="text-sm font-medium text-gray-900">
+                              <span
+                                className={cn(
+                                  "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
+                                  entry.status === "completed" &&
+                                    "bg-green-100 text-green-800",
+                                  entry.status === "in-progress" &&
+                                    "bg-amber-100 text-amber-800",
+                                  entry.status === "confirmed" &&
+                                    "bg-blue-100 text-blue-800",
+                                  entry.status === "pending" &&
+                                    "bg-yellow-100 text-yellow-800",
+                                  entry.status === "cancelled" &&
+                                    "bg-red-100 text-red-800"
+                                )}
+                              >
                                 {entry.status}
                               </span>
                               <span className="text-xs text-gray-500">
@@ -379,14 +497,26 @@ export function BookingDetailsModal({
                                 )}
                               </span>
                             </div>
-                            <p className="text-xs text-gray-600 mt-1">
-                              Changed by:{" "}
-                              {typeof entry.changedBy === "object"
-                                ? `${entry.changedBy.firstName} ${entry.changedBy.lastName}`
-                                : entry.changedBy}
-                            </p>
+                            <div className="mt-2 flex items-center space-x-2">
+                              <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span className="text-xs font-medium text-blue-600">
+                                  {entry.changedBy.firstName.charAt(0)}
+                                  {entry.changedBy.lastName.charAt(0)}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">
+                                  {entry.changedBy.firstName}{" "}
+                                  {entry.changedBy.lastName}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {entry.changedBy.email}
+                                </p>
+                              </div>
+                            </div>
                             {entry.notes && (
-                              <p className="text-xs text-gray-600 mt-1">
+                              <p className="text-xs text-gray-600 mt-2 pl-8">
+                                <span className="font-medium">Notes:</span>{" "}
                                 {entry.notes}
                               </p>
                             )}

@@ -20,8 +20,14 @@ export function DayView({
   const getBookingsForDay = (date: Date) => {
     const dayStr = date.toISOString().split("T")[0];
     return bookings.filter((booking) => {
-      const bookingDateStr = booking.bookingDate.toISOString().split("T")[0];
-      return bookingDateStr === dayStr && booking.assignedBay === selectedBay;
+      const bookingDateStr = booking.bookingDate.split("T")[0];
+      if (selectedBay === "all") return bookingDateStr === dayStr;
+      return (
+        bookingDateStr === dayStr &&
+        booking.services.some(
+          (service) => service.bayId === selectedBay.toString()
+        )
+      );
     });
   };
 
@@ -60,8 +66,8 @@ export function DayView({
                   : "bg-blue-100 text-blue-700"
               )}
               style={{
-                top: `${booking.getTopPosition()}px`,
-                height: `${booking.getHeight()}px`,
+                top: "0px",
+                height: "60px",
               }}
             >
               <div className="p-2 flex flex-col h-full">
@@ -69,7 +75,7 @@ export function DayView({
                   <div className="flex space-x-2 items-center">
                     <div className="text-sm font-medium">{booking._id}</div>
                     <div className="text-xs text-gray-600">
-                      BAY {booking.assignedBay}
+                      BAY {booking.services.map((s) => s.bayId).join(", ")}
                     </div>
                   </div>
                 </div>

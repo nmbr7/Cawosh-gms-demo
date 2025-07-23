@@ -26,30 +26,71 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-interface JobSheet {
-  id: string;
-  bookingId: string;
-  technicianId: string;
-  technician?: {
-    id: string;
-    name: string;
-  };
-  booking?: {
-    date: string;
-    startTime: string;
-    endTime: string;
-    bay: number;
-  };
-  checklist: Array<{
-    task: string;
-    status: string;
-  }>;
-  partsUsed: Array<{
-    itemId: string;
-    itemName: string;
-    quantity: number;
-  }>;
+interface JobSheetService {
+  _id: string;
+  name: string;
+  description: string;
+  cost: number;
+  laborHours: number;
   status: string;
+  startedAt: string | null;
+  completedAt: string | null;
+  notes: string | null;
+}
+
+interface JobSheet {
+  _id: string;
+  jobSheetId: string;
+  booking: {
+    _id: string;
+    bookingId: string;
+    customer: {
+      name: string;
+      phone: string;
+      email: string;
+    };
+    vehicle: {
+      make: string;
+      model: string;
+      year: number;
+      license: string;
+      vin: string;
+    };
+  };
+  services: JobSheetService[];
+  parts: Array<{
+    _id: string;
+    name: string;
+    description?: string;
+    cost?: number;
+    quantity?: number;
+  }>;
+  laborRate: number;
+  totalCost: number;
+  status: string;
+  garage_id: {
+    _id: string;
+    name: string;
+    address: {
+      street: string;
+      city: string;
+      state: string;
+      zipCode: string;
+      country: string;
+    };
+  };
+  assignedTo: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    role: string;
+  };
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
 
 interface PaginationInfo {
@@ -69,14 +110,10 @@ interface FilterState {
 }
 
 interface FilterOptions {
-  technicians: Array<{
-    id: string;
-    name: string;
-  }>;
-  statuses: Array<{
-    value: string;
-    label: string;
-  }>;
+  statuses: Array<{ value: string; label: string }>;
+  serviceStatuses: Array<{ value: string; label: string }>;
+  technicians: Array<{ id: string; name: string }>;
+  // ...add others as needed
 }
 
 const formatTime = (time: string) => {
@@ -107,8 +144,9 @@ export default function JobSheetPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    technicians: [],
     statuses: [],
+    serviceStatuses: [],
+    technicians: [],
   });
   const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
     currentPage: 1,
@@ -161,15 +199,19 @@ export default function JobSheetPage() {
         params.append("technicianId", filters.technicianId);
       }
 
-      const response = await fetch(`/api/job-sheet?${params.toString()}`);
+      const response = await fetch(`/api/job-sheets?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Failed to fetch job sheets");
       }
       const data = await response.json();
 
-      setJobSheets(data.jobSheets);
-      setPaginationInfo(data.pagination);
-      setFilterOptions(data.filters);
+      setJobSheets(data.data.jobSheets);
+      setPaginationInfo(data.data.pagination);
+      setFilterOptions({
+        statuses: data.data.filters.options.statuses || [],
+        serviceStatuses: data.data.filters.options.serviceStatuses || [],
+        technicians: data.data.filters.options.technicians || [],
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -683,47 +725,69 @@ export default function JobSheetPage() {
             ) : (
               jobSheets.map((jobSheet) => (
                 <tr
-                  key={jobSheet.id}
+                  key={jobSheet._id}
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => handleJobSheetClick(jobSheet)}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {jobSheet.id}
+                    {jobSheet.jobSheetId}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.bookingId}
+                    {jobSheet.booking.bookingId}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.booking
-                      ? formatDate(jobSheet.booking.date)
+                    {jobSheet.booking.bookingId
+                      ? formatDate(jobSheet.booking.bookingId)
                       : "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.booking
+                    {jobSheet.booking.bookingId
                       ? `${formatTime(
-                          jobSheet.booking.startTime
-                        )} - ${formatTime(jobSheet.booking.endTime)}`
+                          jobSheet.booking.bookingId
+                        )} - ${formatTime(jobSheet.booking.bookingId)}`
                       : "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.booking ? `Bay ${jobSheet.booking.bay}` : "N/A"}
+                    {jobSheet.booking.bookingId
+                      ? `Bay ${jobSheet.booking.bookingId}`
+                      : "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.technician?.name || "Unknown Technician"}
+                    {jobSheet.assignedTo.firstName}{" "}
+                    {jobSheet.assignedTo.lastName}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     <div className="space-y-1">
-                      {jobSheet.checklist.map((task, index) => (
+                      {jobSheet.services.map((service) => (
                         <div
-                          key={index}
+                          key={service._id}
                           className={cn(
                             "text-xs px-2 py-1 rounded-full inline-block mr-1",
-                            task.status === "completed"
+                            service.status === "completed"
                               ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-800"
+                              : service.status === "in-progress"
+                              ? "bg-amber-100 text-amber-800"
+                              : service.status === "draft"
+                              ? "bg-gray-100 text-gray-800"
+                              : "bg-blue-100 text-blue-800"
                           )}
+                          title={
+                            (service.startedAt
+                              ? `Started: ${service.startedAt}\n`
+                              : "") +
+                            (service.completedAt
+                              ? `Completed: ${service.completedAt}`
+                              : "")
+                          }
                         >
-                          {task.task}
+                          {service.name}{" "}
+                          <span className="ml-1">
+                            [
+                            {filterOptions.serviceStatuses.find(
+                              (s) => s.value === service.status
+                            )?.label || service.status}
+                            ]
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -734,10 +798,14 @@ export default function JobSheetPage() {
                         "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
                         jobSheet.status === "completed" &&
                           "bg-green-100 text-green-800",
-                        jobSheet.status === "in_progress" &&
+                        jobSheet.status === "in-progress" &&
                           "bg-amber-100 text-amber-800",
-                        jobSheet.status === "not_started" &&
-                          "bg-blue-100 text-blue-800"
+                        jobSheet.status === "draft" &&
+                          "bg-gray-100 text-gray-800",
+                        jobSheet.status === "active" &&
+                          "bg-blue-100 text-blue-800",
+                        jobSheet.status === "cancelled" &&
+                          "bg-red-100 text-red-800"
                       )}
                     >
                       {filterOptions.statuses.find(
@@ -760,7 +828,7 @@ export default function JobSheetPage() {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>
-              Job Sheet Details - {selectedJobSheet?.id}
+              Job Sheet Details - {selectedJobSheet?.jobSheetId}
             </DialogTitle>
           </DialogHeader>
 
@@ -772,14 +840,15 @@ export default function JobSheetPage() {
                   <h3 className="text-sm font-medium text-gray-500">
                     Booking ID
                   </h3>
-                  <p className="mt-1">{selectedJobSheet.bookingId}</p>
+                  <p className="mt-1">{selectedJobSheet.booking.bookingId}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">
                     Technician
                   </h3>
                   <p className="mt-1">
-                    {selectedJobSheet.technician?.name || "Unknown Technician"}
+                    {selectedJobSheet.assignedTo.firstName}{" "}
+                    {selectedJobSheet.assignedTo.lastName}
                   </p>
                 </div>
                 <div>
@@ -787,23 +856,16 @@ export default function JobSheetPage() {
                     Date & Time
                   </h3>
                   <p className="mt-1">
-                    {selectedJobSheet.booking ? (
-                      <>
-                        {formatDate(selectedJobSheet.booking.date)}
-                        <br />
-                        {formatTime(selectedJobSheet.booking.startTime)} -{" "}
-                        {formatTime(selectedJobSheet.booking.endTime)}
-                      </>
-                    ) : (
-                      "N/A"
-                    )}
+                    {selectedJobSheet.booking.bookingId
+                      ? `${formatDate(selectedJobSheet.booking.bookingId)}`
+                      : "N/A"}
                   </p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Bay</h3>
                   <p className="mt-1">
-                    {selectedJobSheet.booking
-                      ? `Bay ${selectedJobSheet.booking.bay}`
+                    {selectedJobSheet.booking.bookingId
+                      ? `Bay ${selectedJobSheet.booking.bookingId}`
                       : "N/A"}
                   </p>
                 </div>
@@ -815,17 +877,45 @@ export default function JobSheetPage() {
                   Tasks
                 </h3>
                 <div className="space-y-2">
-                  {selectedJobSheet.checklist.map((task, index) => (
+                  {selectedJobSheet.services.map((service) => (
                     <div
-                      key={index}
+                      key={service._id}
                       className={cn(
                         "text-sm px-3 py-2 rounded-md",
-                        task.status === "completed"
+                        service.status === "completed"
                           ? "bg-green-50 text-green-800"
-                          : "bg-gray-50 text-gray-800"
+                          : service.status === "in-progress"
+                          ? "bg-amber-50 text-amber-800"
+                          : service.status === "draft"
+                          ? "bg-gray-50 text-gray-800"
+                          : "bg-blue-50 text-blue-800"
                       )}
                     >
-                      {task.task}
+                      <div className="flex items-center justify-between">
+                        <span>{service.name}</span>
+                        <span className="ml-2 text-xs font-semibold">
+                          [
+                          {filterOptions.serviceStatuses.find(
+                            (s) => s.value === service.status
+                          )?.label || service.status}
+                          ]
+                        </span>
+                      </div>
+                      {service.startedAt && (
+                        <div className="text-xs text-gray-500">
+                          Started: {service.startedAt}
+                        </div>
+                      )}
+                      {service.completedAt && (
+                        <div className="text-xs text-gray-500">
+                          Completed: {service.completedAt}
+                        </div>
+                      )}
+                      {service.notes && (
+                        <div className="text-xs text-gray-500">
+                          Notes: {service.notes}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -836,16 +926,16 @@ export default function JobSheetPage() {
                 <h3 className="text-sm font-medium text-gray-500 mb-2">
                   Parts Used
                 </h3>
-                {selectedJobSheet.partsUsed.length === 0 ? (
+                {selectedJobSheet.parts.length === 0 ? (
                   <p className="text-sm text-gray-400 italic">NO PARTS USED</p>
                 ) : (
                   <div className="space-y-2">
-                    {selectedJobSheet.partsUsed.map((part, index) => (
+                    {selectedJobSheet.parts.map((part) => (
                       <div
-                        key={index}
+                        key={part._id}
                         className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-md"
                       >
-                        <span className="text-sm">{part.itemName}</span>
+                        <span className="text-sm">{part.name}</span>
                         <span className="text-sm text-gray-500">
                           Qty: {part.quantity}
                         </span>
@@ -865,10 +955,14 @@ export default function JobSheetPage() {
                     "px-3 py-1 text-sm font-medium rounded-full",
                     selectedJobSheet.status === "completed" &&
                       "bg-green-100 text-green-800",
-                    selectedJobSheet.status === "in_progress" &&
+                    selectedJobSheet.status === "in-progress" &&
                       "bg-amber-100 text-amber-800",
-                    selectedJobSheet.status === "not_started" &&
-                      "bg-blue-100 text-blue-800"
+                    selectedJobSheet.status === "draft" &&
+                      "bg-gray-100 text-gray-800",
+                    selectedJobSheet.status === "active" &&
+                      "bg-blue-100 text-blue-800",
+                    selectedJobSheet.status === "cancelled" &&
+                      "bg-red-100 text-red-800"
                   )}
                 >
                   {filterOptions.statuses.find(

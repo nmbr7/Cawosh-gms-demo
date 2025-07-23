@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { Booking, BookingStatus } from "@/app/models/booking";
+import { BookingStatus } from "@/app/models/booking";
 
 interface BackendBooking {
   _id: string;
@@ -31,23 +31,24 @@ interface BackendBooking {
     currency: string;
     currencySymbol: string;
     status: BookingStatus;
+    technicianId: {
+      _id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone: string;
+      role: string;
+    };
+    bayId: string;
     startTime: string;
     endTime: string;
     _id?: string;
+    pauses: unknown[];
   }>;
   bookingDate: string;
   totalDuration: number;
   totalPrice: number;
   status: BookingStatus;
-  assignedStaff: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    role: string;
-  };
-  assignedBay: string;
   garage_id: {
     _id: string;
     name: string;
@@ -89,7 +90,7 @@ interface BackendResponse {
     filters: {
       status?: string;
       garage_id?: string;
-      assignedBay?: string;
+      bay?: string;
       startDate?: string;
       endDate?: string;
       serviceStatus?: string;
@@ -166,7 +167,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     backendUrl.searchParams.set("sortOrder", sortOrder);
 
     // Add optional filters
-    if (bay) backendUrl.searchParams.set("assignedBay", bay);
+    if (bay) backendUrl.searchParams.set("bay", bay);
     if (status) backendUrl.searchParams.set("status", status);
     if (serviceStatus)
       backendUrl.searchParams.set("serviceStatus", serviceStatus);
@@ -208,8 +209,6 @@ export async function GET(request: Request): Promise<NextResponse> {
           totalDuration: booking.totalDuration,
           totalPrice: booking.totalPrice,
           status: booking.status,
-          assignedStaff: booking.assignedStaff,
-          assignedBay: booking.assignedBay,
           garage_id: booking.garage_id,
           notes: booking.notes,
           history: booking.history,
@@ -217,7 +216,7 @@ export async function GET(request: Request): Promise<NextResponse> {
           updatedAt: booking.updatedAt,
         };
 
-        return new Booking(bookingData);
+        return bookingData;
       }) || [];
 
     return NextResponse.json({
@@ -244,6 +243,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const body = await request.json();
+    console.log("Creating booking with data:", body);
 
     // Get auth token
     const cookieStore = await cookies();
@@ -261,6 +261,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       `${process.env.BACKEND_URL}/api/bookings` ||
       "http://localhost:3000/api/bookings";
 
+    console.log("Sending request to backend:", backendUrl);
+
     const response = await fetch(backendUrl, {
       method: "POST",
       headers: {
@@ -270,15 +272,22 @@ export async function POST(request: Request): Promise<NextResponse> {
       body: JSON.stringify(body),
     });
 
+    console.log("Backend response status:", response.status);
+
     if (!response.ok) {
       const errorData = await response.json();
+      console.error("Backend error:", errorData);
       return NextResponse.json(
-        { error: errorData.error || "Failed to create booking" },
+        {
+          error:
+            errorData.error || errorData.message || "Failed to create booking",
+        },
         { status: response.status }
       );
     }
 
     const data = await response.json();
+    console.log("Backend success response:", data);
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error("Error creating booking:", error);

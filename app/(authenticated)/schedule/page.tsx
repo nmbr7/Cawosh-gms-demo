@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { useGarageStore } from "@/store/garage";
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -24,6 +25,8 @@ export default function SchedulePage() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const garage = useGarageStore((state) => state.garage);
 
   // Fetch bookings when date or bay changes
   useEffect(() => {
@@ -45,8 +48,13 @@ export default function SchedulePage() {
         const startDateStr = format(monthStart, "yyyy-MM-dd");
         const endDateStr = format(monthEnd, "yyyy-MM-dd");
 
+        if (!garage) {
+          throw new Error("Garage not found");
+        }
+
         // Build query parameters
         const paramsObj: Record<string, string> = {
+          garageId: garage.id,
           startDate: startDateStr,
           endDate: endDateStr,
           all: "true",
@@ -61,10 +69,7 @@ export default function SchedulePage() {
         );
         const data = await response.json();
 
-        const bookingInstances = data.bookings.map(
-          (bookingData: BookingData) => new Booking(bookingData)
-        );
-        setBookings(bookingInstances);
+        setBookings(data.bookings);
       } catch (error) {
         console.error("Error fetching bookings:", error);
       } finally {

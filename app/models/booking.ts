@@ -19,43 +19,14 @@ interface VehicleData {
   vin: string;
 }
 
-interface ServiceReference {
+export interface BookingServiceRef {
   _id: string;
   name: string;
   description: string;
   category: string;
 }
 
-export interface BookingService {
-  serviceId: string | ServiceReference;
-  name: string;
-  description: string;
-  duration: number;
-  price: number;
-  currency: string;
-  currencySymbol: string;
-  status: BookingStatus;
-  startTime: string;
-  endTime: string;
-  _id?: string;
-}
-
-interface HistoryEntry {
-  status: BookingStatus;
-  changedBy:
-    | string
-    | {
-        _id: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-      };
-  changedAt: string;
-  notes: string;
-  _id?: string;
-}
-
-interface AssignedStaff {
+interface TechnicianData {
   _id: string;
   firstName: string;
   lastName: string;
@@ -64,11 +35,44 @@ interface AssignedStaff {
   role: string;
 }
 
+export interface BookingService {
+  _id: string;
+  serviceId: BookingServiceRef;
+  name: string;
+  description: string;
+  duration: number;
+  price: number;
+  currency: string;
+  currencySymbol: string;
+  status: string;
+  technicianId: TechnicianData;
+  bayId: string;
+  startTime: string;
+  endTime: string;
+  pauses: unknown[];
+}
+
+interface HistoryEntry {
+  status: BookingStatus;
+  changedBy: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  changedAt: string;
+  notes: string;
+  _id?: string;
+}
+
 interface GarageInfo {
   _id: string;
   name: string;
+  subdomain?: string;
   email: string;
   phone: string;
+  website?: string;
+  tenantId?: string;
   address: {
     street: string;
     city: string;
@@ -76,6 +80,46 @@ interface GarageInfo {
     zipCode: string;
     country: string;
   };
+  businessHours?: Array<{
+    day: string;
+    open: string;
+    close: string;
+    isClosed: boolean;
+    _id: string;
+  }>;
+  settings?: {
+    timezone: string;
+    currency: string;
+    taxRate: number;
+    allowOnlineBooking: boolean;
+  };
+  billing?: {
+    taxRate: number;
+    taxRegistrationNumber: string;
+    taxRegistrationName: string;
+    taxRegistrationAddress: {
+      street: string;
+      city: string;
+      state: string;
+      zipCode: string;
+      country: string;
+    };
+  };
+  services?: Array<{
+    serviceId: string;
+    isActive: boolean;
+    customPrice?: number;
+    customDuration?: number;
+  }>;
+  bays?: Array<{
+    _id: string;
+    name: string;
+    supportedServices: string[];
+  }>;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 export interface BookingData {
@@ -88,69 +132,119 @@ export interface BookingData {
   totalDuration: number;
   totalPrice: number;
   status: BookingStatus;
-  assignedStaff: AssignedStaff;
-  assignedBay: string;
-  garage_id: string | GarageInfo;
+  garage_id: GarageInfo;
   notes?: string;
   history: HistoryEntry[];
   createdAt?: string;
   updatedAt?: string;
+  __v?: number;
+  assignedStaff?: unknown;
+  jobSheet?: unknown;
 }
 
-export class Booking {
-  _id?: string;
+export interface BookingHistoryEntry {
+  _id: string;
+  status: string;
+  changedBy: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  changedAt: string;
+  notes: string;
+}
+
+export interface BookingGarage {
+  _id: string;
+  name: string;
+  subdomain?: string;
+  email: string;
+  phone: string;
+  website?: string;
+  tenantId?: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  businessHours?: Array<{
+    day: string;
+    open: string;
+    close: string;
+    isClosed: boolean;
+    _id: string;
+  }>;
+  settings?: {
+    timezone: string;
+    currency: string;
+    taxRate: number;
+    allowOnlineBooking: boolean;
+  };
+  billing?: {
+    taxRate: number;
+    taxRegistrationNumber: string;
+    taxRegistrationName: string;
+    taxRegistrationAddress: {
+      street: string;
+      city: string;
+      state: string;
+      zipCode: string;
+      country: string;
+    };
+  };
+  services?: Array<{
+    serviceId: string;
+    isActive: boolean;
+    customPrice?: number;
+    customDuration?: number;
+  }>;
+  bays?: Array<{
+    _id: string;
+    name: string;
+    supportedServices: string[];
+  }>;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+}
+
+export interface Booking {
+  _id: string;
   bookingId?: string;
-  customer: CustomerData;
-  vehicle: VehicleData;
+  customer: {
+    name: string;
+    phone: string;
+    email: string;
+  };
+  vehicle: {
+    make: string;
+    model: string;
+    year: number;
+    license: string;
+    vin: string;
+  };
   services: BookingService[];
-  bookingDate: Date;
+  bookingDate: string;
   totalDuration: number;
   totalPrice: number;
-  status: BookingStatus;
-  assignedStaff: AssignedStaff;
-  assignedBay: string;
-  garage_id: string | GarageInfo;
+  status: string;
+  garage_id: BookingGarage;
   notes?: string;
-  history: HistoryEntry[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  history: BookingHistoryEntry[];
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+  assignedStaff?: unknown;
+  jobSheet?: unknown;
+}
 
-  constructor(data: BookingData) {
-    this._id = data._id;
-    this.bookingId = data.bookingId;
-    this.customer = data.customer;
-    this.vehicle = data.vehicle;
-    this.services = data.services;
-    this.bookingDate = new Date(data.bookingDate);
-    this.totalDuration = data.totalDuration;
-    this.totalPrice = data.totalPrice;
-    this.status = data.status;
-    this.assignedStaff = data.assignedStaff;
-    this.assignedBay = data.assignedBay;
-    this.garage_id =
-      typeof data.garage_id === "string"
-        ? {
-            _id: data.garage_id,
-            name: "",
-            email: "",
-            phone: "",
-            address: {
-              street: "",
-              city: "",
-              state: "",
-              zipCode: "",
-              country: "",
-            },
-          }
-        : data.garage_id;
-    this.notes = data.notes;
-    this.history = data.history;
-    this.createdAt = data.createdAt ? new Date(data.createdAt) : undefined;
-    this.updatedAt = data.updatedAt ? new Date(data.updatedAt) : undefined;
-  }
-
-  getStatusColor(): string {
-    switch (this.status) {
+export class BookingUtil {
+  static getStatusColor(status: string): string {
+    switch (status) {
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "confirmed":
@@ -166,37 +260,19 @@ export class Booking {
     }
   }
 
-  isActive(): boolean {
-    return (
-      this.status === "pending" ||
-      this.status === "confirmed" ||
-      this.status === "in-progress"
-    );
+  static getPrimaryService(booking: Booking): BookingService | undefined {
+    return booking.services[0];
   }
 
-  isCompleted(): boolean {
-    return this.status === "completed";
+  static getFormattedDate(booking: Booking): string {
+    return new Date(booking.bookingDate).toLocaleDateString();
   }
 
-  isCancelled(): boolean {
-    return this.status === "cancelled";
-  }
-
-  getPrimaryService(): BookingService | undefined {
-    return this.services[0];
-  }
-
-  getFormattedDate(): string {
-    return this.bookingDate.toLocaleDateString();
-  }
-
-  getFormattedTime(): string {
-    const primaryService = this.getPrimaryService();
+  static getFormattedTime(booking: Booking): string {
+    const primaryService = BookingUtil.getPrimaryService(booking);
     if (!primaryService) return "";
-
     const startTime = new Date(primaryService.startTime);
     const endTime = new Date(primaryService.endTime);
-
     return `${startTime.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
@@ -206,56 +282,37 @@ export class Booking {
     })}`;
   }
 
-  getLatestHistoryEntry(): HistoryEntry | undefined {
-    return this.history.length > 0
-      ? this.history[this.history.length - 1]
+  static getLatestHistoryEntry(
+    booking: Booking
+  ): BookingHistoryEntry | undefined {
+    return booking.history.length > 0
+      ? booking.history[booking.history.length - 1]
       : undefined;
   }
 
-  // Check if this booking overlaps with another booking
-  overlapsWith(other: Booking): boolean {
-    if (this.assignedBay !== other.assignedBay) {
-      return false;
-    }
-
-    const thisStart = this.bookingDate;
-    const thisEnd = new Date(thisStart.getTime() + this.totalDuration * 60000);
-    const otherStart = other.bookingDate;
-    const otherEnd = new Date(
-      otherStart.getTime() + other.totalDuration * 60000
-    );
-
+  static overlapsWith(a: Booking, b: Booking): boolean {
+    if (!a.services.length || !b.services.length) return false;
+    // Compare by bay and time range of the first service
+    const aService = a.services[0];
+    const bService = b.services[0];
+    if (aService.bayId !== bService.bayId) return false;
+    const aStart = new Date(aService.startTime).getTime();
+    const aEnd = new Date(aService.endTime).getTime();
+    const bStart = new Date(bService.startTime).getTime();
+    const bEnd = new Date(bService.endTime).getTime();
     return (
-      (thisStart >= otherStart && thisStart < otherEnd) ||
-      (thisEnd > otherStart && thisEnd <= otherEnd) ||
-      (thisStart <= otherStart && thisEnd >= otherEnd)
+      (aStart >= bStart && aStart < bEnd) ||
+      (aEnd > bStart && aEnd <= bEnd) ||
+      (aStart <= bStart && aEnd >= bEnd)
     );
   }
 
-  // Validate if the booking times are valid
-  isValid(): boolean {
+  static isValid(booking: Booking): boolean {
     const now = new Date();
     return (
-      this.bookingDate >= now && this.totalDuration > 0 && this.totalPrice >= 0
+      new Date(booking.bookingDate) >= now &&
+      booking.totalDuration > 0 &&
+      booking.totalPrice >= 0
     );
-  }
-
-  getTopPosition(): number {
-    // Example: calculate top position based on start time (customize as needed)
-    // Let's say your schedule starts at 8:00 AM
-    const startHour = 8;
-    const date =
-      this.bookingDate instanceof Date
-        ? this.bookingDate
-        : new Date(this.bookingDate);
-    const hour = date.getHours();
-    const minute = date.getMinutes();
-    return (hour - startHour) * 60 + minute; // 1px per minute, adjust as needed
-  }
-
-  getHeight(): number {
-    // Example: return height based on totalDuration (in minutes)
-    // 1 minute = 1px, so 60 minutes = 60px (adjust as needed)
-    return this.totalDuration || 60;
   }
 }
