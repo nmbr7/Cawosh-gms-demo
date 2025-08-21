@@ -186,7 +186,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     });
 
     if (!response.ok) {
-      throw new Error(`Backend API error: ${response.status}`);
+      throw new Error(`Backend API error: ${response.status} ${response.text}`);
     }
 
     const backendData: BackendResponse = await response.json();
