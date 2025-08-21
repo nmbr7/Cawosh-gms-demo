@@ -18,6 +18,7 @@ export default function AuthenticatedLayout({
   const user = useAuthStore((state) => state.user);
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -26,6 +27,10 @@ export default function AuthenticatedLayout({
     } else {
       setIsLoading(false);
     }
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [user, router]);
 
   // Prevent any rendering until we know the auth state
@@ -36,22 +41,23 @@ export default function AuthenticatedLayout({
   return (
     <FormOptionsProvider>
       <div className="flex min-h-screen bg-gray-100">
-        <div
+        { !isMobile && <div
           className={cn(
             "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
             sidebarOpen ? "w-64" : "w-20"
           )}
         >
           <Sidebar />
-        </div>
+        </div>}
         <main
           className={cn(
             "flex-1 transition-all duration-300 ease-in-out",
-            sidebarOpen ? "ml-64" : "ml-20"
+            sidebarOpen ? "ml-64" : "ml-20",
+            isMobile ? "ml-0" : ""
           )}
         >
           <Header />
-          <div className="p-6">{children}</div>
+          <div className="p-4 md:p-6">{children}</div>
         </main>
       </div>
     </FormOptionsProvider>

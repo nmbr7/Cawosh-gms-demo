@@ -23,7 +23,7 @@ import {
 import { useUIStore } from "@/store/ui";
 import { useAuthStore } from "@/store/auth";
 
-const links = [
+export const links = [
   { name: "Dashboard", href: "/dashboard", icon: SquaresFour },
   { name: "Calendar", href: "/schedule", icon: CalendarBlank },
   { name: "Bookings", href: "/bookings", icon: Note },

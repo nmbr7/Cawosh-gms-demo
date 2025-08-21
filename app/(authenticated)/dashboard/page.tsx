@@ -17,9 +17,9 @@ import {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-6">
-      <div className=" text-gray-500 font-medium pl-1">Today</div>
-      <div className="flex w-[90%] gap-6 bg-[#F5F5F5]">
+    <div className="space-y-6 bg-[#F5F5F5]">
+      <div className=" text-gray-500 font-medium pl-1 ">Today</div>
+      <div className="flex sm:flex-row flex-col w-full sm:w-[90%] gap-6 bg-[#F5F5F5]">
         <DashboardStatCard
           label="On-going"
           value={10}
