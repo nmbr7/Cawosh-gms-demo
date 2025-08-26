@@ -21,20 +21,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DataTable } from "@/components/ui/data-table";
+
 // import { ItemDetailsModal } from "@/components/modals/item-details-modal";
 // import { ItemCreateModal } from "@/components/modals/item-create-modal";
 import { useInventory } from "@/store/inventory";
 import type { InventoryItem } from "@/types/inventory";
+import { InventoryAlerts } from "@/app/components/inventory/InventoryAlerts";
+import { ItemDetailsModal } from "@/app/components/inventory/InventoryItemDetailModal";
 
 export default function InventoryPage() {
-  // const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const [showFilters, setShowFilters] = useState(false);
 
   const { items, pagination, filters, setFilters, filterOptions } =
     useInventory();
+
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
   const columns = [
     {
@@ -104,6 +108,7 @@ export default function InventoryPage() {
 
   return (
     <div className="p-6">
+      <InventoryAlerts />
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <div className="relative">
@@ -111,7 +116,7 @@ export default function InventoryPage() {
             <Input
               type="text"
               placeholder="Search inventory..."
-              className="w-[300px] pl-9 pr-8"
+              className="w-[300px] pl-9 pr-8 bg-white"
               value={filters.q || ""}
               onChange={(e) => setFilters({ q: e.target.value || undefined })}
             />
@@ -152,8 +157,12 @@ export default function InventoryPage() {
                 Category
               </label>
               <Select
-                value={filters.category}
-                onValueChange={(value) => setFilters({ category: value })}
+                value={filters.category ?? "all"}
+                onValueChange={(value) =>
+                  setFilters({
+                    category: value === "all" ? undefined : value,
+                  })
+                }
               >
                 <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Select category" />
@@ -163,6 +172,35 @@ export default function InventoryPage() {
                   {filterOptions.categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Stock Status
+              </label>
+              <Select
+                value={(filters.status ?? "ALL") as string}
+                onValueChange={(value) =>
+                  setFilters({
+                    status: value as "ALL" | "IN_STOCK" | "LOW" | "OUT",
+                  })
+                }
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="ALL">All Statuses</SelectItem>
+                  {filterOptions.statuses.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s === "IN_STOCK"
+                        ? "In Stock"
+                        : s === "LOW"
+                        ? "Low Stock"
+                        : "Out of Stock"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -178,26 +216,26 @@ export default function InventoryPage() {
         // isLoading={isLoading} // This state is no longer managed by Zustand
         onRowClick={(item) => {
           console.log(item);
-          // setSelectedItem(item);
-          // setIsModalOpen(true);
+          setSelectedItem(item);
+          setIsModalOpen(true);
         }}
         emptyMessage={
-          filters.category !== "all" || filters.q
+          filters.category !== undefined || filters.q
             ? "No items match your filters"
             : "No inventory items found"
         }
         emptySubMessage={
-          filters.category !== "all" || filters.q
+          filters.category !== undefined || filters.q
             ? "Try adjusting your filters or search criteria"
             : "Get started by adding a new inventory item"
         }
         emptyAction={
-          filters.category !== "all" || filters.q
+          filters.category !== undefined || filters.q
             ? {
                 label: "Clear filters",
                 onClick: () => {
                   setFilters({
-                    category: "all",
+                    category: undefined,
                     q: undefined,
                     sortBy: "name",
                     sortOrder: "asc",
@@ -265,11 +303,12 @@ export default function InventoryPage() {
       </div>
 
       {/* Add modals at the end */}
-      {/* <ItemDetailsModal
+      <ItemDetailsModal
         item={selectedItem as InventoryItem}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+      {/* 
       <ItemCreateModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}

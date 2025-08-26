@@ -40,6 +40,13 @@ type InventoryState = {
   allItems: InventoryItem[];
   movements: Record<string, StockMovement[]>;
 
+  alerts: {
+    lowCount: number;
+    outCount: number;
+    lowItems: InventoryItem[];
+    outItems: InventoryItem[];
+  };
+
   // Computed data (like API response)
   items: InventoryItem[];
   pagination: PaginationInfo;
@@ -78,6 +85,14 @@ export const useInventory = create<InventoryState>((set, get) => ({
     unit: item.unit as "pair" | "bottle" | "pc" | "box" | "litre" | "kg",
     status: computeStatus(item.quantity, item.reorderLevel),
   })),
+
+  // Initialize alerts
+  alerts: {
+    lowCount: 0,
+    outCount: 0,
+    lowItems: [],
+    outItems: [],
+  },
   movements: {},
 
   // Initialize computed data
@@ -220,14 +235,81 @@ export const useInventory = create<InventoryState>((set, get) => ({
         updatedFilters.page = 1;
       }
 
-      const { items, pagination, filterOptions } =
-        state.getFilteredAndPaginatedData();
+      // Recompute using updatedFilters (avoid stale state.filters)
+      const allItems = state.allItems;
+      const filters = updatedFilters;
+
+      const filtered = allItems.filter((item) => {
+        if (
+          filters.q &&
+          !item.name.toLowerCase().includes(filters.q.toLowerCase()) &&
+          !item.sku.toLowerCase().includes(filters.q.toLowerCase())
+        )
+          return false;
+        if (filters.category && item.category !== filters.category)
+          return false;
+        if (
+          filters.status &&
+          filters.status !== "ALL" &&
+          item.status !== filters.status
+        )
+          return false;
+        if (filters.supplier && item.supplier !== filters.supplier)
+          return false;
+        if (filters.location && item.location !== filters.location)
+          return false;
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        const aValue = a[filters.sortBy as keyof InventoryItem];
+        const bValue = b[filters.sortBy as keyof InventoryItem];
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return filters.sortOrder === "asc"
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return filters.sortOrder === "asc"
+            ? aValue - bValue
+            : bValue - aValue;
+        }
+        return 0;
+      });
+
+      const totalItems = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / filters.limit));
+      const startIndex = (filters.page - 1) * filters.limit;
+      const endIndex = startIndex + filters.limit;
+      const paginatedItems = filtered.slice(startIndex, endIndex);
 
       return {
         filters: updatedFilters,
-        items,
-        pagination,
-        filterOptions,
+        items: paginatedItems,
+        pagination: {
+          currentPage: filters.page,
+          totalPages,
+          totalItems,
+          itemsPerPage: filters.limit,
+        },
+        filterOptions: {
+          categories: [...new Set(allItems.map((i) => i.category))].sort(),
+          suppliers: [
+            ...new Set(
+              allItems
+                .map((i) => i.supplier)
+                .filter((s): s is string => Boolean(s))
+            ),
+          ].sort(),
+          locations: [
+            ...new Set(
+              allItems
+                .map((i) => i.location)
+                .filter((l): l is string => Boolean(l))
+            ),
+          ].sort(),
+          statuses: ["IN_STOCK", "LOW", "OUT"],
+        },
       };
     });
   },
@@ -243,11 +325,13 @@ export const useInventory = create<InventoryState>((set, get) => ({
       };
 
       const updatedAllItems = [item, ...state.allItems];
+      const alerts = computeAlerts(updatedAllItems);
       const { items, pagination, filterOptions } =
         state.getFilteredAndPaginatedData();
 
       return {
         allItems: updatedAllItems,
+        alerts,
         items,
         pagination,
         filterOptions,
@@ -270,11 +354,13 @@ export const useInventory = create<InventoryState>((set, get) => ({
           : item
       );
 
+      const alerts = computeAlerts(updatedAllItems);
       const { items, pagination, filterOptions } =
         state.getFilteredAndPaginatedData();
 
       return {
         allItems: updatedAllItems,
+        alerts,
         items,
         pagination,
         filterOptions,
@@ -318,12 +404,14 @@ export const useInventory = create<InventoryState>((set, get) => ({
       const ms = state.movements[itemId] ?? [];
       const newMs = [move, ...ms];
 
+      const alerts = computeAlerts(updatedAllItems);
       const { items, pagination, filterOptions } =
         state.getFilteredAndPaginatedData();
 
       return {
         allItems: updatedAllItems,
         movements: { ...state.movements, [itemId]: newMs },
+        alerts,
         items,
         pagination,
         filterOptions,
@@ -332,8 +420,20 @@ export const useInventory = create<InventoryState>((set, get) => ({
   },
 }));
 
+function computeAlerts(items: InventoryItem[]) {
+  const lowCount = items.filter((item) => item.status === "LOW").length;
+  const outCount = items.filter((item) => item.status === "OUT").length;
+  const lowItems = items.filter((item) => item.status === "LOW");
+  const outItems = items.filter((item) => item.status === "OUT");
+  return { lowCount, outCount, lowItems, outItems };
+}
 // Initialize the store with computed data
 const initialState = useInventory.getState();
 const { items, pagination, filterOptions } =
   initialState.getFilteredAndPaginatedData();
-useInventory.setState({ items, pagination, filterOptions });
+useInventory.setState({
+  items,
+  pagination,
+  filterOptions,
+  alerts: computeAlerts(items),
+});
