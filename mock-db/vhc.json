@@ -1,0 +1,130 @@
+{
+  "templates": [
+    {
+      "id": "vhc_template_v1",
+      "version": 1,
+      "title": "Standard VHC",
+      "isActive": true,
+      "sections": [
+        {
+          "id": "safety",
+          "title": "Critical Safety Systems",
+          "weight": 0.45,
+          "items": [
+            {
+              "id": "mandatory_lights",
+              "label": "Mandatory lights",
+              "type": "radio",
+              "options": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "weight": 0.09
+            },
+            {
+              "id": "brake_pads",
+              "label": "Brake pad/shoe wear",
+              "type": "radio",
+              "options": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "weight": 0.12
+            }
+          ]
+        },
+        {
+          "id": "hv_system",
+          "title": "High Voltage System",
+          "applicable_to": [
+            "ev",
+            "hybrid"
+          ],
+          "weight": 0.15,
+          "items": [
+            {
+              "id": "charge_port_condition",
+              "label": "Charge port condition",
+              "type": "radio",
+              "options": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "weight": 0.03
+            }
+          ]
+        },
+        {
+          "id": "engine_oil",
+          "title": "Engine Oil/Leaks",
+          "applicable_to": [
+            "ice",
+            "hybrid"
+          ],
+          "weight": 0.08,
+          "items": [
+            {
+              "id": "engine_oil_level",
+              "label": "Oil level/condition",
+              "type": "radio",
+              "options": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "weight": 0.08
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "id": "3cf306c6-f0b8-40d2-a8da-e8a026bc1e1d",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "veh_001",
+      "bookingId": "book_001",
+      "serviceIds": [
+        "svc_oil_change"
+      ],
+      "assignedTo": "tech_001",
+      "answers": [
+        {
+          "itemId": "mandatory_lights",
+          "value": 4,
+          "notes": "dusty"
+        },
+        {
+          "itemId": "brake_pads",
+          "value": 3
+        }
+      ],
+      "createdBy": "admin_001",
+      "createdAt": "2025-09-18T08:47:37.636Z",
+      "updatedAt": "2025-09-18T08:47:38.028Z",
+      "scores": {
+        "section": {},
+        "total": 0.6666666666666666
+      },
+      "progress": {
+        "answered": 2,
+        "total": 3
+      }
+    }
+  ]
+}
