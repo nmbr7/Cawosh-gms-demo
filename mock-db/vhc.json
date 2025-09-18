@@ -92,6 +92,159 @@
   ],
   "responses": [
     {
+      "id": "bd0f4817-a4e9-4cdc-a149-585d41dd1042",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "SDDA",
+      "answers": [],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T10:43:04.181Z",
+      "updatedAt": "2025-09-18T10:43:04.181Z"
+    },
+    {
+      "id": "214307cd-784b-4287-a060-d5dfacf46b23",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "HH",
+      "answers": [
+        {
+          "itemId": "mandatory_lights",
+          "value": 4
+        },
+        {
+          "itemId": "engine_oil_level",
+          "value": 3
+        },
+        {
+          "itemId": "brake_pads",
+          "value": 3
+        }
+      ],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T10:38:25.544Z",
+      "updatedAt": "2025-09-18T10:39:20.663Z",
+      "scores": {
+        "section": {},
+        "total": 1
+      },
+      "progress": {
+        "answered": 3,
+        "total": 3
+      }
+    },
+    {
+      "id": "7f63548e-9452-4915-b508-04129a88df4d",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "hybrid",
+      "status": "in_progress",
+      "vehicleId": "AAAA",
+      "answers": [],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T10:34:12.431Z",
+      "updatedAt": "2025-09-18T10:34:12.431Z"
+    },
+    {
+      "id": "de238c07-2c91-457f-a75e-dcdbc59b2631",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "DSD",
+      "answers": [],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T10:30:56.153Z",
+      "updatedAt": "2025-09-18T10:30:56.153Z"
+    },
+    {
+      "id": "aa58fb1b-b582-411d-b71a-d05acd572111",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "AA",
+      "answers": [],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T10:24:33.355Z",
+      "updatedAt": "2025-09-18T10:24:33.355Z"
+    },
+    {
+      "id": "cf27d070-124e-4ffc-9e6c-c2db6d26efde",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "AAA",
+      "answers": [],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T10:21:00.126Z",
+      "updatedAt": "2025-09-18T10:21:00.126Z"
+    },
+    {
+      "id": "7960b980-9f19-4351-92de-e65e7f071dff",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "ADOO",
+      "answers": [],
+      "createdBy": "Afsal",
+      "createdAt": "2025-09-18T10:17:22.267Z",
+      "updatedAt": "2025-09-18T10:17:22.267Z"
+    },
+    {
+      "id": "864d987a-3d8d-4323-a5d4-90be21351793",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "AVCX",
+      "answers": [],
+      "createdBy": "Afsal",
+      "createdAt": "2025-09-18T10:15:12.039Z",
+      "updatedAt": "2025-09-18T10:15:12.039Z"
+    },
+    {
+      "id": "708fc028-9e9c-4c4a-ab93-484b4e440356",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "RE24 AG",
+      "answers": [],
+      "createdBy": "Afsal",
+      "createdAt": "2025-09-18T10:07:58.030Z",
+      "updatedAt": "2025-09-18T10:07:58.030Z"
+    },
+    {
+      "id": "29929069-5bef-439b-b103-a4f25e0d3953",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "RE24 FGH",
+      "answers": [],
+      "createdBy": "Afsal",
+      "createdAt": "2025-09-18T09:44:34.854Z",
+      "updatedAt": "2025-09-18T09:44:34.854Z"
+    },
+    {
+      "id": "5ef70255-b069-40a1-80cb-f13cd0dc9207",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "veh_demo",
+      "answers": [],
+      "createdBy": "current_user",
+      "createdAt": "2025-09-18T09:31:11.992Z",
+      "updatedAt": "2025-09-18T09:31:11.992Z"
+    },
+    {
       "id": "3cf306c6-f0b8-40d2-a8da-e8a026bc1e1d",
       "templateId": "vhc_template_v1",
       "templateVersion": 1,

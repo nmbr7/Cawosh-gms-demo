@@ -31,6 +31,11 @@ export const links = [
   { name: "Billings", href: "/billings", icon: Wallet },
   { name: "Stock Management", href: "/inventory", icon: Package },
   {
+    name: "Vehicle Health Checks",
+    href: "/vehicle-health-checks",
+    icon: Files,
+  },
+  {
     name: "Customer Support",
     href: "/customer-support",
     icon: Headphones,
