@@ -92,6 +92,31 @@
   ],
   "responses": [
     {
+      "id": "80f00cec-9b0e-45b4-8ee0-a2f6ef476652",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "ADSD",
+      "answers": [
+        {
+          "itemId": "mandatory_lights",
+          "value": 2
+        }
+      ],
+      "createdBy": "technician",
+      "createdAt": "2025-09-20T09:44:35.668Z",
+      "updatedAt": "2025-09-20T09:44:52.055Z",
+      "scores": {
+        "section": {},
+        "total": 0.3333333333333333
+      },
+      "progress": {
+        "answered": 1,
+        "total": 3
+      }
+    },
+    {
       "id": "c24599e6-028f-4f5f-bda9-75a42c483c67",
       "templateId": "vhc_template_v1",
       "templateVersion": 1,

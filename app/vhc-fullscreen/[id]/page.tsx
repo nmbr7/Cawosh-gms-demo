@@ -6,6 +6,11 @@ import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import VehicleHealthStepper, {
   VHCSection,
 } from "@/components/vhc/VehicleHealthStepper";
+import {
+  VHC_VALUE_MAPPING,
+  getVHCTitle,
+  convertAnswersForStorage,
+} from "@/lib/vhc/answerMapping";
 
 type Template = {
   id: string;
@@ -110,18 +115,23 @@ export default function VHCFullscreen({
 
   const current = sections[currentIndex];
   const currentFlat = flatItems[flatIndex];
-  const getAnswer = (itemId: string) =>
-    resp?.answers.find((a) => a.itemId === itemId)?.value;
+  const getAnswer = (itemId: string) => {
+    const answer = resp?.answers.find((a) => a.itemId === itemId)?.value;
+    return getVHCTitle(answer);
+  };
 
   const saveAnswers = useCallback(
     async (partial: { itemId: string; value: number | string | boolean }[]) => {
       if (!resp) return;
       setSaving(true);
       try {
+        // Convert descriptive titles back to numeric values for storage
+        const convertedPartial = convertAnswersForStorage(partial);
+
         const res = await fetchWithAuth(`/api/vhc/responses/${resp.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers: partial }),
+          body: JSON.stringify({ answers: convertedPartial }),
         });
         const updated = await res.json();
         setResp(() => ({
@@ -154,9 +164,13 @@ export default function VHCFullscreen({
       helperText: undefined,
       options:
         (it as { options?: number[] }).options?.map((v: number) => ({
-          value: v,
-          label: String(v),
-        })) || [1, 2, 3, 4, 5].map((v) => ({ value: v, label: String(v) })),
+          value: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+          label: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+        })) ||
+        [1, 2, 3, 4, 5].map((v) => ({
+          value: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+          label: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+        })),
     })),
     illustrationCaption: undefined,
   }));
@@ -199,8 +213,15 @@ export default function VHCFullscreen({
             helperText: undefined,
             options:
               (currentFlat.item as { options?: number[] }).options?.map(
-                (v: number) => ({ value: v, label: String(v) })
-              ) || [1, 2, 3, 4, 5].map((v) => ({ value: v, label: String(v) })),
+                (v: number) => ({
+                  value: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+                  label: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+                })
+              ) ||
+              [1, 2, 3, 4, 5].map((v) => ({
+                value: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+                label: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+              })),
           }}
           currentValue={currentVal}
           onSelect={(v) =>

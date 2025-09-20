@@ -3,6 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import {
+  VHC_VALUE_MAPPING,
+  getVHCTitle,
+  convertAnswersForStorage,
+} from "@/lib/vhc/answerMapping";
 
 type Template = {
   id: string;
@@ -61,18 +66,23 @@ export default function VehicleHealthCheckEditorPage() {
 
   const current = sections[currentIndex];
 
-  const getAnswer = (itemId: string) =>
-    resp?.answers.find((a) => a.itemId === itemId)?.value;
+  const getAnswer = (itemId: string) => {
+    const answer = resp?.answers.find((a) => a.itemId === itemId)?.value;
+    return getVHCTitle(answer);
+  };
 
   const saveAnswers = useCallback(
     async (partial: { itemId: string; value: number | string | boolean }[]) => {
       if (!resp) return;
       setSaving(true);
       try {
+        // Convert descriptive titles back to numeric values for storage
+        const convertedPartial = convertAnswersForStorage(partial);
+
         const res = await fetchWithAuth(`/api/vhc/responses/${resp.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers: partial }),
+          body: JSON.stringify({ answers: convertedPartial }),
         });
         const updated = await res.json();
         setResp(() => ({
@@ -133,24 +143,30 @@ export default function VehicleHealthCheckEditorPage() {
                 </div>
                 {/* Radio scale 1..5 default */}
                 {(!it.type || it.type === "radio") && (
-                  <div className="flex items-center gap-4">
-                    {(it.options || [1, 2, 3, 4, 5]).map((opt) => (
-                      <label
-                        key={opt}
-                        className="inline-flex items-center gap-2 text-sm"
-                      >
-                        <input
-                          type="radio"
-                          name={it.id}
-                          className="h-4 w-4"
-                          checked={getAnswer(it.id) === opt}
-                          onChange={() =>
-                            saveAnswers([{ itemId: it.id, value: opt }])
-                          }
-                        />
-                        <span>{opt}</span>
-                      </label>
-                    ))}
+                  <div className="flex flex-col gap-2">
+                    {(it.options || [1, 2, 3, 4, 5]).map((opt) => {
+                      const title =
+                        VHC_VALUE_MAPPING[
+                          opt as keyof typeof VHC_VALUE_MAPPING
+                        ];
+                      return (
+                        <label
+                          key={opt}
+                          className="inline-flex items-center gap-2 text-sm p-2 rounded border hover:bg-gray-50 cursor-pointer"
+                        >
+                          <input
+                            type="radio"
+                            name={it.id}
+                            className="h-4 w-4"
+                            checked={getAnswer(it.id) === title}
+                            onChange={() =>
+                              saveAnswers([{ itemId: it.id, value: title }])
+                            }
+                          />
+                          <span>{title}</span>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
               </div>
