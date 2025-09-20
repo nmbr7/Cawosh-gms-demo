@@ -92,6 +92,145 @@
   ],
   "responses": [
     {
+      "id": "c24599e6-028f-4f5f-bda9-75a42c483c67",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "ADO",
+      "answers": [
+        {
+          "itemId": "mandatory_lights",
+          "value": 2
+        },
+        {
+          "itemId": "brake_pads",
+          "value": 2
+        }
+      ],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T17:54:08.408Z",
+      "updatedAt": "2025-09-18T18:04:18.183Z",
+      "scores": {
+        "section": {},
+        "total": 0.6666666666666666
+      },
+      "progress": {
+        "answered": 2,
+        "total": 3
+      }
+    },
+    {
+      "id": "82453491-7c1b-4577-9831-38b1ab3f329e",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "AFCSA",
+      "answers": [
+        {
+          "itemId": "mandatory_lights",
+          "value": 3
+        },
+        {
+          "itemId": "brake_pads",
+          "value": 1
+        }
+      ],
+      "createdBy": "Afsal",
+      "createdAt": "2025-09-18T17:51:38.437Z",
+      "updatedAt": "2025-09-18T17:52:26.891Z",
+      "scores": {
+        "section": {},
+        "total": 0.6666666666666666
+      },
+      "progress": {
+        "answered": 2,
+        "total": 3
+      }
+    },
+    {
+      "id": "084b280e-cafe-4d2f-b69e-ccb6c9791c33",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "Hello",
+      "answers": [],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T12:16:57.912Z",
+      "updatedAt": "2025-09-18T12:16:57.912Z"
+    },
+    {
+      "id": "67114187-00bb-4bf3-8d2c-eecfc340d0ec",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "Hello",
+      "answers": [],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T12:16:57.591Z",
+      "updatedAt": "2025-09-18T12:16:57.591Z"
+    },
+    {
+      "id": "a50cc2e9-20f0-4bea-b99f-1a2146f2e526",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "Ar",
+      "answers": [
+        {
+          "itemId": "mandatory_lights",
+          "value": 4
+        },
+        {
+          "itemId": "brake_pads",
+          "value": 1
+        },
+        {
+          "itemId": "engine_oil_level",
+          "value": 3
+        }
+      ],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T12:08:33.537Z",
+      "updatedAt": "2025-09-18T12:09:15.396Z",
+      "scores": {
+        "section": {},
+        "total": 1
+      },
+      "progress": {
+        "answered": 3,
+        "total": 3
+      }
+    },
+    {
+      "id": "cc5aa3aa-4d72-4624-97e3-144b38c8b17a",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "AADDS",
+      "answers": [],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T12:07:55.171Z",
+      "updatedAt": "2025-09-18T12:07:55.171Z"
+    },
+    {
+      "id": "f38e9ff3-5c20-49d6-a943-2a327b4c626e",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "Ddd",
+      "answers": [],
+      "createdBy": "technician",
+      "createdAt": "2025-09-18T12:02:58.262Z",
+      "updatedAt": "2025-09-18T12:02:58.262Z"
+    },
+    {
       "id": "bd0f4817-a4e9-4cdc-a149-585d41dd1042",
       "templateId": "vhc_template_v1",
       "templateVersion": 1,
