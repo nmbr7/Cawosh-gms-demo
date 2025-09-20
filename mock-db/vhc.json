@@ -92,6 +92,31 @@
   ],
   "responses": [
     {
+      "id": "e3534d17-49f5-4b9d-87b2-86d3f24c0359",
+      "templateId": "vhc_template_v1",
+      "templateVersion": 1,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "HEEL",
+      "answers": [
+        {
+          "itemId": "mandatory_lights",
+          "value": 1
+        }
+      ],
+      "createdBy": "technician",
+      "createdAt": "2025-09-20T10:11:48.522Z",
+      "updatedAt": "2025-09-20T10:12:30.132Z",
+      "scores": {
+        "section": {},
+        "total": 0.3333333333333333
+      },
+      "progress": {
+        "answered": 1,
+        "total": 3
+      }
+    },
+    {
       "id": "80f00cec-9b0e-45b4-8ee0-a2f6ef476652",
       "templateId": "vhc_template_v1",
       "templateVersion": 1,

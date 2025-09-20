@@ -42,14 +42,102 @@ class VHCMockRepo {
     status?: string;
     assignedTo?: string;
     vehicleId?: string;
+    powertrain?: string;
+    createdBy?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    startDate?: string;
+    endDate?: string;
   }) {
-    let rs = this.db.responses;
+    let rs = [...this.db.responses]; // Create a copy to avoid mutating original
+
+    // Apply filters
     if (params?.status) rs = rs.filter((r) => r.status === params.status);
     if (params?.assignedTo)
       rs = rs.filter((r) => r.assignedTo === params.assignedTo);
     if (params?.vehicleId)
-      rs = rs.filter((r) => r.vehicleId === params.vehicleId);
-    return rs;
+      rs = rs.filter((r) =>
+        r.vehicleId.toLowerCase().includes(params.vehicleId.toLowerCase())
+      );
+    if (params?.powertrain)
+      rs = rs.filter((r) => r.powertrain === params.powertrain);
+    if (params?.createdBy)
+      rs = rs.filter((r) =>
+        r.createdBy.toLowerCase().includes(params.createdBy.toLowerCase())
+      );
+
+    // Apply date filters
+    if (params?.startDate) {
+      const startDate = new Date(params.startDate);
+      rs = rs.filter((r) => new Date(r.createdAt) >= startDate);
+    }
+    if (params?.endDate) {
+      const endDate = new Date(params.endDate);
+      endDate.setHours(23, 59, 59, 999); // End of day
+      rs = rs.filter((r) => new Date(r.createdAt) <= endDate);
+    }
+
+    // Apply sorting
+    if (params?.sortBy) {
+      rs.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+
+        switch (params.sortBy) {
+          case "createdAt":
+            aValue = new Date(a.createdAt).getTime();
+            bValue = new Date(b.createdAt).getTime();
+            break;
+          case "updatedAt":
+            aValue = new Date(a.updatedAt).getTime();
+            bValue = new Date(b.updatedAt).getTime();
+            break;
+          case "vehicleId":
+            aValue = a.vehicleId.toLowerCase();
+            bValue = b.vehicleId.toLowerCase();
+            break;
+          case "status":
+            aValue = a.status;
+            bValue = b.status;
+            break;
+          case "powertrain":
+            aValue = a.powertrain;
+            bValue = b.powertrain;
+            break;
+          case "score":
+            aValue = a.scores?.total || 0;
+            bValue = b.scores?.total || 0;
+            break;
+          default:
+            aValue = a.createdAt;
+            bValue = b.createdAt;
+        }
+
+        if (aValue < bValue) return params.sortOrder === "asc" ? -1 : 1;
+        if (aValue > bValue) return params.sortOrder === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // Apply pagination
+    const page = params?.page || 1;
+    const limit = params?.limit || 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    const paginatedResults = rs.slice(startIndex, endIndex);
+
+    return {
+      data: paginatedResults,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(rs.length / limit),
+        totalItems: rs.length,
+        itemsPerPage: limit,
+      },
+    };
   }
 
   getResponse(id: string) {
