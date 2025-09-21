@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import VHCSectionGrid from "@/components/vhc/VHCSectionGrid";
 import {
   VHC_VALUE_MAPPING,
   getVHCTitle,
@@ -31,7 +32,7 @@ export default function VehicleHealthCheckEditorPage() {
   const id = params?.id as string;
   const [tpl, setTpl] = useState<Template | null>(null);
   const [resp, setResp] = useState<ResponseData | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -64,11 +65,25 @@ export default function VehicleHealthCheckEditorPage() {
     );
   }, [tpl, resp]);
 
-  const current = sections[currentIndex];
+  const current = sections[currentSectionIndex];
 
-  const getAnswer = (itemId: string) => {
-    const answer = resp?.answers.find((a) => a.itemId === itemId)?.value;
-    return getVHCTitle(answer);
+  const currentValues = useMemo(() => {
+    const values: Record<string, number | string | boolean | undefined> = {};
+    if (resp?.answers) {
+      resp.answers.forEach((answer) => {
+        values[answer.itemId] = getVHCTitle(answer.value);
+      });
+    }
+    return values;
+  }, [resp]);
+
+  // Calculate question numbers across all sections
+  const getQuestionStartNumber = (sectionIndex: number) => {
+    let count = 1;
+    for (let i = 0; i < sectionIndex; i++) {
+      count += sections[i]?.items.length || 0;
+    }
+    return count;
   };
 
   const saveAnswers = useCallback(
@@ -101,122 +116,112 @@ export default function VehicleHealthCheckEditorPage() {
     return <div className="text-sm text-gray-600">Loading...</div>;
   }
 
+  // Convert current section to VHCSection format
+  const vhcSection = {
+    id: current.id,
+    title: current.title,
+    items: current.items.map((it) => ({
+      id: it.id,
+      label: it.label,
+      helperText: undefined,
+      options:
+        (it as { options?: number[] }).options
+          ?.map((v: number) => ({
+            value: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+            label: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+          }))
+          .reverse() ||
+        [1, 2, 3, 4, 5]
+          .map((v) => ({
+            value: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+            label: VHC_VALUE_MAPPING[v as keyof typeof VHC_VALUE_MAPPING],
+          }))
+          .reverse(),
+    })),
+    illustrationCaption: undefined,
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Vehicle Health Check</h1>
-        <div className="text-xs text-gray-500">
+        <div className="text-sm text-gray-500">
           {saving ? "Saving..." : "Saved"}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Left: Controls */}
-        <div className="bg-white rounded-lg shadow p-4 md:p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="text-lg font-medium">{current.title}</div>
-            <div className="space-x-2">
-              <button
-                className="px-3 py-1.5 text-sm rounded-md border bg-white hover:bg-gray-50 disabled:opacity-50"
-                onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
-                disabled={currentIndex === 0}
-              >
-                Back
-              </button>
-              <button
-                className="px-3 py-1.5 text-sm rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-                onClick={() =>
-                  setCurrentIndex((i) => Math.min(sections.length - 1, i + 1))
-                }
-                disabled={currentIndex >= sections.length - 1}
-              >
-                Next
-              </button>
-            </div>
-          </div>
+      {/* Section Navigation */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2">
+        {sections.map((section, index) => {
+          const isCompleted = section.items.every(
+            (item) => currentValues[item.id] !== undefined
+          );
+          const isCurrent = index === currentSectionIndex;
 
-          <div className="space-y-4">
-            {current.items.map((it) => (
-              <div key={it.id} className="space-y-2">
-                <div className="text-sm font-medium text-gray-800">
-                  {it.label}
-                </div>
-                {/* Radio scale 1..5 default */}
-                {(!it.type || it.type === "radio") && (
-                  <div className="flex flex-col gap-2">
-                    {(it.options || [1, 2, 3, 4, 5]).map((opt) => {
-                      const title =
-                        VHC_VALUE_MAPPING[
-                          opt as keyof typeof VHC_VALUE_MAPPING
-                        ];
-                      return (
-                        <label
-                          key={opt}
-                          className="inline-flex items-center gap-2 text-sm p-2 rounded border hover:bg-gray-50 cursor-pointer"
-                        >
-                          <input
-                            type="radio"
-                            name={it.id}
-                            className="h-4 w-4"
-                            checked={getAnswer(it.id) === title}
-                            onChange={() =>
-                              saveAnswers([{ itemId: it.id, value: title }])
-                            }
-                          />
-                          <span>{title}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right: Diagram placeholder */}
-        <div className="bg-white rounded-lg shadow p-4 md:p-6 flex items-center justify-center">
-          <svg viewBox="0 0 200 120" className="w-full h-64 text-gray-400">
-            <rect
-              x="10"
-              y="40"
-              width="180"
-              height="40"
-              rx="8"
-              fill="currentColor"
-              opacity="0.1"
-            />
-            <circle cx="40" cy="90" r="12" fill="currentColor" opacity="0.2" />
-            <circle cx="160" cy="90" r="12" fill="currentColor" opacity="0.2" />
-            <text
-              x="100"
-              y="25"
-              textAnchor="middle"
-              fontSize="12"
-              fill="#6B7280"
+          return (
+            <button
+              key={section.id}
+              onClick={() => setCurrentSectionIndex(index)}
+              className={`flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isCurrent
+                  ? "bg-blue-100 text-blue-700 border border-blue-200"
+                  : isCompleted
+                  ? "bg-green-100 text-green-700 border border-green-200"
+                  : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+              }`}
             >
-              {current.title}
-            </text>
-          </svg>
-        </div>
+              <div className="flex items-center gap-2">
+                {isCompleted && <span className="text-green-600">✓</span>}
+                <span>
+                  {index + 1}. {section.title}
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Step indicators */}
-      <div className="flex flex-wrap gap-2">
-        {sections.map((s, idx) => (
-          <button
-            key={s.id}
-            className={
-              "px-3 py-1.5 text-xs rounded-md border " +
-              (idx === currentIndex
-                ? "bg-blue-50 border-blue-600 text-blue-700"
-                : "bg-white hover:bg-gray-50")
+      {/* Grid Component */}
+      <VHCSectionGrid
+        section={vhcSection}
+        currentValues={currentValues}
+        onSelect={(itemId, value) => saveAnswers([{ itemId, value }])}
+        startQuestionNumber={getQuestionStartNumber(currentSectionIndex)}
+      />
+
+      {/* Navigation Footer */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+        <button
+          onClick={() => setCurrentSectionIndex((i) => Math.max(0, i - 1))}
+          disabled={currentSectionIndex === 0}
+          className="px-4 py-2 rounded-md border bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+        >
+          Previous Section
+        </button>
+
+        <div className="text-sm text-gray-600">
+          {currentSectionIndex + 1} of {sections.length} sections
+        </div>
+
+        <button
+          onClick={() => {
+            if (currentSectionIndex >= sections.length - 1) {
+              // All sections completed, navigate to report page
+              window.location.href = `/vehicle-health-checks/${params.id}/report`;
+            } else {
+              setCurrentSectionIndex((i) =>
+                Math.min(sections.length - 1, i + 1)
+              );
             }
-            onClick={() => setCurrentIndex(idx)}
-          >
-            {idx + 1}. {s.title}
-          </button>
-        ))}
+          }}
+          disabled={false}
+          className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm"
+        >
+          {currentSectionIndex >= sections.length - 1
+            ? "View Report"
+            : "Next Section"}
+        </button>
       </div>
     </div>
   );

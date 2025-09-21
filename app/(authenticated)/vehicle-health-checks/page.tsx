@@ -228,7 +228,7 @@ export default function VehicleHealthChecksPage() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="h-full flex flex-col space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Vehicle Health Checks</h1>
         <div className="flex items-center gap-2">
@@ -376,14 +376,16 @@ export default function VehicleHealthChecksPage() {
         </div>
       )}
 
-      <DataTable<VHCListItem>
-        columns={columns}
-        data={data}
-        isLoading={isLoading}
-        emptyMessage="No health checks found"
-        emptySubMessage="Start by creating a new vehicle health check"
-        emptyAction={{ label: "New Test", onClick: onCreate }}
-      />
+      <div className="flex-1 overflow-hidden">
+        <DataTable<VHCListItem>
+          columns={columns}
+          data={data}
+          isLoading={isLoading}
+          emptyMessage="No health checks found"
+          emptySubMessage="Start by creating a new vehicle health check"
+          emptyAction={{ label: "New Test", onClick: onCreate }}
+        />
+      </div>
 
       {/* Pagination */}
       {paginationInfo.totalPages > 1 && (

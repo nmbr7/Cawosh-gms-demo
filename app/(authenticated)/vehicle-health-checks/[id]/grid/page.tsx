@@ -1,7 +1,7 @@
 "use client";
 
-import { use, useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import VHCSectionGrid from "@/components/vhc/VHCSectionGrid";
 import {
@@ -27,18 +27,14 @@ type ResponseData = {
   answers: { itemId: string; value?: number | string | boolean }[];
 };
 
-export default function VHCFullscreen({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
+export default function VHCGridPage() {
+  const params = useParams();
   const router = useRouter();
+  const id = params?.id as string;
   const [tpl, setTpl] = useState<Template | null>(null);
   const [resp, setResp] = useState<ResponseData | null>(null);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [isTabletLandscape, setIsTabletLandscape] = useState(false);
 
   const load = useCallback(async () => {
     const res = await fetchWithAuth(`/api/vhc/responses/${id}`, {
@@ -63,38 +59,12 @@ export default function VHCFullscreen({
     }
   }, [id, load]);
 
-  // Detect tablet landscape and toggle full-bleed card
-  useEffect(() => {
-    const evaluate = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const isLandscape = width > height;
-      const isTablet = width >= 768 && width <= 1400; // iPad Air/Pro range
-      setIsTabletLandscape(isLandscape && isTablet);
-    };
-    evaluate();
-    window.addEventListener("resize", evaluate);
-    window.addEventListener(
-      "orientationchange",
-      evaluate as unknown as EventListener
-    );
-    return () => {
-      window.removeEventListener("resize", evaluate);
-      window.removeEventListener(
-        "orientationchange",
-        evaluate as unknown as EventListener
-      );
-    };
-  }, []);
-
   const sections = useMemo(() => {
     if (!tpl || !resp) return [] as Template["sections"];
     return tpl.sections.filter(
       (s) => !s.applicable_to || s.applicable_to.includes(resp.powertrain)
     );
   }, [tpl, resp]);
-
-  const current = sections[currentSectionIndex];
 
   const currentValues = useMemo(() => {
     const values: Record<string, number | string | boolean | undefined> = {};
@@ -105,15 +75,6 @@ export default function VHCFullscreen({
     }
     return values;
   }, [resp]);
-
-  // Calculate question numbers across all sections
-  const getQuestionStartNumber = (sectionIndex: number) => {
-    let count = 1;
-    for (let i = 0; i < sectionIndex; i++) {
-      count += sections[i]?.items.length || 0;
-    }
-    return count;
-  };
 
   const saveAnswers = useCallback(
     async (partial: { itemId: string; value: number | string | boolean }[]) => {
@@ -141,7 +102,23 @@ export default function VHCFullscreen({
     [resp]
   );
 
-  if (!tpl || !resp || !current) {
+  const handleSelect = useCallback(
+    (itemId: string, value: number | string) => {
+      saveAnswers([{ itemId, value }]);
+    },
+    [saveAnswers]
+  );
+
+  // Calculate question numbers across all sections
+  const getQuestionStartNumber = (sectionIndex: number) => {
+    let count = 1;
+    for (let i = 0; i < sectionIndex; i++) {
+      count += sections[i]?.items.length || 0;
+    }
+    return count;
+  };
+
+  if (!tpl || !resp || sections.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center text-sm text-gray-600">
         Loading...
@@ -149,11 +126,13 @@ export default function VHCFullscreen({
     );
   }
 
-  // Convert current section to VHCSection format
+  const currentSection = sections[currentSectionIndex];
+
+  // Convert section to VHCSection format
   const vhcSection = {
-    id: current.id,
-    title: current.title,
-    items: current.items.map((it) => ({
+    id: currentSection.id,
+    title: currentSection.title,
+    items: currentSection.items.map((it) => ({
       id: it.id,
       label: it.label,
       helperText: undefined,
@@ -175,42 +154,38 @@ export default function VHCFullscreen({
   };
 
   return (
-    <div
-      className={
-        isTabletLandscape
-          ? "h-screen w-screen bg-gray-100 overflow-hidden"
-          : "min-h-screen bg-gray-100 p-3 md:p-4"
-      }
-    >
-      <div
-        className={
-          isTabletLandscape
-            ? "h-full w-full rounded-none p-4 md:p-6 bg-white shadow"
-            : "rounded-lg p-4 md:p-6 mx-auto w-full md:w-full lg:max-w-5xl bg-white shadow"
-        }
-      >
-        <div className="space-y-6">
-          {/* Section Navigation */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => router.push("/vehicle-health-checks")}
-                className="text-gray-600 hover:text-gray-900 text-sm"
+                className="text-gray-600 hover:text-gray-900"
               >
                 ← Back to VHC List
               </button>
-              <span className="text-gray-400">|</span>
-              <span className="text-sm text-gray-600">
-                Section {currentSectionIndex + 1} of {sections.length}
-              </span>
+              <h1 className="text-xl font-semibold text-gray-900">
+                Vehicle Health Check - Grid View
+              </h1>
             </div>
-            <div className="text-sm text-gray-500">
-              {saving ? "Saving..." : "Saved"}
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-500">
+                {saving ? "Saving..." : "Saved"}
+              </div>
+              <div className="text-sm text-gray-600">
+                Section {currentSectionIndex + 1} of {sections.length}
+              </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Section Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2">
+      {/* Section Navigation */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 py-3 overflow-x-auto">
             {sections.map((section, index) => {
               const isCompleted = section.items.every(
                 (item) => currentValues[item.id] !== undefined
@@ -221,7 +196,7 @@ export default function VHCFullscreen({
                 <button
                   key={section.id}
                   onClick={() => setCurrentSectionIndex(index)}
-                  className={`flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isCurrent
                       ? "bg-blue-100 text-blue-700 border border-blue-200"
                       : isCompleted
@@ -239,17 +214,23 @@ export default function VHCFullscreen({
               );
             })}
           </div>
+        </div>
+      </div>
 
-          {/* Grid Component */}
-          <VHCSectionGrid
-            section={vhcSection}
-            currentValues={currentValues}
-            onSelect={(itemId, value) => saveAnswers([{ itemId, value }])}
-            startQuestionNumber={getQuestionStartNumber(currentSectionIndex)}
-          />
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <VHCSectionGrid
+          section={vhcSection}
+          currentValues={currentValues}
+          onSelect={handleSelect}
+          startQuestionNumber={getQuestionStartNumber(currentSectionIndex)}
+        />
+      </div>
 
-          {/* Navigation Footer */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+      {/* Navigation Footer */}
+      <div className="bg-white border-t border-gray-200 sticky bottom-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             <button
               onClick={() => setCurrentSectionIndex((i) => Math.max(0, i - 1))}
               disabled={currentSectionIndex === 0}
@@ -266,7 +247,7 @@ export default function VHCFullscreen({
               onClick={() => {
                 if (currentSectionIndex >= sections.length - 1) {
                   // All sections completed, navigate to report page
-                  router.push(`/vhc-fullscreen/${params.id}/report`);
+                  router.push(`/vehicle-health-checks/${params.id}/report`);
                 } else {
                   setCurrentSectionIndex((i) =>
                     Math.min(sections.length - 1, i + 1)

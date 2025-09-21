@@ -38,6 +38,10 @@ class VHCMockRepo {
     return this.db.templates.find((t) => t.isActive) || null;
   }
 
+  getTemplate(id: string): VHCTemplate | null {
+    return this.db.templates.find((t) => t.id === id) || null;
+  }
+
   listResponses(params?: {
     status?: string;
     assignedTo?: string;
@@ -186,22 +190,60 @@ class VHCMockRepo {
       map.set(a.itemId, { ...map.get(a.itemId), ...a } as VHCAnswer);
     res.answers = Array.from(map.values());
     res.updatedAt = new Date().toISOString();
-    // naive scoring: count answered/total; total score as proportion of max (will be replaced by real weighting)
+    // Calculate proper weighted scores based on answer values and section weights
     const template = this.db.templates.find((t) => t.id === res.templateId);
     const activeSections =
       template?.sections.filter(
         (s) => !s.applicable_to || s.applicable_to.includes(res.powertrain)
       ) || [];
-    const totalItems = activeSections.reduce(
-      (acc, s) => acc + s.items.length,
-      0
-    );
+
+    const sectionScores: Record<string, number> = {};
+    let totalWeightedScore = 0;
+    let totalWeight = 0;
+
+    // Calculate section scores
+    for (const section of activeSections) {
+      const sectionAnswers = res.answers.filter((answer) =>
+        section.items.some((item) => item.id === answer.itemId)
+      );
+
+      if (sectionAnswers.length === 0) {
+        sectionScores[section.id] = 0;
+        continue;
+      }
+
+      // Calculate weighted average for this section
+      let sectionWeightedScore = 0;
+      let sectionTotalWeight = 0;
+
+      for (const answer of sectionAnswers) {
+        const item = section.items.find((item) => item.id === answer.itemId);
+        if (item && typeof answer.value === "number") {
+          // Normalize answer value (1-5) to 0-1 scale, then apply item weight
+          const normalizedValue = (answer.value - 1) / 4; // 1->0, 2->0.25, 3->0.5, 4->0.75, 5->1
+          const itemScore = normalizedValue * item.weight;
+          sectionWeightedScore += itemScore;
+          sectionTotalWeight += item.weight;
+        }
+      }
+
+      const sectionScore =
+        sectionTotalWeight > 0 ? sectionWeightedScore / sectionTotalWeight : 0;
+      sectionScores[section.id] = sectionScore;
+
+      // Add to total weighted score
+      totalWeightedScore += sectionScore * section.weight;
+      totalWeight += section.weight;
+    }
+
+    const overallScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
+
     const answered = res.answers.filter(
       (a) => a.value !== undefined && a.value !== null
     ).length;
-    const total = totalItems || 1;
-    const ratio = Math.min(1, answered / total);
-    res.scores = { section: {}, total: ratio };
+    const total = activeSections.reduce((acc, s) => acc + s.items.length, 0);
+
+    res.scores = { section: sectionScores, total: overallScore };
     res.progress = { answered, total };
     writeDB(this.db);
     return res;

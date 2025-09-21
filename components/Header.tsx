@@ -16,19 +16,20 @@ export default function Header() {
   const toggleMessages = () => setShowMessages(!showMessages);
   const toggleNotifications = () => setShowNotifications(!showNotifications);
   const toggleProfileMenu = () => setShowProfileMenu(!showProfileMenu);
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(()=>{
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  },[])
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   return (
-    <header className="flex flex-wrap md:flex-nowrap items-center justify-between p-4 bg-white text-black shadow-md">
+    <header className="sticky top-0 z-40 flex flex-wrap md:flex-nowrap items-center justify-between p-4 bg-white text-black shadow-md min-w-full">
+      {" "}
       {/* Left section - Greeting */}
-      { isMobile && <HamburgerMenu/> }
+      {isMobile && <HamburgerMenu />}
       <div className="w-full flex flex-row md:w-auto md:order-2 order-3">
         <div>
           <h1 className="text-xl font-bold">
@@ -37,9 +38,8 @@ export default function Header() {
           <p className="text-sm">Let&apos;s check your Garage today</p>
         </div>
       </div>
-
       {/* Center section - Search and notifications */}
-      <div className="flex-1 flex items-center justify-center max-w-3xl mx-auto w-full md:w-auto order-5 md:order-2 mt-2 md:mt-0 w-full">
+      <div className="flex-1 flex items-center justify-center max-w-3xl mx-auto w-full md:w-auto order-5 md:order-2 mt-2 md:mt-0">
         <div className="flex items-center h-full">
           <div className="relative w-full md:w-[400px]  flex items-center">
             <MagnifyingGlass
@@ -80,7 +80,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-
       {/* Right section - Profile */}
       <div className="relative flex flex-row-reverse md:flex-row  space-x-3 w-1/2 md:w-auto order-2 md:order-3">
         {user?.imageUrl ? (
