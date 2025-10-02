@@ -83,6 +83,7 @@ export function BookingDetailsModal({
       setBooking(null);
       setError(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, bookingId]);
 
   const fetchBookingDetails = async () => {

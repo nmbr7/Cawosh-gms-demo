@@ -266,7 +266,7 @@ export default function VHCFullscreen({
               onClick={() => {
                 if (currentSectionIndex >= sections.length - 1) {
                   // All sections completed, navigate to report page
-                  router.push(`/vhc-fullscreen/${params.id}/report`);
+                  router.push(`/vhc-fullscreen/${id}/report`);
                 } else {
                   setCurrentSectionIndex((i) =>
                     Math.min(sections.length - 1, i + 1)

@@ -530,6 +530,146 @@
   ],
   "responses": [
     {
+      "id": "9cdf9daf-bcbf-49d3-a65e-14fbc7a21fcb",
+      "templateId": "vhc_template_v2",
+      "templateVersion": 2,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "Hello",
+      "answers": [
+        {
+          "itemId": "mandatory_lights",
+          "value": 5
+        },
+        {
+          "itemId": "horn_wipers_washers",
+          "value": 4
+        },
+        {
+          "itemId": "brake_noise_feel",
+          "value": 5
+        },
+        {
+          "itemId": "clutch_transmission",
+          "value": 3
+        },
+        {
+          "itemId": "engine_noise_smoke",
+          "value": 4
+        },
+        {
+          "itemId": "glass_mirrors_wiper_blades",
+          "value": 5
+        },
+        {
+          "itemId": "fluid_level_oil_water_coolant",
+          "value": 5
+        },
+        {
+          "itemId": "fluid_leaks_oil_water",
+          "value": 3
+        },
+        {
+          "itemId": "battery_condition",
+          "value": 4
+        },
+        {
+          "itemId": "drive_belt",
+          "value": 5
+        },
+        {
+          "itemId": "shoe_wear_percentage",
+          "value": 4
+        },
+        {
+          "itemId": "brake_pad_offside_front_inner",
+          "value": 4
+        },
+        {
+          "itemId": "master_cylinder_servo",
+          "value": 4
+        },
+        {
+          "itemId": "brake_fluid_condition_temperature",
+          "value": 4
+        },
+        {
+          "itemId": "brake_pad_nearside_rear_inner",
+          "value": 4
+        },
+        {
+          "itemId": "brake_pad_offside_rear_outer",
+          "value": 4
+        },
+        {
+          "itemId": "brake_pad_nearside_front_outer",
+          "value": 5
+        },
+        {
+          "itemId": "brake_pad_offside_rear_inner",
+          "value": 5
+        },
+        {
+          "itemId": "brake_pad_nearside_rear_outer",
+          "value": 4
+        },
+        {
+          "itemId": "hoses_pipes_cables_wheel_bearings",
+          "value": 4
+        },
+        {
+          "itemId": "brake_pad_offside_front_outer",
+          "value": 5
+        },
+        {
+          "itemId": "brake_pad_nearside_front_inner",
+          "value": 4
+        },
+        {
+          "itemId": "exhaust_system_catalyst",
+          "value": 4
+        },
+        {
+          "itemId": "steering_suspension",
+          "value": 4
+        },
+        {
+          "itemId": "drive_shaft_gaitors",
+          "value": 4
+        },
+        {
+          "itemId": "oil_leaks",
+          "value": 5
+        },
+        {
+          "itemId": "dents_chips_scratches_rust",
+          "value": 5
+        },
+        {
+          "itemId": "miscellaneous",
+          "value": 4
+        }
+      ],
+      "createdBy": "technician",
+      "createdAt": "2025-10-02T23:26:53.111Z",
+      "updatedAt": "2025-10-02T23:27:57.227Z",
+      "scores": {
+        "section": {
+          "light_electrics": 0.8750000000000001,
+          "external_internal": 0.8125000000000001,
+          "underbonnet": 0.7833333333333334,
+          "brakes_hubs": 0.8104838709677417,
+          "underside": 0.7833333333333334,
+          "body_damages": 0.95
+        },
+        "total": 0.8236717267552182
+      },
+      "progress": {
+        "answered": 28,
+        "total": 28
+      }
+    },
+    {
       "id": "6593467e-caa0-47ff-824a-032e0aa14966",
       "templateId": "vhc_template_v2",
       "templateVersion": 2,

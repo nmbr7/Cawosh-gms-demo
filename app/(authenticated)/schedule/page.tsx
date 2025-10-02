@@ -78,7 +78,7 @@ export default function SchedulePage() {
     };
 
     fetchBookings();
-  }, [selectedDate, selectedBay]);
+  }, [selectedDate, selectedBay, garage]);
 
   useEffect(() => {
     // If 'All Bays' is selected and viewMode is not 'Month', switch to Bay 1

@@ -63,13 +63,13 @@ class VHCMockRepo {
       rs = rs.filter((r) => r.assignedTo === params.assignedTo);
     if (params?.vehicleId)
       rs = rs.filter((r) =>
-        r.vehicleId.toLowerCase().includes(params.vehicleId.toLowerCase())
+        r.vehicleId.toLowerCase().includes(params.vehicleId!.toLowerCase())
       );
     if (params?.powertrain)
       rs = rs.filter((r) => r.powertrain === params.powertrain);
     if (params?.createdBy)
       rs = rs.filter((r) =>
-        r.createdBy.toLowerCase().includes(params.createdBy.toLowerCase())
+        r.createdBy.toLowerCase().includes(params.createdBy!.toLowerCase())
       );
 
     // Apply date filters
@@ -86,8 +86,8 @@ class VHCMockRepo {
     // Apply sorting
     if (params?.sortBy) {
       rs.sort((a, b) => {
-        let aValue: any;
-        let bValue: any;
+        let aValue: string | number;
+        let bValue: string | number;
 
         switch (params.sortBy) {
           case "createdAt":

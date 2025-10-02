@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { EmploymentType } from "@/app/models/user";
-import { useFormOptions } from "@/app/contexts/FormOptionsContext";
+import { useUserFormOptions } from "@/hooks/useUserFormOptions";
 import { memo, useMemo } from "react";
 
 interface EmploymentDetailsProps {
@@ -33,7 +33,7 @@ export const EmploymentDetails = memo(function EmploymentDetails({
   onJoiningDateChange,
   disabled = false,
 }: EmploymentDetailsProps) {
-  const { formOptions, isLoading: isLoadingOptions } = useFormOptions();
+  const { formOptions, isLoading: isLoadingOptions } = useUserFormOptions();
 
   // Memoize the computed arrays to prevent unnecessary re-renders
   const displayPositions = useMemo(() => {

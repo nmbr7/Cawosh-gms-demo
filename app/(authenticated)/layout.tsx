@@ -7,7 +7,6 @@ import { useUIStore } from "@/store/ui";
 import Sidebar from "@/components/Sidebar";
 import { cn } from "@/lib/utils";
 import Header from "@/components/Header";
-import { FormOptionsProvider } from "@/app/contexts/FormOptionsContext";
 
 export default function AuthenticatedLayout({
   children,
@@ -39,31 +38,29 @@ export default function AuthenticatedLayout({
   }
 
   return (
-    <FormOptionsProvider>
-      <div className="flex min-h-screen bg-gray-100">
-        {!isMobile && (
-          <div
-            className={cn(
-              "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
-              sidebarOpen ? "w-64" : "w-20"
-            )}
-          >
-            <Sidebar />
-          </div>
-        )}
-        <main
+    <div className="flex min-h-screen bg-gray-100">
+      {!isMobile && (
+        <div
           className={cn(
-            "flex-1 transition-all duration-300 ease-in-out min-h-screen flex flex-col",
-            sidebarOpen ? "ml-64" : "ml-20",
-            isMobile ? "ml-0" : ""
+            "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
+            sidebarOpen ? "w-64" : "w-20"
           )}
         >
-          <Header />
-          <div className="flex-1 overflow-x-auto overflow-y-auto p-4 md:p-6">
-            {children}
-          </div>
-        </main>
-      </div>
-    </FormOptionsProvider>
+          <Sidebar />
+        </div>
+      )}
+      <main
+        className={cn(
+          "flex-1 transition-all duration-300 ease-in-out min-h-screen flex flex-col",
+          sidebarOpen ? "ml-64" : "ml-20",
+          isMobile ? "ml-0" : ""
+        )}
+      >
+        <Header />
+        <div className="flex-1 overflow-x-auto overflow-y-auto p-4 md:p-6">
+          {children}
+        </div>
+      </main>
+    </div>
   );
 }
