@@ -289,7 +289,8 @@ export default function BookingsPage() {
 
   useEffect(() => {
     fetchBookings();
-  }, [currentPage, selectedBay, filters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, selectedBay, filters, garage?.id]);
 
   const handleFilterChange = (key: keyof FilterState, value: string | null) => {
     setFilters((prev) => ({ ...prev, [key]: value }));

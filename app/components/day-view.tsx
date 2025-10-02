@@ -20,14 +20,22 @@ export function DayView({
   const getBookingsForDay = (date: Date) => {
     const dayStr = date.toISOString().split("T")[0];
     return bookings.filter((booking) => {
-      const bookingDateStr = booking.bookingDate.split("T")[0];
-      if (selectedBay === "all") return bookingDateStr === dayStr;
-      return (
-        bookingDateStr === dayStr &&
-        booking.services.some(
-          (service) => service.bayId === selectedBay.toString()
-        )
-      );
+      // Check if any service in this booking falls on the selected day
+      const hasServiceOnDay = booking.services.some((service) => {
+        const serviceDateStr = service.startTime.split("T")[0];
+        return serviceDateStr === dayStr;
+      });
+
+      if (!hasServiceOnDay) return false;
+
+      // If bay is specified, check if any service is in that bay
+      if (selectedBay !== "all") {
+        return booking.services.some(
+          (service) => service.bayId === `bay${selectedBay}`
+        );
+      }
+
+      return true;
     });
   };
 
