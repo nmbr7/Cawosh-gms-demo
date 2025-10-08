@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import React from "react";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface Billing {
   id: string;
@@ -74,7 +75,9 @@ export default function BillingsPage() {
         date: dateFilter,
       });
 
-      const response = await fetch(`/api/billings?${params.toString()}`);
+      const response = await fetchWithAuth(
+        `/api/billings?${params.toString()}`
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch billings");
       }

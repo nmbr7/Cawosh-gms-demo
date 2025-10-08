@@ -17,50 +17,42 @@ import {
 } from "@/app/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { Pencil, ChevronLeft, ChevronRight, Eye, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { ServiceModal } from "./ServiceModal";
 import ServiceListSkeleton from "./ServiceListSkeleton";
-
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  duration: number;
-  price: number;
-  currency: string;
-  currencySymbol: string;
-  category: string;
-  isActive: boolean;
-}
+import type { Service } from "@/app/models/service";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface ServiceListProps {
   services: Service[];
-  onServiceUpdate: (service: Service) => void;
+  onServiceUpdate: (
+    service: Omit<Service, "serviceId"> & { serviceId: string }
+  ) => void;
   onServiceDelete: (serviceId: string) => void;
-  onServiceAdd: (service: Omit<Service, "id">) => void;
+  onServiceAdd: (service: Omit<Service, "serviceId">) => void;
   loading?: boolean;
+  garageId: string;
 }
-
-export type { Service };
 
 export function ServiceList({
   services,
   onServiceUpdate,
   onServiceAdd,
   loading = false,
+  garageId,
 }: ServiceListProps) {
   const [isAdding, setIsAdding] = useState(false);
-  // const [editingId, setEditingId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [newService, setNewService] = useState<Omit<Service, "id">>({
+  const [newService, setNewService] = useState<Omit<Service, "serviceId">>({
     name: "",
     description: "",
     currency: "GBP",
     currencySymbol: "£",
     duration: 60,
-    price: 0,
+    defaultPrice: 0,
+    customPrice: 0,
     category: "maintenance",
     isActive: true,
   });
@@ -74,24 +66,38 @@ export function ServiceList({
   const endIndex = startIndex + itemsPerPage;
   const currentServices = services.slice(startIndex, endIndex);
 
-  const handleAddService = () => {
+  const handleAddService = async () => {
     if (!newService.name || !newService.description) {
       toast.error("Please fill in all required fields");
       return;
     }
-    onServiceAdd(newService);
-    setNewService({
-      name: "",
-      description: "",
-      duration: 60,
-      currency: "GBP",
-      currencySymbol: "£",
-      price: 0,
-      category: "maintenance",
-      isActive: true,
+    const response = await fetchWithAuth(`/api/garages/${garageId}/services`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newService),
     });
-    setIsAdding(false);
-    toast.success("Service added successfully");
+
+    if (response.ok) {
+      const data = await response.json();
+      onServiceAdd(data);
+      setNewService({
+        name: "",
+        description: "",
+        duration: 60,
+        currency: "GBP",
+        currencySymbol: "£",
+        defaultPrice: 0,
+        customPrice: 0,
+        category: "maintenance",
+        isActive: true,
+      });
+      setIsAdding(false);
+      toast.success("Service added successfully");
+    } else {
+      toast.error("Failed to add service");
+    }
   };
 
   return (
@@ -103,16 +109,6 @@ export function ServiceList({
               <CardTitle className="text-2xl">Service List</CardTitle>
               <CardDescription>Manage your available services</CardDescription>
             </div>
-            <Button
-              onClick={() => {
-                setModalMode("add");
-                setSelectedService(null);
-                setModalOpen(true);
-              }}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Service
-            </Button>
           </div>
         </CardHeader>
         <hr />
@@ -165,11 +161,11 @@ export function ServiceList({
                       <Label>Price</Label>
                       <Input
                         type="number"
-                        value={newService.price}
+                        value={newService.customPrice}
                         onChange={(e) =>
                           setNewService({
                             ...newService,
-                            price: parseFloat(e.target.value) || 0,
+                            customPrice: parseFloat(e.target.value) || 0,
                           })
                         }
                       />
@@ -200,80 +196,97 @@ export function ServiceList({
                 </div>
               )}
 
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Duration</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {currentServices.map((service) => (
-                    <TableRow key={service.id}>
-                      <TableCell>{service.name}</TableCell>
-                      <TableCell>
-                        <span className="px-3 py-1 rounded-lg text-xs  bg-gray-100 text-gray-800">
-                          {service.category}
-                        </span>
-                      </TableCell>
-                      <TableCell>{service.duration} min</TableCell>
-                      <TableCell>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-xs font-medium">
-                            {service.currencySymbol}
-                          </span>
-                          <span className="text-md ">{service.price}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-semibold
-                            ${
-                              service.isActive
-                                ? "bg-green-100 text-green-700"
-                                : "bg-gray-200 text-gray-500"
-                            }
-                          `}
-                        >
-                          {service.isActive ? "Active" : "Disabled"}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setModalMode("view");
-                              setSelectedService(service);
-                              setModalOpen(true);
-                            }}
-                            aria-label="View Service"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              setModalMode("edit");
-                              setSelectedService(service);
-                              setModalOpen(true);
-                            }}
-                            aria-label="Edit Service"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+              {services.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="rounded-full bg-gray-100 p-3 mb-4">
+                    <Wrench className="h-6 w-6 text-gray-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No Services Found
+                  </h3>
+                  <p className="text-gray-500 max-w-sm">
+                    There are no services available for this garage. Please
+                    contact your administrator to add services.
+                  </p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Duration</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {currentServices.map((service) => (
+                      <TableRow key={service.serviceId}>
+                        <TableCell>{service.name}</TableCell>
+                        <TableCell>
+                          <span className="px-3 py-1 rounded-lg text-xs  bg-gray-100 text-gray-800">
+                            {service.category || "Uncategorized"}
+                          </span>
+                        </TableCell>
+                        <TableCell>{service.duration || 60} min</TableCell>
+                        <TableCell>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-xs font-medium">
+                              {service.currencySymbol || "£"}
+                            </span>
+                            <span className="text-md ">
+                              {service.customPrice || service.defaultPrice || 0}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-semibold
+                              ${
+                                service.isActive
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-gray-200 text-gray-500"
+                              }
+                            `}
+                          >
+                            {service.isActive ? "Active" : "Disabled"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setModalMode("view");
+                                setSelectedService(service);
+                                setModalOpen(true);
+                              }}
+                              aria-label="View Service"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                setModalMode("edit");
+                                setSelectedService(service);
+                                setModalOpen(true);
+                              }}
+                              aria-label="Edit Service"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </>
           )}
         </CardContent>
@@ -331,7 +344,8 @@ export function ServiceList({
         onClose={() => setModalOpen(false)}
         onSave={(data, id) => {
           if (modalMode === "add") onServiceAdd(data);
-          else if (modalMode === "edit" && id) onServiceUpdate({ ...data, id });
+          else if (modalMode === "edit" && id)
+            onServiceUpdate({ ...data, serviceId: id });
         }}
       />
     </>

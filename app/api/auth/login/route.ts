@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { MOCK_ADMIN } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -13,47 +12,65 @@ export async function POST(request: Request) {
       );
     }
 
-    // Mock login validation
-    if (email !== MOCK_ADMIN.email || password !== "password") {
+    // Get backend URL from environment variable
+    const backendUrl = process.env.BACKEND_URL;
+    if (!backendUrl) {
+      throw new Error("BACKEND_URL environment variable is not set");
+    }
+
+    // Forward the request to the real backend
+    const response = await fetch(`${backendUrl}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
-        { status: 401 }
+        { error: data.error || data.message || "Invalid email or password" },
+        { status: response.status }
       );
     }
 
-    // Mock successful login response
-    const mockLoginData = {
-      data: {
-        access_token: "mock-jwt-token",
-        permissions: MOCK_ADMIN.permissions,
-        system_access: MOCK_ADMIN.systemAccess,
-      },
-    };
-
     // Create the response
-    const response = NextResponse.json({
+    const nextResponse = NextResponse.json({
       success: true,
       message: "Login successful",
-      data: {
-        user: MOCK_ADMIN,
-        token: mockLoginData.data.access_token,
-        permissions: mockLoginData.data.permissions,
-        systemAccess: mockLoginData.data.system_access,
-      },
+      data: data.data,
     });
 
     // Set the access token in an HTTP-only cookie
-    response.cookies.set("access_token", mockLoginData.data.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
+    if (data.data.token) {
+      nextResponse.cookies.set("access_token", data.data.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
+    }
 
-    return response;
+    return nextResponse;
   } catch (error) {
     console.error("Login error:", error);
+
+    // Handle specific error cases
+    if (error instanceof TypeError && error.message.includes("fetch failed")) {
+      return NextResponse.json(
+        {
+          error:
+            "Unable to connect to authentication service. Please try again later.",
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to process login request" },
       { status: 500 }

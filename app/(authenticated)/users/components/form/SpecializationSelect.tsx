@@ -16,27 +16,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
-const SPECIALIZATIONS = [
-  "Engine Diagnostics",
-  "Transmission Repair",
-  "Brake Systems",
-  "Suspension & Steering",
-  "Electrical Systems",
-  "Air Conditioning",
-  "Exhaust Systems",
-  "Body & Paint",
-  "Wheel Alignment",
-  "Oil & Fluid Services",
-  "Battery Services",
-  "Tire Services",
-  "General Maintenance",
-  "Performance Tuning",
-  "Hybrid/Electric Vehicles",
-];
+interface ISkillRef {
+  _id?: string;
+  code: string;
+  displayName: string;
+}
 
 interface SpecializationSelectProps {
-  selectedSpecializations: string[];
-  onSpecializationsChange: (value: string[]) => void;
+  selectedSpecializations: ISkillRef[];
+  onSpecializationsChange: (value: ISkillRef[]) => void;
   disabled?: boolean;
 }
 
@@ -48,22 +36,47 @@ export function SpecializationSelect({
   const [specializationInput, setSpecializationInput] = useState("");
   const [isOpenSpecialization, setIsOpenSpecialization] = useState(false);
 
-  const handleSpecializationSelect = (value: string) => {
-    if (!selectedSpecializations.includes(value)) {
+  const SPECIALIZATIONS: ISkillRef[] = [
+    { code: "engine_diagnostics", displayName: "Engine Diagnostics" },
+    { code: "transmission_repair", displayName: "Transmission Repair" },
+    { code: "brake_systems", displayName: "Brake Systems" },
+    { code: "suspension_steering", displayName: "Suspension & Steering" },
+    { code: "electrical_systems", displayName: "Electrical Systems" },
+    { code: "air_conditioning", displayName: "Air Conditioning" },
+    { code: "exhaust_systems", displayName: "Exhaust Systems" },
+    { code: "body_paint", displayName: "Body & Paint" },
+    { code: "wheel_alignment", displayName: "Wheel Alignment" },
+    { code: "oil_fluid_services", displayName: "Oil & Fluid Services" },
+    { code: "battery_services", displayName: "Battery Services" },
+    { code: "tire_services", displayName: "Tire Services" },
+    { code: "general_maintenance", displayName: "General Maintenance" },
+    { code: "performance_tuning", displayName: "Performance Tuning" },
+    {
+      code: "hybrid_electric_vehicles",
+      displayName: "Hybrid/Electric Vehicles",
+    },
+  ];
+
+  const handleSpecializationSelect = (value: ISkillRef) => {
+    if (!selectedSpecializations.some((s) => s.code === value.code)) {
       onSpecializationsChange([...selectedSpecializations, value]);
     }
     setSpecializationInput("");
     setIsOpenSpecialization(false);
   };
 
-  const handleSpecializationRemove = (value: string) => {
-    onSpecializationsChange(selectedSpecializations.filter((s) => s !== value));
+  const handleSpecializationRemove = (code: string) => {
+    onSpecializationsChange(
+      selectedSpecializations.filter((s) => s.code !== code)
+    );
   };
 
   const filteredSpecializations = SPECIALIZATIONS.filter(
     (spec) =>
-      spec.toLowerCase().includes(specializationInput.toLowerCase()) &&
-      !selectedSpecializations.includes(spec)
+      spec.displayName
+        .toLowerCase()
+        .includes(specializationInput.toLowerCase()) &&
+      !selectedSpecializations.some((s) => s.code === spec.code)
   );
 
   return (
@@ -72,14 +85,14 @@ export function SpecializationSelect({
       <div className="flex flex-wrap gap-2 mb-2">
         {selectedSpecializations.map((spec) => (
           <Badge
-            key={spec}
+            key={spec.code}
             variant="secondary"
             className="flex items-center gap-1"
           >
-            {spec}
+            {spec.displayName}
             <button
               type="button"
-              onClick={() => handleSpecializationRemove(spec)}
+              onClick={() => handleSpecializationRemove(spec.code)}
               className="ml-1 hover:text-red-500"
             >
               <X className="h-3 w-3" />
@@ -111,10 +124,10 @@ export function SpecializationSelect({
             <CommandGroup>
               {filteredSpecializations.map((spec) => (
                 <CommandItem
-                  key={spec}
+                  key={spec.code}
                   onSelect={() => handleSpecializationSelect(spec)}
                 >
-                  {spec}
+                  {spec.displayName}
                 </CommandItem>
               ))}
             </CommandGroup>

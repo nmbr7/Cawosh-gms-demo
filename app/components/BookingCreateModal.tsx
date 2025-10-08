@@ -8,13 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -22,25 +15,53 @@ import {
   PopoverContent,
 } from "@/components/ui/popover";
 import { addDays, startOfDay, format, isBefore } from "date-fns";
-import { Slot } from "../models/slot";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { toast } from "sonner";
+import { useGarageStore } from "@/store/garage";
+import { SlotList } from "./SlotList";
+import { ServiceMultiSelect, Service } from "./ServiceMultiSelect";
 
 interface BookingCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onBookingCreated?: () => void;
 }
 
-// Mock data for services and bays
-const mockServices = [
-  { id: "1", name: "Oil Change" },
-  { id: "2", name: "Tire Rotation" },
-  { id: "3", name: "Brake Inspection" },
-];
-const mockBays = [1, 2, 3];
+// Update Slot type to match new API schema
+type SlotService = {
+  service: {
+    id: string;
+    name: string;
+    duration: number;
+  };
+  technician: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  startTime: string;
+  endTime: string;
+};
+
+interface Slot {
+  bay: {
+    id: string;
+    name: string;
+  };
+  services: SlotService[];
+  date: string;
+  isAvailable: boolean;
+}
 
 export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
   isOpen,
   onClose,
+  onBookingCreated,
 }) => {
+  // Get garage from store
+  const garage = useGarageStore((state) => state.garage);
+
   // Form state
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -49,14 +70,62 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
   const [carModel, setCarModel] = useState("");
   const [carYear, setCarYear] = useState("");
   const [carRegistration, setCarRegistration] = useState("");
-  const [serviceId, setServiceId] = useState<string | null>(null);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [bay, setBay] = useState<string>("");
   const [notes, setNotes] = useState("");
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [slots, setSlots] = useState<Slot[]>([]);
-  const [selectedSlot, setSelectedSlot] = useState<string>("");
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
+    null
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Services state
+  const [selectedServices, setSelectedServices] = useState<Service[]>([]);
+
+  // Set default date to tomorrow and bay to 1 when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setDate(addDays(startOfDay(new Date()), 1));
+      setBay("");
+    }
+  }, [isOpen]);
+
+  // Only fetch slots when both a service and a date are selected
+  useEffect(() => {
+    if (!selectedServices.length || !date || !garage) {
+      setSlots([]);
+      setSelectedSlotIndex(null);
+      return;
+    }
+
+    const fetchSlots = async () => {
+      try {
+        const dateStr = format(date, "yyyy-MM-dd");
+        const res = await fetchWithAuth(
+          `/api/garages/${
+            garage.id
+          }/slots?date=${dateStr}&serviceIds=${selectedServices
+            .map((s) => s.id)
+            .join(",")}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setSlots(data.data || []);
+          setSelectedSlotIndex(null);
+        } else {
+          setSlots([]);
+          setSelectedSlotIndex(null);
+        }
+      } catch {
+        setSlots([]);
+        setSelectedSlotIndex(null);
+      }
+    };
+
+    fetchSlots();
+  }, [selectedServices, date, garage]);
 
   // Add validation function
   const isFormValid = () => {
@@ -68,10 +137,9 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
       carModel.trim() !== "" &&
       carYear.trim() !== "" &&
       carRegistration.trim() !== "" &&
-      serviceId !== null &&
+      selectedServices.length > 0 &&
       date !== undefined &&
-      bay !== "" &&
-      selectedSlot !== ""
+      selectedSlotIndex !== null
     );
   };
 
@@ -84,57 +152,81 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
     setCarModel("");
     setCarYear("");
     setCarRegistration("");
-    setServiceId(null);
     setDate(undefined);
     setBay("");
     setNotes("");
     setSlots([]);
-    setSelectedSlot("");
+    setSelectedSlotIndex(null);
+    setSelectedServices([]);
+    setIsDatePopoverOpen(false);
   };
 
-  // Set default date to tomorrow and bay to 1 when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setDate(addDays(startOfDay(new Date()), 1));
-      setBay("");
-    }
-  }, [isOpen]);
-
-  // Fetch slots when serviceId, date, or bay changes
-  useEffect(() => {
-    if (!bay) {
-      setSlots([]);
-      setSelectedSlot("");
+  // For now, just close on submit
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedSlotIndex === null || !slots[selectedSlotIndex]) {
+      toast.error("Could not find selected slot details.");
       return;
     }
-    const fetchSlots = async () => {
-      if (!serviceId || !date || !bay) {
-        setSlots([]);
-        setSelectedSlot("");
-        return;
-      }
-      const dateStr = format(date, "yyyy-MM-dd");
-      const res = await fetch(
-        `/api/bookings/slots?serviceId=${serviceId}&date=${dateStr}&bay=${bay}`
-      );
-      console.log(res);
-      if (res.ok) {
-        const data = await res.json();
-        setSlots(data.slots || []);
-        setSelectedSlot("");
-      } else {
-        setSlots([]);
-        setSelectedSlot("");
-      }
-    };
-    fetchSlots();
-  }, [serviceId, date, bay]);
+    const slotObj = slots[selectedSlotIndex];
 
-  // For now, just close on submit
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedSlot) return;
-    onClose();
+    try {
+      // Create booking data in the backend API format
+      const bookingData = {
+        date: date ? format(date, "yyyy-MM-dd") : "",
+        customer: {
+          firstName: customerName.split(" ")[0] || customerName,
+          lastName: customerName.split(" ").slice(1).join(" ") || "",
+          email: customerEmail,
+          phone: customerPhone,
+        },
+        vehicle: {
+          make: carMake,
+          model: carModel,
+          year: parseInt(carYear),
+          licensePlate: carRegistration,
+          vin: "", // Optional field
+        },
+        services: slotObj.services.map((svc) => ({
+          serviceId: svc.service.id,
+          technicianId: svc.technician.id,
+          bayId: slotObj.bay.id,
+          startTime: svc.startTime,
+          endTime: svc.endTime,
+          status: "pending",
+          notes: notes || "",
+        })),
+        notes: notes,
+      };
+
+      console.log("Creating booking with data:", bookingData);
+
+      setIsSubmitting(true);
+      const res = await fetchWithAuth("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (res.ok) {
+        toast.success("Booking created successfully!");
+        resetForm();
+        onBookingCreated?.();
+        onClose();
+      } else {
+        const errorData = await res.json();
+        toast.error(
+          errorData.error || "Failed to create booking. Please try again later."
+        );
+      }
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      toast.error("An error occurred. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Track if form is dirty
@@ -146,7 +238,7 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
     carModel ||
     carYear ||
     carRegistration ||
-    serviceId ||
+    selectedServices.length ||
     date ||
     bay ||
     notes;
@@ -274,26 +366,21 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
               <div className="space-y-6">
                 {/* Service Selection */}
                 <div>
-                  <h3 className="text-sm font-semibold mb-2">Service</h3>
+                  <h3 className="text-sm font-semibold mb-2">Services</h3>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Service <span className="text-red-500">*</span>
+                    Services <span className="text-red-500">*</span>
                   </label>
-                  <Select
-                    value={serviceId ?? ""}
-                    onValueChange={setServiceId}
-                    required
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Select service" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {mockServices.map((service) => (
-                        <SelectItem key={service.id} value={service.id}>
-                          {service.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <ServiceMultiSelect
+                    garageId={garage?.id || ""}
+                    selectedServices={selectedServices}
+                    onChange={setSelectedServices}
+                    placeholder="Select services"
+                  />
+                  {selectedServices.length === 0 && (
+                    <div className="text-xs text-red-500 mt-1">
+                      Please select at least one service.
+                    </div>
+                  )}
                 </div>
 
                 {/* Date & Status */}
@@ -355,12 +442,13 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                 </div>
 
                 {/* Bay Selection */}
+                {/*
                 <div>
                   <h3 className="text-sm font-semibold mb-2">Bay</h3>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Bay <span className="text-red-500">*</span>
+                    Bay
                   </label>
-                  <Select value={bay} onValueChange={(v) => setBay(v)} required>
+                  <Select value={bay} onValueChange={(v) => setBay(v)}>
                     <SelectTrigger className="w-full bg-white">
                       <SelectValue placeholder="Select bay" />
                     </SelectTrigger>
@@ -373,50 +461,19 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
                     </SelectContent>
                   </Select>
                 </div>
+                */}
 
                 {/* Slot Selection */}
                 <div>
                   <h3 className="text-sm font-semibold mb-2">
                     Available Slots
                   </h3>
-                  {!bay ? (
-                    <div className="text-xs text-gray-500">
-                      Please select a bay to see available slots.
-                    </div>
-                  ) : slots.length === 0 ? (
-                    <div className="text-xs text-gray-500">
-                      No slots available. Please select a service, date, and
-                      bay.
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {slots.map((slot) => {
-                        const slotValue = `${slot.start}-${slot.end}`;
-                        return (
-                          <label
-                            key={slotValue}
-                            className={`cursor-pointer px-3 py-2 border rounded-md text-xs ${
-                              selectedSlot === slotValue
-                                ? "bg-blue-500 text-white border-blue-500"
-                                : "bg-white text-gray-700 border-gray-300"
-                            }`}
-                          >
-                            <input
-                              type="radio"
-                              name="slot"
-                              value={slotValue}
-                              checked={selectedSlot === slotValue}
-                              onChange={() => setSelectedSlot(slotValue)}
-                              className="hidden"
-                              disabled={!bay}
-                            />
-                            {slot.start} - {slot.end}
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-                  {!selectedSlot && slots.length > 0 && (
+                  <SlotList
+                    slots={slots}
+                    selectedSlotIndex={selectedSlotIndex}
+                    setSelectedSlotIndex={setSelectedSlotIndex}
+                  />
+                  {selectedSlotIndex === null && slots.length > 0 && (
                     <div className="text-xs text-red-500 mt-1">
                       Please select a slot to continue.
                     </div>
@@ -442,15 +499,20 @@ export const BookingCreateModal: React.FC<BookingCreateModalProps> = ({
             </div>
 
             <DialogFooter className="flex justify-end gap-2 mt-6 pt-4 border-t bg-white">
-              <Button type="button" variant="outline" onClick={handleCancel}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="bg-blue-500 text-white hover:bg-blue-600"
-                disabled={!isFormValid()}
+                disabled={!isFormValid() || isSubmitting}
               >
-                Create Booking
+                {isSubmitting ? "Creating..." : "Create Booking"}
               </Button>
             </DialogFooter>
           </form>

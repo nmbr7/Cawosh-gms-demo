@@ -24,10 +24,11 @@ import {
   Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import React from "react";
 import { PlusIcon } from "lucide-react";
 import { AddUserModal } from "./components/AddUserModal";
+import { toast } from "sonner";
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 
 interface PaginationInfo {
   currentPage: number;
@@ -44,8 +45,14 @@ interface FilterState {
   sortOrder: "asc" | "desc";
 }
 
+interface ISkillRef {
+  _id?: string;
+  code: string;
+  displayName: string;
+}
+
 interface ApiUser {
-  id: number;
+  _id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -59,10 +66,16 @@ interface ApiUser {
   position?: string;
   department?: string;
   specialization?: string[];
+  skills?: ISkillRef[];
   managedDepartments?: string[];
   lastLogin?: string;
   createdAt: string;
   updatedAt: string;
+  workingHours?: {
+    start: string;
+    end: string;
+    days: string[];
+  };
 }
 
 interface UserData {
@@ -76,7 +89,7 @@ interface UserData {
   department?: string;
   employmentType?: EmploymentType;
   joiningDate?: string;
-  specialization?: string[];
+  skills?: ISkillRef[];
 }
 
 export default function UsersPage() {
@@ -106,6 +119,7 @@ export default function UsersPage() {
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
   const fetchUsers = useCallback(async () => {
+    console.log("fetching users");
     try {
       setIsLoading(true);
       setError(null);
@@ -129,14 +143,14 @@ export default function UsersPage() {
         params.append("search", filters.search);
       }
 
-      const response = await fetch(`/api/users?${params.toString()}`);
+      const response = await fetchWithAuth(`/api/users?${params.toString()}`);
       if (!response.ok) {
         throw new Error("Failed to fetch users");
       }
       const data = await response.json();
       setUsers(
-        data.users.map((user: ApiUser) => ({
-          id: user.id.toString(),
+        data.data.map((user: ApiUser) => ({
+          _id: user._id,
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
@@ -150,19 +164,33 @@ export default function UsersPage() {
           position: user.position,
           department: user.department,
           specialization: user.specialization,
+          skills: user.skills || [],
           managedDepartments: user.managedDepartments,
           lastLogin: user.lastLogin,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
+          workingHours: user.workingHours,
         }))
       );
-      setPaginationInfo(data.pagination);
+      setPaginationInfo({
+        currentPage: data.pagination.page || 1,
+        totalPages: data.pagination.pages || 1,
+        totalItems: data.pagination.total || 0,
+        itemsPerPage: data.pagination.limit || 10,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, filters]);
+  }, [
+    currentPage,
+    filters.role,
+    filters.status,
+    filters.search,
+    filters.sortBy,
+    filters.sortOrder,
+  ]);
 
   useEffect(() => {
     fetchUsers();
@@ -190,13 +218,45 @@ export default function UsersPage() {
 
   const handleAddUser = async (userData: UserData) => {
     try {
-      // TODO: Implement API call to add user
-      console.log("Adding user:", userData);
+      const method = modalMode === "edit" && selectedUser ? "PUT" : "POST";
+      const url =
+        modalMode === "edit" && selectedUser
+          ? `/api/users?id=${selectedUser._id}`
+          : "/api/users";
+
+      const response = await fetchWithAuth(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...userData,
+          ...(modalMode === "edit" &&
+            selectedUser && { _id: selectedUser._id }),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to ${modalMode === "edit" ? "update" : "create"} user`
+        );
+      }
+
+      toast.success(
+        `User ${modalMode === "edit" ? "updated" : "created"} successfully`
+      );
       setIsAddUserModalOpen(false);
-      // Refresh the users list
+      setSelectedUser(null);
+      setModalMode("add");
       fetchUsers();
     } catch (error) {
-      console.error("Error adding user:", error);
+      toast.error(
+        `Failed to ${modalMode === "edit" ? "update" : "create"} user`
+      );
+      console.error(
+        `Error ${modalMode === "edit" ? "updating" : "adding"} user:`,
+        error
+      );
     }
   };
 
@@ -309,7 +369,11 @@ export default function UsersPage() {
               </Button>
             </div>
             <Button
-              onClick={() => setIsAddUserModalOpen(true)}
+              onClick={() => {
+                setSelectedUser(null);
+                setModalMode("add");
+                setIsAddUserModalOpen(true);
+              }}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
@@ -379,22 +443,22 @@ export default function UsersPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
+                  Employee
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
+                  Role & Position
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
+                  Department
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Login
+                  Specialization
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created At
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -550,7 +614,11 @@ export default function UsersPage() {
             </Button>
           </div>
           <Button
-            onClick={() => setIsAddUserModalOpen(true)}
+            onClick={() => {
+              setSelectedUser(null);
+              setModalMode("add");
+              setIsAddUserModalOpen(true);
+            }}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
@@ -653,9 +721,7 @@ export default function UsersPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Specialization
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Login
-                </th>
+
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
@@ -663,7 +729,7 @@ export default function UsersPage() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
+                <tr key={user._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col">
                       <div className="text-sm font-medium text-gray-900">
@@ -684,6 +750,8 @@ export default function UsersPage() {
                             "bg-purple-100 text-purple-800",
                           user.role === "manager" &&
                             "bg-blue-100 text-blue-800",
+                          user.role === "technician" &&
+                            "bg-green-100 text-green-800",
                           user.role === "staff" && "bg-green-100 text-green-800"
                         )}
                       >
@@ -713,26 +781,26 @@ export default function UsersPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">
-                      {user.specialization?.map((spec, index) => (
+                      {user.skills?.map((spec) => (
                         <span
-                          key={index}
+                          key={spec.code}
                           className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
                         >
-                          {spec}
+                          {spec.displayName}
                         </span>
                       ))}
-                      {!user.specialization && user.role === "manager" && (
+                      {!user.skills && user.role === "manager" && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
                           {user.managedDepartments?.join(", ")}
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {user.lastLogin
                       ? format(new Date(user.lastLogin), "MMM dd, yyyy HH:mm")
                       : "-"}
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex items-center gap-1">
                       <Button
@@ -821,16 +889,18 @@ export default function UsersPage() {
         initialData={
           selectedUser
             ? {
-                firstName: selectedUser.firstName,
-                lastName: selectedUser.lastName,
-                email: selectedUser.email,
-                phone: selectedUser.phone || "",
-                role: selectedUser.role,
-                status: selectedUser.status,
-                position: selectedUser.position,
-                department: selectedUser.department,
-                employmentType: selectedUser.employmentType || "full-time",
-                specialization: selectedUser.specialization,
+                ...selectedUser,
+                role: selectedUser.role as UserRole,
+                position: selectedUser.position || "",
+                department: selectedUser.department || "",
+                status: selectedUser.status as UserStatus,
+                employmentType: selectedUser.employmentType as EmploymentType,
+                workingHours: selectedUser.workingHours || {
+                  start: "",
+                  end: "",
+                  days: [],
+                },
+                skills: selectedUser.skills || [],
               }
             : undefined
         }

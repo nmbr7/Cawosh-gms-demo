@@ -6,8 +6,6 @@ interface ContactInputsProps {
   phone: string;
   onEmailChange: (value: string) => void;
   onPhoneChange: (value: string) => void;
-  emailError?: string;
-  phoneError?: string;
   disabled?: boolean;
 }
 
@@ -16,8 +14,6 @@ export function ContactInputs({
   phone,
   onEmailChange,
   onPhoneChange,
-  emailError,
-  phoneError,
   disabled = false,
 }: ContactInputsProps) {
   return (
@@ -32,11 +28,8 @@ export function ContactInputs({
           value={email}
           onChange={(e) => onEmailChange(e.target.value)}
           placeholder="Enter email"
-          required
-          className={emailError ? "border-red-500" : ""}
           disabled={disabled}
         />
-        {emailError && <p className="text-sm text-red-500">{emailError}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="phone">
@@ -51,12 +44,10 @@ export function ContactInputs({
             value={phone}
             onChange={(e) => onPhoneChange(e.target.value)}
             placeholder="Enter phone number"
-            className={`rounded-l-none ${phoneError ? "border-red-500" : ""}`}
-            required
+            className="rounded-l-none"
             disabled={disabled}
           />
         </div>
-        {phoneError && <p className="text-sm text-red-500">{phoneError}</p>}
       </div>
     </div>
   );

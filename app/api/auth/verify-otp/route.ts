@@ -1,45 +1,48 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { email, code } = await request.json();
+    const { email, otp } = await request.json();
 
     // Validate required fields
-    if (!email || !code) {
+    if (!email || !otp) {
       return NextResponse.json(
-        { error: 'Email and verification code are required' },
+        { error: "Email and OTP are required" },
         { status: 400 }
       );
     }
 
-    // Validate code format (should be 5 digits)
-    if (!/^\d{5}$/.test(code)) {
-      return NextResponse.json(
-        { error: 'Invalid verification code format' },
-        { status: 400 }
-      );
-    }
-
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // For demo purposes, accept '12345' as the valid code
-    if (code === '12345') {
-      return NextResponse.json({ 
-        success: true,
-        message: 'Verification code validated successfully'
-      });
-    }
-
-    return NextResponse.json(
-      { error: 'Invalid verification code' },
-      { status: 400 }
+    // Forward the request to the real backend
+    const response = await fetch(
+      `${process.env.BACKEND_URL}/api/auth/verify-otp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp }),
+      }
     );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: data.error || "Failed to verify OTP" },
+        { status: response.status }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: data.message || "OTP verified successfully",
+      data: data.data,
+    });
   } catch (error) {
-    console.error('OTP verification error:', error);
+    console.error("Verify OTP error:", error);
     return NextResponse.json(
-      { error: 'Failed to verify code' },
+      { error: "Failed to verify OTP" },
       { status: 500 }
     );
   }
-} 
+}

@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { EmploymentType } from "@/app/models/user";
+import { useUserFormOptions } from "@/hooks/useUserFormOptions";
+import { memo, useMemo } from "react";
 
 interface EmploymentDetailsProps {
   position: string;
@@ -20,23 +22,7 @@ interface EmploymentDetailsProps {
   disabled?: boolean;
 }
 
-const POSITIONS = [
-  "Service Technician",
-  "Manager",
-  "Admin",
-  "Operations Manager",
-  "Service Manager",
-];
-
-const DEPARTMENTS = [
-  "Service",
-  "Operations",
-  "IT",
-  "Maintenance",
-  "Management",
-];
-
-export function EmploymentDetails({
+export const EmploymentDetails = memo(function EmploymentDetails({
   position,
   department,
   employmentType,
@@ -47,6 +33,30 @@ export function EmploymentDetails({
   onJoiningDateChange,
   disabled = false,
 }: EmploymentDetailsProps) {
+  const { formOptions, isLoading: isLoadingOptions } = useUserFormOptions();
+
+  // Memoize the computed arrays to prevent unnecessary re-renders
+  const displayPositions = useMemo(() => {
+    const positions = [...formOptions.positions];
+    if (position && !formOptions.positions.includes(position)) {
+      positions.push(position);
+    }
+    return positions;
+  }, [formOptions.positions, position]);
+
+  const displayDepartments = useMemo(() => {
+    const departments = [...formOptions.departments];
+    if (department && !formOptions.departments.includes(department)) {
+      departments.push(department);
+    }
+    return departments;
+  }, [formOptions.departments, department]);
+
+  console.log("EmploymentDetails render - position:", position);
+  console.log("EmploymentDetails render - department:", department);
+  console.log("EmploymentDetails render - employmentType:", employmentType);
+  console.log("EmploymentDetails render - joiningDate:", joiningDate);
+
   return (
     <div className="space-y-4">
       <div>
@@ -56,13 +66,16 @@ export function EmploymentDetails({
         <Select
           value={position}
           onValueChange={onPositionChange}
-          disabled={disabled}
+          disabled={disabled || isLoadingOptions}
+          required
         >
           <SelectTrigger className="bg-white">
-            <SelectValue placeholder="Select position" />
+            <SelectValue
+              placeholder={isLoadingOptions ? "Loading..." : "Select position"}
+            />
           </SelectTrigger>
           <SelectContent className="bg-white">
-            {POSITIONS.map((pos) => (
+            {displayPositions.map((pos) => (
               <SelectItem key={pos} value={pos}>
                 {pos}
               </SelectItem>
@@ -77,13 +90,18 @@ export function EmploymentDetails({
         <Select
           value={department}
           onValueChange={onDepartmentChange}
-          disabled={disabled}
+          disabled={disabled || isLoadingOptions}
+          required
         >
           <SelectTrigger className="bg-white">
-            <SelectValue placeholder="Select department" />
+            <SelectValue
+              placeholder={
+                isLoadingOptions ? "Loading..." : "Select department"
+              }
+            />
           </SelectTrigger>
           <SelectContent className="bg-white">
-            {DEPARTMENTS.map((dept) => (
+            {displayDepartments.map((dept) => (
               <SelectItem key={dept} value={dept}>
                 {dept}
               </SelectItem>
@@ -125,4 +143,6 @@ export function EmploymentDetails({
       </div>
     </div>
   );
-}
+});
+
+EmploymentDetails.displayName = "EmploymentDetails";

@@ -21,10 +21,27 @@ export function WeekView({
   // Get bookings for a specific day
   const getBookingsForDay = (date: Date) => {
     const dayStr = format(date, "yyyy-MM-dd");
-    return bookings.filter((booking) => {
-      const bookingDateStr = booking.date;
-      return bookingDateStr === dayStr && booking.bay === selectedBay;
+    const bookingsForDay = bookings.filter((booking) => {
+      // Check if any service in this booking falls on the selected day
+      const hasServiceOnDay = booking.services.some((service) => {
+        const serviceDateStr = service.startTime.split("T")[0];
+        return serviceDateStr === dayStr;
+      });
+
+      if (!hasServiceOnDay) return false;
+
+      // If bay is specified, check if any service is in that bay
+      if (selectedBay !== "all") {
+        return booking.services.some(
+          (service) => service.bayId === `bay${selectedBay}`
+        );
+      }
+
+      return true;
     });
+
+    console.log("bookingsForDay", bookingsForDay);
+    return bookingsForDay;
   };
 
   const formatDayDate = (date: Date) => {
@@ -85,26 +102,28 @@ export function WeekView({
                 {/* Bookings for this day */}
                 {getBookingsForDay(date).map((booking) => (
                   <div
-                    key={booking.id}
+                    key={booking._id}
                     className={cn(
                       "absolute w-full px-2",
                       booking.status === "completed"
                         ? "bg-green-100 text-green-700"
-                        : booking.status === "ongoing"
+                        : booking.status === "in-progress"
                         ? "bg-amber-100 text-amber-700"
                         : "bg-blue-100 text-blue-700"
                     )}
                     style={{
-                      top: `${booking.getTopPosition()}px`,
-                      height: `${booking.getHeight()}px`,
+                      top: "0px",
+                      height: "60px",
                     }}
                   >
                     <div className="p-2 flex flex-col h-full">
                       <div className="text-sm font-medium flex-1">
-                        {booking.id}
+                        {booking._id}
                       </div>
                       <div className="text-sm text-gray-600">
-                        {booking.serviceName}
+                        {booking.services
+                          .map((service) => service.name)
+                          .join(", ")}
                       </div>
                     </div>
                   </div>

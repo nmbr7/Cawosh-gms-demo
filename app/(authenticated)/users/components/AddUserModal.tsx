@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { UserRole, UserStatus, EmploymentType } from "@/app/models/user";
 import { NameInputs } from "./form/NameInputs";
 import { ContactInputs } from "./form/ContactInputs";
@@ -28,18 +31,38 @@ interface ValidationErrors {
   [key: string]: string;
 }
 
+interface ISkillRef {
+  _id?: string;
+  code: string;
+  displayName: string;
+}
+
 interface FormData {
   firstName: string;
   lastName: string;
   email: string;
+  password?: string;
   phone: string;
+  address: string;
   role: UserRole;
   status: UserStatus;
   position: string;
   department: string;
   employmentType: EmploymentType;
   joiningDate: string;
-  specialization: string[];
+  skills: ISkillRef[];
+  certifications: string[];
+  workingHours: {
+    start: string;
+    end: string;
+    days: string[];
+  };
+  systemAccess: {
+    canManageUsers: boolean;
+    canManageSettings: boolean;
+    canViewReports: boolean;
+    canManageBilling: boolean;
+  };
   image?: File | null;
   imageUrl?: string | null;
 }
@@ -63,7 +86,9 @@ export function AddUserModal({
     firstName: initialData?.firstName || "",
     lastName: initialData?.lastName || "",
     email: initialData?.email || "",
+    password: initialData?.password || "",
     phone: initialData?.phone || "",
+    address: initialData?.address || "",
     role: initialData?.role || "staff",
     status: initialData?.status || "active",
     position: initialData?.position || "",
@@ -71,27 +96,43 @@ export function AddUserModal({
     employmentType: initialData?.employmentType || "full-time",
     joiningDate:
       initialData?.joiningDate || new Date().toISOString().split("T")[0],
-    specialization: initialData?.specialization || [],
+    skills: initialData?.skills || [],
+    certifications: initialData?.certifications || [],
+    workingHours: initialData?.workingHours
+      ? {
+          start: initialData.workingHours.start || "10:00",
+          end: initialData.workingHours.end || "18:00",
+          days: initialData.workingHours.days || [],
+        }
+      : {
+          start: "10:00",
+          end: "18:00",
+          days: [],
+        },
+    systemAccess: initialData?.systemAccess || {
+      canManageUsers: false,
+      canManageSettings: false,
+      canViewReports: false,
+      canManageBilling: false,
+    },
     image: null,
     imageUrl: initialData?.imageUrl || null,
   });
 
-  const [errors, setErrors] = useState<{
-    email?: string;
-    phone?: string;
-  }>({});
-
   const isViewMode = mode === "view";
   const isEditMode = mode === "edit";
 
-  // Reset form data when initialData changes
+  // Reset form data when initialData changes or mode changes
   useEffect(() => {
     if (initialData) {
+      // Edit or view mode - populate with user data
       setFormData({
         firstName: initialData.firstName || "",
         lastName: initialData.lastName || "",
         email: initialData.email || "",
+        password: initialData.password || "",
         phone: initialData.phone || "",
+        address: initialData.address || "",
         role: initialData.role || "staff",
         status: initialData.status || "active",
         position: initialData.position || "",
@@ -99,12 +140,111 @@ export function AddUserModal({
         employmentType: initialData.employmentType || "full-time",
         joiningDate:
           initialData.joiningDate || new Date().toISOString().split("T")[0],
-        specialization: initialData.specialization || [],
+        skills: initialData.skills || [],
+        certifications: initialData.certifications || [],
+        workingHours: initialData.workingHours
+          ? {
+              start: initialData.workingHours.start || "10:00",
+              end: initialData.workingHours.end || "18:00",
+              days: initialData.workingHours.days || [],
+            }
+          : {
+              start: "10:00",
+              end: "18:00",
+              days: [],
+            },
+        systemAccess: initialData.systemAccess || {
+          canManageUsers: false,
+          canManageSettings: false,
+          canViewReports: false,
+          canManageBilling: false,
+        },
         image: null,
         imageUrl: initialData.imageUrl || null,
       });
+    } else if (mode === "add") {
+      // Add mode - reset to empty form
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        phone: "",
+        address: "",
+        role: "staff",
+        status: "active",
+        position: "",
+        department: "",
+        employmentType: "full-time",
+        joiningDate: new Date().toISOString().split("T")[0],
+        skills: [],
+        certifications: [],
+        workingHours: {
+          start: "10:00",
+          end: "18:00",
+          days: [],
+        },
+        systemAccess: {
+          canManageUsers: false,
+          canManageSettings: false,
+          canViewReports: false,
+          canManageBilling: false,
+        },
+        image: null,
+        imageUrl: null,
+      });
     }
-  }, [initialData]);
+  }, [initialData, mode]);
+
+  // Memoized callback functions to prevent unnecessary re-renders
+  const handlePositionChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, position: value }));
+  }, []);
+
+  const handleDepartmentChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, department: value }));
+  }, []);
+
+  const handleEmploymentTypeChange = useCallback((value: EmploymentType) => {
+    setFormData((prev) => ({ ...prev, employmentType: value }));
+  }, []);
+
+  const handleJoiningDateChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, joiningDate: value }));
+  }, []);
+
+  // Memoized callbacks for other form components
+  const handleFirstNameChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, firstName: value }));
+  }, []);
+
+  const handleLastNameChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, lastName: value }));
+  }, []);
+
+  const handleEmailChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, email: value }));
+  }, []);
+
+  const handlePhoneChange = useCallback((value: string) => {
+    setFormData((prev) => ({ ...prev, phone: value }));
+  }, []);
+
+  const handleRoleChange = useCallback((value: UserRole) => {
+    setFormData((prev) => ({ ...prev, role: value }));
+  }, []);
+
+  const handleStatusChange = useCallback((value: UserStatus) => {
+    setFormData((prev) => ({ ...prev, status: value }));
+  }, []);
+
+  const handleSkillsChange = useCallback((value: ISkillRef[]) => {
+    setFormData((prev) => ({ ...prev, skills: value }));
+  }, []);
+
+  const handleImageChange = useCallback((file: File | null) => {
+    setFormData((prev) => ({ ...prev, image: file }));
+  }, []);
 
   const validateForm = () => {
     const validationErrors: ValidationErrors = {
@@ -113,30 +253,43 @@ export function AddUserModal({
       email: !formData.email ? "Email is required" : "",
       phone: !formData.phone ? "Phone is required" : "",
       role: !formData.role ? "Role is required" : "",
+      position: !formData.position ? "Position is required" : "",
+      department: !formData.department ? "Department is required" : "",
     };
+
+    // Password is only required in add mode
+    if (mode === "add" && !formData.password) {
+      validationErrors.password = "Password is required";
+    }
+
     const errors = getValidationErrors(validationErrors);
-    const fieldErrors: { email?: string; phone?: string } = {};
+    const formatErrors: string[] = [];
 
     if (formData.email && !validateEmail(formData.email)) {
-      fieldErrors.email = "Please enter a valid email address";
+      formatErrors.push("Please enter a valid email address");
     }
 
     if (formData.phone && !validatePhone(formData.phone)) {
-      fieldErrors.phone =
-        "Please enter a valid UK phone number (e.g., 07123456789)";
+      formatErrors.push(
+        "Please enter a valid UK phone number (e.g., 7123456789)"
+      );
     }
 
-    setErrors(fieldErrors);
+    // Password validation only applies if password is provided
+    if (formData.password && formData.password.length < 8) {
+      formatErrors.push("Password must be at least 8 characters long");
+    }
 
-    if (errors.length > 0 || Object.keys(fieldErrors).length > 0) {
-      toast.error("Validation Error", {
+    // Combine all validation errors for Sonner display
+    const allErrors = [...errors, ...formatErrors];
+
+    if (allErrors.length > 0) {
+      toast.error("Please fix below errors", {
         description: (
           <ul className="list-disc list-inside">
-            {errors.map((error, index) => (
+            {allErrors.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
-            {fieldErrors.email && <li>{fieldErrors.email}</li>}
-            {fieldErrors.phone && <li>{fieldErrors.phone}</li>}
           </ul>
         ),
       });
@@ -153,13 +306,23 @@ export function AddUserModal({
       return;
     }
 
-    onSave(formData);
+    // Format data for backend API
+    const apiData = {
+      ...formData,
+      joiningDate: new Date(formData.joiningDate).toISOString(),
+      workingHours: {
+        ...formData.workingHours,
+        days: ["monday", "tuesday", "wednesday", "thursday", "friday"], // Default working days
+      },
+    };
+
+    onSave(apiData);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="p-6 pb-4">
           <DialogTitle className="text-2xl font-semibold">
             {isViewMode
               ? "User Details"
@@ -168,43 +331,78 @@ export function AddUserModal({
               : "Add New User"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          id="user-form"
+          onSubmit={handleSubmit}
+          className="flex-1 overflow-y-auto px-6 space-y-6"
+        >
           <div className="grid grid-cols-2 gap-8">
             {/* Left Column */}
             <div className="space-y-6">
               <ImagePicker
                 imageUrl={initialData?.imageUrl}
-                onImageChange={(file) =>
-                  setFormData((prev) => ({ ...prev, image: file }))
-                }
+                onImageChange={handleImageChange}
                 disabled={isViewMode}
               />
 
               <NameInputs
                 firstName={formData.firstName}
                 lastName={formData.lastName}
-                onFirstNameChange={(value) =>
-                  setFormData((prev) => ({ ...prev, firstName: value }))
-                }
-                onLastNameChange={(value) =>
-                  setFormData((prev) => ({ ...prev, lastName: value }))
-                }
+                onFirstNameChange={handleFirstNameChange}
+                onLastNameChange={handleLastNameChange}
                 disabled={isViewMode}
               />
 
               <ContactInputs
                 email={formData.email}
                 phone={formData.phone}
-                onEmailChange={(value) =>
-                  setFormData((prev) => ({ ...prev, email: value }))
-                }
-                onPhoneChange={(value) =>
-                  setFormData((prev) => ({ ...prev, phone: value }))
-                }
-                emailError={errors.email}
-                phoneError={errors.phone}
+                onEmailChange={handleEmailChange}
+                onPhoneChange={handlePhoneChange}
                 disabled={isViewMode}
               />
+
+              {/* Password Field */}
+              {!isViewMode && (
+                <div className="space-y-2">
+                  <Label htmlFor="password">
+                    Password {isEditMode && "(leave blank to keep current)"}
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        password: e.target.value,
+                      }))
+                    }
+                    placeholder={
+                      isEditMode
+                        ? "Leave blank to keep current password"
+                        : "Enter password"
+                    }
+                    disabled={isViewMode}
+                  />
+                </div>
+              )}
+
+              {/* Address Field */}
+              <div className="space-y-2">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      address: e.target.value,
+                    }))
+                  }
+                  placeholder="Enter address"
+                  disabled={isViewMode}
+                />
+              </div>
             </div>
 
             {/* Right Column */}
@@ -212,17 +410,13 @@ export function AddUserModal({
               <div className="grid grid-cols-2 gap-4">
                 <RoleSelect
                   role={formData.role}
-                  onRoleChange={(value) =>
-                    setFormData((prev) => ({ ...prev, role: value }))
-                  }
+                  onRoleChange={handleRoleChange}
                   disabled={isViewMode}
                 />
 
                 <StatusSelect
                   status={formData.status}
-                  onStatusChange={(value) =>
-                    setFormData((prev) => ({ ...prev, status: value }))
-                  }
+                  onStatusChange={handleStatusChange}
                   disabled={isViewMode}
                 />
               </div>
@@ -232,45 +426,176 @@ export function AddUserModal({
                 department={formData.department}
                 employmentType={formData.employmentType}
                 joiningDate={formData.joiningDate}
-                onPositionChange={(value) =>
-                  setFormData((prev) => ({ ...prev, position: value }))
-                }
-                onDepartmentChange={(value) =>
-                  setFormData((prev) => ({ ...prev, department: value }))
-                }
-                onEmploymentTypeChange={(value) =>
-                  setFormData((prev) => ({ ...prev, employmentType: value }))
-                }
-                onJoiningDateChange={(value) =>
-                  setFormData((prev) => ({ ...prev, joiningDate: value }))
-                }
+                onPositionChange={handlePositionChange}
+                onDepartmentChange={handleDepartmentChange}
+                onEmploymentTypeChange={handleEmploymentTypeChange}
+                onJoiningDateChange={handleJoiningDateChange}
                 disabled={isViewMode}
               />
+
+              {/* Working Hours */}
+              <div className="space-y-4">
+                <Label>Working Hours</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startTime">Start Time</Label>
+                    <Input
+                      id="startTime"
+                      type="time"
+                      value={formData.workingHours.start}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          workingHours: {
+                            ...prev.workingHours,
+                            start: e.target.value,
+                          },
+                        }))
+                      }
+                      disabled={isViewMode}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endTime">End Time</Label>
+                    <Input
+                      id="endTime"
+                      type="time"
+                      value={formData.workingHours.end}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          workingHours: {
+                            ...prev.workingHours,
+                            end: e.target.value,
+                          },
+                        }))
+                      }
+                      disabled={isViewMode}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* System Access */}
+              <div className="space-y-4">
+                <Label>System Access Permissions</Label>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="canManageUsers"
+                      checked={formData.systemAccess.canManageUsers}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          systemAccess: {
+                            ...prev.systemAccess,
+                            canManageUsers: checked,
+                          },
+                        }))
+                      }
+                      disabled={isViewMode}
+                    />
+                    <Label htmlFor="canManageUsers">Can Manage Users</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="canManageSettings"
+                      checked={formData.systemAccess.canManageSettings}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          systemAccess: {
+                            ...prev.systemAccess,
+                            canManageSettings: checked,
+                          },
+                        }))
+                      }
+                      disabled={isViewMode}
+                    />
+                    <Label htmlFor="canManageSettings">
+                      Can Manage Settings
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="canViewReports"
+                      checked={formData.systemAccess.canViewReports}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          systemAccess: {
+                            ...prev.systemAccess,
+                            canViewReports: checked,
+                          },
+                        }))
+                      }
+                      disabled={isViewMode}
+                    />
+                    <Label htmlFor="canViewReports">Can View Reports</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="canManageBilling"
+                      checked={formData.systemAccess.canManageBilling}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          systemAccess: {
+                            ...prev.systemAccess,
+                            canManageBilling: checked,
+                          },
+                        }))
+                      }
+                      disabled={isViewMode}
+                    />
+                    <Label htmlFor="canManageBilling">Can Manage Billing</Label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Full Width Section */}
           <div className="col-span-2">
             <SpecializationSelect
-              selectedSpecializations={formData.specialization}
-              onSpecializationsChange={(value) =>
-                setFormData((prev) => ({ ...prev, specialization: value }))
-              }
+              selectedSpecializations={formData.skills}
+              onSpecializationsChange={handleSkillsChange}
               disabled={isViewMode}
             />
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              {isViewMode ? "Close" : "Cancel"}
-            </Button>
-            {!isViewMode && (
-              <Button type="submit">
-                {isEditMode ? "Update User" : "Add User"}
-              </Button>
-            )}
-          </DialogFooter>
+          {/* Certifications */}
+          <div className="col-span-2">
+            <div className="space-y-2">
+              <Label htmlFor="certifications">Certifications</Label>
+              <Input
+                id="certifications"
+                value={formData.certifications.join(", ")}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    certifications: e.target.value
+                      .split(",")
+                      .map((cert) => cert.trim())
+                      .filter((cert) => cert),
+                  }))
+                }
+                placeholder="Enter certifications separated by commas"
+                disabled={isViewMode}
+              />
+            </div>
+          </div>
         </form>
+        <DialogFooter className="p-6 pt-4 border-t">
+          <Button type="button" variant="outline" onClick={onClose}>
+            {isViewMode ? "Close" : "Cancel"}
+          </Button>
+          {!isViewMode && (
+            <Button type="submit" form="user-form">
+              {isEditMode ? "Update User" : "Add User"}
+            </Button>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

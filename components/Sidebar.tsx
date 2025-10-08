@@ -17,17 +17,24 @@ import {
   Headphones,
   UserList,
   Gear,
+  Package,
 } from "phosphor-react";
 
 import { useUIStore } from "@/store/ui";
 import { useAuthStore } from "@/store/auth";
 
-const links = [
+export const links = [
   { name: "Dashboard", href: "/dashboard", icon: SquaresFour },
   { name: "Calendar", href: "/schedule", icon: CalendarBlank },
   { name: "Bookings", href: "/bookings", icon: Note },
   { name: "Job Sheet", href: "/job-sheet", icon: Files },
   { name: "Billings", href: "/billings", icon: Wallet },
+  { name: "Stock Management", href: "/inventory", icon: Package },
+  {
+    name: "Vehicle Health Checks",
+    href: "/vehicle-health-checks",
+    icon: Files,
+  },
   {
     name: "Customer Support",
     href: "/customer-support",

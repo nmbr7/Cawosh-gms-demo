@@ -1,0 +1,193 @@
+{
+  "users": [
+    {
+      "_id": {
+        "$oid": "684eb6af90d2563d51c33d5b"
+      },
+      "firstName": "Afsal",
+      "lastName": "Aziz",
+      "email": "admin@local.garage.com",
+      "password": "$2b$10$3olns/GR1xR/Pj0vnGvTU.KyCsNXhkhk.CVjxBKpkyzzxtJpAilfK",
+      "phone": "+1234567890",
+      "employeeId": "EMP001",
+      "role": "admin",
+      "position": "System Administrator",
+      "status": "active",
+      "department": "IT",
+      "joiningDate": {
+        "$date": "2025-06-15T12:03:59.089Z"
+      },
+      "employmentType": "full-time",
+      "workingHours": {
+        "start": "09:00",
+        "end": "18:00",
+        "days": ["monday", "tuesday", "wednesday", "thursday", "friday"]
+      },
+      "skills": ["System Administration", "Network Management"],
+      "certifications": ["ITIL", "CompTIA A+"],
+      "systemAccess": {
+        "canManageUsers": true,
+        "canManageSettings": true,
+        "canViewReports": true,
+        "canManageBilling": true
+      },
+      "tenantId": {
+        "$oid": "684eb6ae90d2563d51c33d3f"
+      },
+      "isActive": true,
+      "failedLoginAttempts": {
+        "count": 0
+      },
+      "lastLogin": {
+        "$date": "2025-06-19T17:53:59.093Z"
+      },
+      "createdAt": {
+        "$date": "2025-06-15T12:03:59.096Z"
+      },
+      "updatedAt": {
+        "$date": "2025-06-19T17:53:59.096Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "684eb6af90d2563d51c33d60"
+      },
+      "firstName": "Staff",
+      "lastName": "User",
+      "email": "staff@local.garage.com",
+      "password": "$2b$10$W8uu5qf2cBahahjkEFThReAiLZnYvlg.SBz1UJPqLIEhddEFdMIG6",
+      "phone": "+1234567891",
+      "employeeId": "EMP002",
+      "role": "staff",
+      "position": "Service Technician",
+      "status": "active",
+      "department": "Service",
+      "joiningDate": {
+        "$date": "2025-06-15T12:03:59.253Z"
+      },
+      "employmentType": "full-time",
+      "workingHours": {
+        "start": "09:00",
+        "end": "18:00",
+        "days": ["monday", "tuesday", "wednesday", "thursday", "friday"]
+      },
+      "skills": ["Auto Repair", "Diagnostics"],
+      "certifications": ["ASE Certification"],
+      "systemAccess": {
+        "canManageUsers": false,
+        "canManageSettings": false,
+        "canViewReports": true,
+        "canManageBilling": false
+      },
+      "tenantId": {
+        "$oid": "684eb6ae90d2563d51c33d3f"
+      },
+      "isActive": true,
+      "failedLoginAttempts": {
+        "count": 0
+      },
+      "lastLogin": null,
+      "createdAt": {
+        "$date": "2025-06-15T12:03:59.254Z"
+      },
+      "updatedAt": {
+        "$date": "2025-06-15T12:03:59.254Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "684eb6af90d2563d51c33d62"
+      },
+      "firstName": "Sarah",
+      "lastName": "Manager",
+      "email": "manager@local.garage.com",
+      "password": "$2b$10$YourHashedPasswordHere",
+      "phone": "+1234567892",
+      "employeeId": "EMP003",
+      "role": "manager",
+      "position": "Service Manager",
+      "status": "active",
+      "department": "Service",
+      "joiningDate": {
+        "$date": "2025-06-15T12:03:59.253Z"
+      },
+      "employmentType": "full-time",
+      "workingHours": {
+        "start": "09:00",
+        "end": "18:00",
+        "days": ["monday", "tuesday", "wednesday", "thursday", "friday"]
+      },
+      "skills": ["Team Management", "Service Operations", "Customer Relations"],
+      "certifications": [
+        "Automotive Service Management",
+        "Leadership Certification"
+      ],
+      "systemAccess": {
+        "canManageUsers": true,
+        "canManageSettings": true,
+        "canViewReports": true,
+        "canManageBilling": true
+      },
+      "tenantId": {
+        "$oid": "684eb6ae90d2563d51c33d3f"
+      },
+      "isActive": true,
+      "failedLoginAttempts": {
+        "count": 0
+      },
+      "lastLogin": null,
+      "createdAt": {
+        "$date": "2025-06-15T12:03:59.254Z"
+      },
+      "updatedAt": {
+        "$date": "2025-06-15T12:03:59.254Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "684eb6af90d2563d51c33d63"
+      },
+      "firstName": "Mike",
+      "lastName": "Technician",
+      "email": "tech@local.garage.com",
+      "password": "$2b$10$YourHashedPasswordHere",
+      "phone": "+1234567893",
+      "employeeId": "EMP004",
+      "role": "staff",
+      "position": "Senior Technician",
+      "status": "active",
+      "department": "Service",
+      "joiningDate": {
+        "$date": "2025-06-15T12:03:59.253Z"
+      },
+      "employmentType": "full-time",
+      "workingHours": {
+        "start": "09:00",
+        "end": "18:00",
+        "days": ["monday", "tuesday", "wednesday", "thursday", "friday"]
+      },
+      "skills": ["Advanced Diagnostics", "Engine Repair", "Electrical Systems"],
+      "certifications": ["ASE Master Technician", "Hybrid Vehicle Specialist"],
+      "systemAccess": {
+        "canManageUsers": false,
+        "canManageSettings": false,
+        "canViewReports": true,
+        "canManageBilling": false
+      },
+      "tenantId": {
+        "$oid": "684eb6ae90d2563d51c33d3f"
+      },
+      "isActive": true,
+      "failedLoginAttempts": {
+        "count": 0
+      },
+      "lastLogin": null,
+      "createdAt": {
+        "$date": "2025-06-15T12:03:59.254Z"
+      },
+      "updatedAt": {
+        "$date": "2025-06-15T12:03:59.254Z"
+      }
+    }
+  ]
+}
