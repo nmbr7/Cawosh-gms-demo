@@ -9,6 +9,7 @@ import Link from "next/link";
 import { CustomButton } from "@/components/ui/custom-button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useGarageStore } from "@/store/garage";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -66,8 +67,17 @@ export default function LoginPage() {
         userId: data.data.user.userId,
       });
 
-      // Wait for the cookie to be set and auth store to be updated
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      try {
+        const garageResponse = await fetch("/api/garage-settings");
+        if (garageResponse.ok) {
+          const garageData = await garageResponse.json();
+          if (garageData.data) {
+            useGarageStore.getState().setGarage(garageData.data);
+          }
+        }
+      } catch (garageError) {
+        console.error("Failed to fetch garage settings:", garageError);
+      }
 
       // Navigate to dashboard
       router.push("/dashboard");
