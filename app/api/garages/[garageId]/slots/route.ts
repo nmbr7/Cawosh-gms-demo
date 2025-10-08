@@ -15,6 +15,8 @@ export async function GET(request: Request) {
     const garageId = url.pathname.split("/")[3]; // /api/garages/[garageId]/slots
     const date = url.searchParams.get("date");
     const serviceIds = url.searchParams.get("serviceIds");
+    const bayId = url.searchParams.get("bayId");
+    const technicianId = url.searchParams.get("technicianId");
 
     if (!date || !serviceIds) {
       return NextResponse.json(
@@ -23,15 +25,25 @@ export async function GET(request: Request) {
       );
     }
 
+    // Build backend URL with all parameters
+    const backendUrl = new URL(`${process.env.BACKEND_URL}/api/slots`);
+    backendUrl.searchParams.set("date", date);
+    backendUrl.searchParams.set("serviceIds", serviceIds);
+    backendUrl.searchParams.set("garageId", garageId);
+
+    if (bayId) {
+      backendUrl.searchParams.set("bayId", bayId);
+    }
+    if (technicianId) {
+      backendUrl.searchParams.set("technicianId", technicianId);
+    }
+
     // Call the backend API for slots
-    const response = await fetch(
-      `${process.env.BACKEND_URL}/api/slots?date=${date}&serviceIds=${serviceIds}&garageId=${garageId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await fetch(backendUrl.toString(), {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Failed to fetch slots");

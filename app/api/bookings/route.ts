@@ -128,7 +128,10 @@ export async function GET(request: Request): Promise<NextResponse> {
     const limit: number = parseInt(searchParams.get("limit") || "10");
 
     // Filter parameters
-    const bay: string | null = searchParams.get("bay") || null;
+    const bay: string | null =
+      searchParams.get("bay") || searchParams.get("bayId") || null;
+    const technicianId: string | null =
+      searchParams.get("technicianId") || null;
     const status: string | null = searchParams.get("status") || null;
     const serviceStatus: string | null =
       searchParams.get("serviceStatus") || null;
@@ -168,6 +171,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     // Add optional filters
     if (bay) backendUrl.searchParams.set("bay", bay);
+    if (technicianId) backendUrl.searchParams.set("technicianId", technicianId);
     if (status) backendUrl.searchParams.set("status", status);
     if (serviceStatus)
       backendUrl.searchParams.set("serviceStatus", serviceStatus);

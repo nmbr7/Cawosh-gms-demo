@@ -3,6 +3,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import type { InventoryItem } from "@/types/inventory";
 
@@ -24,6 +25,9 @@ export function ItemDetailsModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{item.name}</DialogTitle>
+          <DialogDescription>
+            View and manage inventory item details
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

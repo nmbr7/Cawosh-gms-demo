@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Booking } from "@/app/models/booking";
 import { format } from "date-fns";
@@ -142,6 +143,9 @@ export function BookingDetailsModal({
                   booking?.bookingId || booking?._id || bookingId
                 }`}
           </DialogTitle>
+          <DialogDescription>
+            View detailed information about this booking
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto pr-2">

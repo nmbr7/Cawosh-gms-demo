@@ -14,32 +14,32 @@
       "businessHours": [
         {
           "day": "monday",
-          "open": "09:00",
-          "close": "18:00",
+          "open": "10:00",
+          "close": "17:00",
           "isClosed": false
         },
         {
           "day": "tuesday",
-          "open": "09:00",
-          "close": "18:00",
+          "open": "10:00",
+          "close": "17:00",
           "isClosed": false
         },
         {
           "day": "wednesday",
-          "open": "09:00",
-          "close": "18:00",
+          "open": "10:00",
+          "close": "17:00",
           "isClosed": false
         },
         {
           "day": "thursday",
-          "open": "09:00",
-          "close": "18:00",
+          "open": "10:00",
+          "close": "17:00",
           "isClosed": false
         },
         {
           "day": "friday",
-          "open": "09:00",
-          "close": "18:00",
+          "open": "10:00",
+          "close": "17:00",
           "isClosed": false
         },
         {

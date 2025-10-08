@@ -1,18 +1,12 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-export async function GET(request: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ garageId: string }> }
+) {
   try {
-    const { searchParams } = new URL(request.url);
-    const garageId = searchParams.get("garageId");
-
-    if (!garageId) {
-      return NextResponse.json(
-        { error: "Garage ID is required" },
-        { status: 400 }
-      );
-    }
-
+    const { garageId } = await params;
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("access_token")?.value;
 
@@ -20,9 +14,9 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Call the backend API for technicians
+    // Call the backend API for bays
     const response = await fetch(
-      `${process.env.BACKEND_URL}/api/technicians?garageId=${garageId}`,
+      `${process.env.BACKEND_URL}/api/garages/${garageId}/bays`,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -31,15 +25,15 @@ export async function GET(request: Request) {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch technicians");
+      throw new Error("Failed to fetch bays");
     }
 
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error fetching technicians:", error);
+    console.error("Error fetching bays:", error);
     return NextResponse.json(
-      { error: "Failed to fetch technicians" },
+      { error: "Failed to fetch bays" },
       { status: 500 }
     );
   }
