@@ -33,9 +33,9 @@ export default function AuthenticatedLayout({
   }, [user, router]);
 
   // Prevent any rendering until we know the auth state
-  if (isLoading || !user) {
-    return null;
-  }
+  // if (isLoading || !user) {
+  //   return null;
+  // }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
