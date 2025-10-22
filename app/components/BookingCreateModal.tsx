@@ -10,64 +10,28 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select"; // Commented out - using HTML select for time picker
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { addDays, startOfDay, format, isBefore } from "date-fns";
-// import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { startOfDay, format, isBefore } from "date-fns";
 import { toast } from "sonner";
 import { useGarageStore } from "@/store/garage";
 import { useBookingDemo } from "@/hooks/useBookingDemo";
-// import { SlotList } from "./SlotList"; // Commented out - no slot selection for now
+import { useBookingStore } from "@/store/booking";
+import { useJobSheetStore } from "@/store/jobSheet";
 import { ServiceDropdown } from "./booking/ServiceDropdown";
 import { BayDropdown } from "./booking/BayDropdown";
 import { TechnicianDropdown } from "./booking/TechnicianDropdown";
 import { BookingTimeline } from "./booking/BookingTimeline";
-import type { Service } from "@/store/booking";
+import type { StoreService } from "@/store/booking";
 
 interface BookingCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBookingCreated?: () => void;
 }
-
-// Update Slot type to match new API schema - COMMENTED OUT FOR NOW
-// type SlotService = {
-//   service: {
-//     id: string;
-//     name: string;
-//     duration: number;
-//   };
-//   technician: {
-//     id: string;
-//     firstName: string;
-//     lastName: string;
-//     email: string;
-//   };
-//   startTime: string;
-//   endTime: string;
-// };
-
-// interface Slot { // Commented out - no slot selection for now
-//   bay: {
-//     id: string;
-//     name: string;
-//   };
-//   services: SlotService[];
-//   date: string;
-//   isAvailable: boolean;
-// }
-
-// Remove these interfaces as they're now imported from the store
 
 export const BookingCreateModal = ({
   isOpen,
@@ -93,24 +57,20 @@ export const BookingCreateModal = ({
   const [notes, setNotes] = useState("");
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
-  // const [slots, setSlots] = useState<Slot[]>([]); // Commented out - no slot selection for now
-  // const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(
-  //   null
-  // );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Services state
-  const [selectedServices, setSelectedServices] = useState<Service[]>([]);
+  const [selectedServices, setSelectedServices] = useState<StoreService[]>([]);
 
   // New state for bay and technician
   const [selectedBay, setSelectedBay] = useState<string>("");
   const [selectedTechnician, setSelectedTechnician] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string>("");
 
-  // Set default date to tomorrow when modal opens
+  // Set default date to today when modal opens
   useEffect(() => {
     if (isOpen) {
-      setDate(addDays(startOfDay(new Date()), 1));
+      setDate(startOfDay(new Date()));
       setSelectedBay("");
       setSelectedTechnician("");
     }
@@ -121,108 +81,6 @@ export const BookingCreateModal = ({
     selectedBay && date
       ? getBookingsForBayAndDate(selectedBay, format(date, "yyyy-MM-dd"))
       : [];
-
-  // Generate static available slots when all required fields are selected
-  useEffect(() => {
-    if (
-      !selectedServices.length ||
-      !date ||
-      !selectedBay ||
-      !selectedTechnician
-    ) {
-      // setSlots([]); // Commented out - no slot selection for now
-      // setSelectedSlotIndex(null);
-      return;
-    }
-
-    // Generate static slots for demonstration - COMMENTED OUT FOR NOW
-    /*
-    const generateStaticSlots = () => {
-      const dateStr = format(date, "yyyy-MM-dd");
-      const staticSlots: Slot[] = [
-        {
-          bay: { id: selectedBay, name: `Bay ${selectedBay.split("-")[1]}` },
-          services: selectedServices.map((service) => ({
-            service: {
-              id: service.id,
-              name: service.name,
-              duration: 30, // Fixed 30 minutes
-            },
-            technician: {
-              id: selectedTechnician,
-              firstName:
-                technicians.find((t) => t.id === selectedTechnician)
-                  ?.firstName || "Unknown",
-              lastName:
-                technicians.find((t) => t.id === selectedTechnician)
-                  ?.lastName || "Technician",
-              email: "tech@example.com",
-            },
-            startTime: `${dateStr}T09:00:00`,
-            endTime: `${dateStr}T09:30:00`,
-          })),
-          date: dateStr,
-          isAvailable: true,
-        },
-        {
-          bay: { id: selectedBay, name: `Bay ${selectedBay.split("-")[1]}` },
-          services: selectedServices.map((service) => ({
-            service: {
-              id: service.id,
-              name: service.name,
-              duration: 30,
-            },
-            technician: {
-              id: selectedTechnician,
-              firstName:
-                technicians.find((t) => t.id === selectedTechnician)
-                  ?.firstName || "Unknown",
-              lastName:
-                technicians.find((t) => t.id === selectedTechnician)
-                  ?.lastName || "Technician",
-              email: "tech@example.com",
-            },
-            startTime: `${dateStr}T10:00:00`,
-            endTime: `${dateStr}T10:30:00`,
-          })),
-          date: dateStr,
-          isAvailable: true,
-        },
-        {
-          bay: { id: selectedBay, name: `Bay ${selectedBay.split("-")[1]}` },
-          services: selectedServices.map((service) => ({
-            service: {
-              id: service.id,
-              name: service.name,
-              duration: 30,
-            },
-            technician: {
-              id: selectedTechnician,
-              firstName:
-                technicians.find((t) => t.id === selectedTechnician)
-                  ?.firstName || "Unknown",
-              lastName:
-                technicians.find((t) => t.id === selectedTechnician)
-                  ?.lastName || "Technician",
-              email: "tech@example.com",
-            },
-            startTime: `${dateStr}T11:00:00`,
-            endTime: `${dateStr}T11:30:00`,
-          })),
-          date: dateStr,
-          isAvailable: true,
-        },
-      ];
-      return staticSlots;
-    };
-    */
-
-    // const staticSlots = generateStaticSlots(); // Commented out - no slot selection for now
-    // setSlots(staticSlots);
-    // setSelectedSlotIndex(null);
-  }, [selectedServices, date, selectedBay, selectedTechnician, technicians]);
-
-  // API functions removed - now using Zustand store
 
   // Add validation function
   const isFormValid = () => {
@@ -239,7 +97,6 @@ export const BookingCreateModal = ({
       selectedTechnician !== "" &&
       date !== undefined &&
       selectedTime !== ""
-      // selectedSlotIndex !== null // Commented out - no slot selection for now
     );
   };
 
@@ -255,67 +112,55 @@ export const BookingCreateModal = ({
     setDate(undefined);
     setSelectedTime("");
     setNotes("");
-    // setSlots([]); // Commented out - no slot selection for now
-    // setSelectedSlotIndex(null);
     setSelectedServices([]);
     setSelectedBay("");
     setSelectedTechnician("");
     setIsDatePopoverOpen(false);
   };
 
-  // For now, just close on submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Commented out slot validation for now
-    // if (selectedSlotIndex === null || !slots[selectedSlotIndex]) {
-    //   toast.error("Could not find selected slot details.");
-    //   return;
-    // }
-    // const slotObj = slots[selectedSlotIndex];
-
     try {
-      // Create booking data in the backend API format
-      const bookingData = {
-        date: date ? format(date, "yyyy-MM-dd") : "",
+      setIsSubmitting(true);
+
+      const bookingStore = useBookingStore.getState();
+      const jobSheetStore = useJobSheetStore.getState();
+
+      const dateStr = date ? format(date, "yyyy-MM-dd") : "";
+
+      // Create booking in store (computes endTime)
+      const booking = bookingStore.createBooking({
         customer: {
-          firstName: customerName.split(" ")[0] || customerName,
-          lastName: customerName.split(" ").slice(1).join(" ") || "",
-          email: customerEmail,
+          name: customerName,
           phone: customerPhone,
+          email: customerEmail,
         },
         vehicle: {
           make: carMake,
           model: carModel,
           year: parseInt(carYear),
-          licensePlate: carRegistration,
+          license: carRegistration,
           vin: "", // Optional field
         },
         services: selectedServices.map((service) => ({
           serviceId: service.id,
-          technicianId: selectedTechnician,
-          bayId: selectedBay,
-          startTime: selectedTime
-            ? `${date ? format(date, "yyyy-MM-dd") : ""}T${selectedTime}:00`
-            : "",
-          endTime: selectedTime
-            ? `${date ? format(date, "yyyy-MM-dd") : ""}T${selectedTime}:00`
-            : "", // Will be calculated as +30 minutes
-          status: "pending",
-          notes: notes || "",
+          name: service.name,
+          description: service.name, // Use name as description for now
+          duration: service.duration,
+          price: service.price,
         })),
+        bayId: selectedBay,
+        technicianId: selectedTechnician,
+        startTimeHHMM: selectedTime,
+        date: dateStr,
         notes: notes,
-      };
+      });
 
-      console.log("Creating booking with data:", bookingData);
+      // Create linked jobsheet
+      jobSheetStore.createFromBooking(booking._id);
 
-      setIsSubmitting(true);
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // For demo purposes, just show success
-      toast.success("Booking created successfully! (Demo mode - no API call)");
+      toast.success("Booking created successfully!");
       resetForm();
       onBookingCreated?.();
       onClose();
@@ -599,23 +444,6 @@ export const BookingCreateModal = ({
                 </div>
               </div>
             </div>
-
-            {/* Available Slots Section - COMMENTED OUT FOR NOW */}
-            {/* {slots.length > 0 && (
-              <div className="mt-6 pt-4 border-t">
-                <h3 className="text-sm font-semibold mb-2">Available Slots</h3>
-                <SlotList
-                  slots={slots}
-                  selectedSlotIndex={selectedSlotIndex}
-                  setSelectedSlotIndex={setSelectedSlotIndex}
-                />
-                {selectedSlotIndex === null && slots.length > 0 && (
-                  <div className="text-xs text-red-500 mt-1">
-                    Please select a slot to continue.
-                  </div>
-                )}
-              </div>
-            )} */}
 
             <DialogFooter className="flex justify-end gap-2 mt-6 pt-4 border-t bg-white">
               <Button

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -25,73 +25,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useJobSheetStore, JobSheet as StoreJobSheet } from "@/store/jobSheet";
+import { useBookingStore } from "@/store/booking";
+import { format } from "date-fns";
 
-interface JobSheetService {
-  _id: string;
-  name: string;
-  description: string;
-  cost: number;
-  laborHours: number;
-  status: string;
-  startedAt: string | null;
-  completedAt: string | null;
-  notes: string | null;
-}
-
-interface JobSheet {
-  _id: string;
-  jobSheetId: string;
-  booking: {
-    _id: string;
-    bookingId: string;
-    customer: {
-      name: string;
-      phone: string;
-      email: string;
-    };
-    vehicle: {
-      make: string;
-      model: string;
-      year: number;
-      license: string;
-      vin: string;
-    };
-  };
-  services: JobSheetService[];
-  parts: Array<{
-    _id: string;
-    name: string;
-    description?: string;
-    cost?: number;
-    quantity?: number;
-  }>;
-  laborRate: number;
-  totalCost: number;
-  status: string;
-  garage_id: {
-    _id: string;
-    name: string;
-    address: {
-      street: string;
-      city: string;
-      state: string;
-      zipCode: string;
-      country: string;
-    };
-  };
-  assignedTo: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    role: string;
-  };
-  notes: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
+// Removed old JobSheet interface - using StoreJobSheet from store
 
 interface PaginationInfo {
   currentPage: number;
@@ -109,51 +47,61 @@ interface FilterState {
   sortOrder: "asc" | "desc";
 }
 
-interface FilterOptions {
-  statuses: Array<{ value: string; label: string }>;
-  serviceStatuses: Array<{ value: string; label: string }>;
-  technicians: Array<{ id: string; name: string }>;
-  // ...add others as needed
-}
+// interface FilterOptions {
+//   statuses: Array<{ value: string; label: string }>;
+//   serviceStatuses: Array<{ value: string; label: string }>;
+//   technicians: Array<{ id: string; name: string }>;
+//   // ...add others as needed
+// }
 
-const formatTime = (time: string) => {
-  try {
-    const [hours, minutes] = time.split(":");
-    return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
-  } catch {
-    return time; // Return original if parsing fails
-  }
-};
+// const formatTime = (time: string) => {
+//   try {
+//     const [hours, minutes] = time.split(":");
+//     return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
+//   } catch {
+//     return time; // Return original if parsing fails
+//   }
+// };
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-};
+// const formatDate = (dateString: string) => {
+//   const date = new Date(dateString);
+//   return date.toLocaleDateString("en-US", {
+//     month: "long",
+//     day: "numeric",
+//     year: "numeric",
+//   });
+// };
 
 export default function JobSheetPage() {
-  const [jobSheets, setJobSheets] = useState<JobSheet[]>([]);
-  const [selectedJobSheet, setSelectedJobSheet] = useState<JobSheet | null>(
-    null
-  );
+  const [jobSheets, setJobSheets] = useState<StoreJobSheet[]>([]);
+  const [selectedJobSheet, setSelectedJobSheet] =
+    useState<StoreJobSheet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    statuses: [],
-    serviceStatuses: [],
-    technicians: [],
-  });
   const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
     itemsPerPage: 10,
   });
+
+  // Get jobsheets and bookings from stores separately
+  const storeJobSheets = useJobSheetStore((state) => state.jobSheets);
+  const bookings = useBookingStore((state) => state.bookings);
+  const filterOptions = useJobSheetStore((state) => state.filterOptions);
+
+  // Combine jobsheets with booking data using useMemo for stable reference
+  const jobSheetsWithBookings = useMemo(() => {
+    return storeJobSheets.map((jobSheet) => {
+      const booking = bookings.find((b) => b._id === jobSheet.bookingId);
+      return {
+        ...jobSheet,
+        booking,
+      };
+    });
+  }, [storeJobSheets, bookings]);
 
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
@@ -172,52 +120,62 @@ export default function JobSheetPage() {
   };
 
   const fetchJobSheets = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+    setIsLoading(true);
+    setError(null);
 
-      // Build query parameters
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: "10",
-        sortBy: filters.sortBy,
-        sortOrder: filters.sortOrder,
-      });
+    // Use store data instead of API
+    const all = jobSheetsWithBookings || [];
 
-      // Add status filter if not "all"
-      if (filters.status !== "all") {
-        params.append("status", filters.status);
+    // Apply filters
+    const filtered = all.filter((js) => {
+      const statusOk = filters.status === "all" || js.status === filters.status;
+
+      const bookingIdOk =
+        !filters.bookingId ||
+        (js.booking?.bookingId
+          ?.toLowerCase()
+          .includes(filters.bookingId.toLowerCase()) ??
+          false);
+
+      const technicianOk =
+        !filters.technicianId ||
+        (js.booking?.services?.some(
+          (s) => s.technicianId?._id === filters.technicianId
+        ) ??
+          false);
+
+      return statusOk && bookingIdOk && technicianOk;
+    });
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      const dir = filters.sortOrder === "asc" ? 1 : -1;
+      if (filters.sortBy === "id") {
+        return a.id.localeCompare(b.id) * dir;
       }
-
-      // Add booking ID filter if exists
-      if (filters.bookingId) {
-        params.append("bookingId", filters.bookingId);
+      if (filters.sortBy === "status") {
+        return a.status.localeCompare(b.status) * dir;
       }
+      // Default: sort by creation date (latest first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
-      // Add technician ID filter if exists
-      if (filters.technicianId) {
-        params.append("technicianId", filters.technicianId);
-      }
+    // Apply pagination
+    const itemsPerPage = 10;
+    const totalItems = sorted.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+    const start = (currentPage - 1) * itemsPerPage;
+    const pageData = sorted.slice(start, start + itemsPerPage);
 
-      const response = await fetch(`/api/job-sheets?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch job sheets");
-      }
-      const data = await response.json();
-
-      setJobSheets(data.data.jobSheets);
-      setPaginationInfo(data.data.pagination);
-      setFilterOptions({
-        statuses: data.data.filters.options.statuses || [],
-        serviceStatuses: data.data.filters.options.serviceStatuses || [],
-        technicians: data.data.filters.options.technicians || [],
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentPage, filters]);
+    setJobSheets(pageData);
+    setPaginationInfo({
+      currentPage,
+      totalPages,
+      totalItems,
+      itemsPerPage,
+    });
+    setIsLoading(false);
+  }, [currentPage, filters, jobSheetsWithBookings]);
 
   useEffect(() => {
     fetchJobSheets();
@@ -251,7 +209,7 @@ export default function JobSheetPage() {
     }));
   };
 
-  const handleJobSheetClick = (jobSheet: JobSheet) => {
+  const handleJobSheetClick = (jobSheet: StoreJobSheet) => {
     setSelectedJobSheet(jobSheet);
   };
 
@@ -725,86 +683,106 @@ export default function JobSheetPage() {
             ) : (
               jobSheets.map((jobSheet) => (
                 <tr
-                  key={jobSheet._id}
+                  key={jobSheet.id}
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => handleJobSheetClick(jobSheet)}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {jobSheet.jobSheetId}
+                    {jobSheet.id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.booking.bookingId}
+                    {jobSheet.booking?.bookingId || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.booking.bookingId
-                      ? formatDate(jobSheet.booking.bookingId)
+                    {jobSheet.booking?.bookingDate
+                      ? format(
+                          new Date(jobSheet.booking.bookingDate),
+                          "MMM dd, yyyy"
+                        )
                       : "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.booking.bookingId
-                      ? `${formatTime(
-                          jobSheet.booking.bookingId
-                        )} - ${formatTime(jobSheet.booking.bookingId)}`
+                    {jobSheet.booking?.services &&
+                    jobSheet.booking.services.length > 0
+                      ? (() => {
+                          const sorted = [...jobSheet.booking.services].sort(
+                            (a, b) =>
+                              new Date(a.startTime).getTime() -
+                              new Date(b.startTime).getTime()
+                          );
+                          const first = sorted[0];
+                          const last = sorted[sorted.length - 1];
+                          const start = new Date(
+                            first.startTime
+                          ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          });
+                          const end = new Date(last.endTime).toLocaleTimeString(
+                            [],
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          );
+                          return `${start} - ${end}`;
+                        })()
                       : "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.booking.bookingId
-                      ? `Bay ${jobSheet.booking.bookingId}`
+                    {jobSheet.booking?.services &&
+                    jobSheet.booking.services.length > 0
+                      ? [
+                          ...new Set(
+                            jobSheet.booking.services.map((s) => s.bayId)
+                          ),
+                        ].join(", ")
                       : "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.assignedTo.firstName}{" "}
-                    {jobSheet.assignedTo.lastName}
+                    {jobSheet.booking?.services &&
+                    jobSheet.booking.services.length > 0
+                      ? (() => {
+                          const technicians = jobSheet.booking.services
+                            .map((s) => {
+                              if (
+                                typeof s.technicianId === "object" &&
+                                s.technicianId
+                              ) {
+                                return `${s.technicianId.firstName} ${s.technicianId.lastName}`;
+                              }
+                              return s.technicianId || "Not assigned";
+                            })
+                            .filter(
+                              (tech, index, arr) => arr.indexOf(tech) === index
+                            );
+                          return technicians.join(", ");
+                        })()
+                      : "N/A"}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     <div className="space-y-1">
-                      {jobSheet.services.map((service) => (
+                      {jobSheet.booking?.services?.map((service) => (
                         <div
                           key={service._id}
-                          className={cn(
-                            "text-xs px-2 py-1 rounded-full inline-block mr-1",
-                            service.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : service.status === "in-progress"
-                              ? "bg-amber-100 text-amber-800"
-                              : service.status === "draft"
-                              ? "bg-gray-100 text-gray-800"
-                              : "bg-blue-100 text-blue-800"
-                          )}
-                          title={
-                            (service.startedAt
-                              ? `Started: ${service.startedAt}\n`
-                              : "") +
-                            (service.completedAt
-                              ? `Completed: ${service.completedAt}`
-                              : "")
-                          }
+                          className="text-xs px-2 py-1 rounded-full inline-block mr-1 bg-blue-100 text-blue-800"
                         >
-                          {service.name}{" "}
-                          <span className="ml-1">
-                            [
-                            {filterOptions.serviceStatuses.find(
-                              (s) => s.value === service.status
-                            )?.label || service.status}
-                            ]
-                          </span>
+                          {service.name}
                         </div>
-                      ))}
+                      )) || "No services"}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={cn(
                         "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                        jobSheet.status === "completed" &&
+                        jobSheet.status === "COMPLETED" &&
                           "bg-green-100 text-green-800",
-                        jobSheet.status === "in-progress" &&
+                        jobSheet.status === "IN_PROGRESS" &&
                           "bg-amber-100 text-amber-800",
-                        jobSheet.status === "draft" &&
-                          "bg-gray-100 text-gray-800",
-                        jobSheet.status === "active" &&
+                        jobSheet.status === "PENDING" &&
                           "bg-blue-100 text-blue-800",
-                        jobSheet.status === "cancelled" &&
+                        jobSheet.status === "CANCELLED" &&
                           "bg-red-100 text-red-800"
                       )}
                     >
@@ -828,7 +806,7 @@ export default function JobSheetPage() {
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>
-              Job Sheet Details - {selectedJobSheet?.jobSheetId}
+              Job Sheet Details - {selectedJobSheet?.id}
             </DialogTitle>
           </DialogHeader>
 
@@ -840,15 +818,34 @@ export default function JobSheetPage() {
                   <h3 className="text-sm font-medium text-gray-500">
                     Booking ID
                   </h3>
-                  <p className="mt-1">{selectedJobSheet.booking.bookingId}</p>
+                  <p className="mt-1">
+                    {selectedJobSheet.booking?.bookingId || "N/A"}
+                  </p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">
                     Technician
                   </h3>
                   <p className="mt-1">
-                    {selectedJobSheet.assignedTo.firstName}{" "}
-                    {selectedJobSheet.assignedTo.lastName}
+                    {selectedJobSheet.booking?.services &&
+                    selectedJobSheet.booking.services.length > 0
+                      ? (() => {
+                          const technicians = selectedJobSheet.booking.services
+                            .map((s) => {
+                              if (
+                                typeof s.technicianId === "object" &&
+                                s.technicianId
+                              ) {
+                                return `${s.technicianId.firstName} ${s.technicianId.lastName}`;
+                              }
+                              return s.technicianId || "Not assigned";
+                            })
+                            .filter(
+                              (tech, index, arr) => arr.indexOf(tech) === index
+                            );
+                          return technicians.join(", ");
+                        })()
+                      : "N/A"}
                   </p>
                 </div>
                 <div>
@@ -856,16 +853,26 @@ export default function JobSheetPage() {
                     Date & Time
                   </h3>
                   <p className="mt-1">
-                    {selectedJobSheet.booking.bookingId
-                      ? `${formatDate(selectedJobSheet.booking.bookingId)}`
+                    {selectedJobSheet.booking?.bookingDate
+                      ? format(
+                          new Date(selectedJobSheet.booking.bookingDate),
+                          "MMM dd, yyyy"
+                        )
                       : "N/A"}
                   </p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Bay</h3>
                   <p className="mt-1">
-                    {selectedJobSheet.booking.bookingId
-                      ? `Bay ${selectedJobSheet.booking.bookingId}`
+                    {selectedJobSheet.booking?.services &&
+                    selectedJobSheet.booking.services.length > 0
+                      ? [
+                          ...new Set(
+                            selectedJobSheet.booking.services.map(
+                              (s) => s.bayId
+                            )
+                          ),
+                        ].join(", ")
                       : "N/A"}
                   </p>
                 </div>
@@ -877,72 +884,50 @@ export default function JobSheetPage() {
                   Tasks
                 </h3>
                 <div className="space-y-2">
-                  {selectedJobSheet.services.map((service) => (
+                  {selectedJobSheet.booking?.services?.map((service) => (
                     <div
                       key={service._id}
-                      className={cn(
-                        "text-sm px-3 py-2 rounded-md",
-                        service.status === "completed"
-                          ? "bg-green-50 text-green-800"
-                          : service.status === "in-progress"
-                          ? "bg-amber-50 text-amber-800"
-                          : service.status === "draft"
-                          ? "bg-gray-50 text-gray-800"
-                          : "bg-blue-50 text-blue-800"
-                      )}
+                      className="text-sm px-3 py-2 rounded-md bg-blue-50 text-blue-800"
                     >
                       <div className="flex items-center justify-between">
                         <span>{service.name}</span>
                         <span className="ml-2 text-xs font-semibold">
-                          [
-                          {filterOptions.serviceStatuses.find(
-                            (s) => s.value === service.status
-                          )?.label || service.status}
-                          ]
+                          [{service.status}]
                         </span>
                       </div>
-                      {service.startedAt && (
-                        <div className="text-xs text-gray-500">
-                          Started: {service.startedAt}
-                        </div>
-                      )}
-                      {service.completedAt && (
-                        <div className="text-xs text-gray-500">
-                          Completed: {service.completedAt}
-                        </div>
-                      )}
-                      {service.notes && (
-                        <div className="text-xs text-gray-500">
-                          Notes: {service.notes}
-                        </div>
-                      )}
+                      <div className="text-xs text-gray-500">
+                        Duration: {service.duration} min
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Price: £{service.price}
+                      </div>
                     </div>
-                  ))}
+                  )) || (
+                    <p className="text-sm text-gray-400 italic">No services</p>
+                  )}
                 </div>
               </div>
 
-              {/* Parts Used */}
+              {/* Customer & Vehicle Info */}
               <div>
                 <h3 className="text-sm font-medium text-gray-500 mb-2">
-                  Parts Used
+                  Customer & Vehicle
                 </h3>
-                {selectedJobSheet.parts.length === 0 ? (
-                  <p className="text-sm text-gray-400 italic">NO PARTS USED</p>
-                ) : (
-                  <div className="space-y-2">
-                    {selectedJobSheet.parts.map((part) => (
-                      <div
-                        key={part._id}
-                        className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-md"
-                      >
-                        <span className="text-sm">{part.name}</span>
-                        <span className="text-sm text-gray-500">
-                          Qty: {part.quantity}
-                        </span>
-                      </div>
-                    ))}
+                <div className="bg-gray-50 px-3 py-2 rounded-md">
+                  <div className="text-sm">
+                    <strong>
+                      {selectedJobSheet.booking?.customer?.name || "N/A"}
+                    </strong>
                   </div>
-                )}
+                  <div className="text-xs text-gray-500">
+                    {selectedJobSheet.booking?.customer?.email || "No email"}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {selectedJobSheet.booking?.vehicle?.make || "Unknown"}{" "}
+                    {selectedJobSheet.booking?.vehicle?.model || "Vehicle"} (
+                    {selectedJobSheet.booking?.vehicle?.year || "N/A"})
+                  </div>
+                </div>
               </div>
 
               {/* Status */}
@@ -953,15 +938,13 @@ export default function JobSheetPage() {
                 <span
                   className={cn(
                     "px-3 py-1 text-sm font-medium rounded-full",
-                    selectedJobSheet.status === "completed" &&
+                    selectedJobSheet.status === "COMPLETED" &&
                       "bg-green-100 text-green-800",
-                    selectedJobSheet.status === "in-progress" &&
+                    selectedJobSheet.status === "IN_PROGRESS" &&
                       "bg-amber-100 text-amber-800",
-                    selectedJobSheet.status === "draft" &&
-                      "bg-gray-100 text-gray-800",
-                    selectedJobSheet.status === "active" &&
+                    selectedJobSheet.status === "PENDING" &&
                       "bg-blue-100 text-blue-800",
-                    selectedJobSheet.status === "cancelled" &&
+                    selectedJobSheet.status === "CANCELLED" &&
                       "bg-red-100 text-red-800"
                   )}
                 >

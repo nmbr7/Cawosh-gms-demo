@@ -1,6 +1,6 @@
 import React from "react";
 import { BookedSlotCard } from "./BookedSlotCard";
-import type { Booking } from "@/store/booking";
+import type { Booking, Service } from "@/types/booking";
 
 interface BookingTimelineProps {
   bayId: string;
@@ -56,9 +56,12 @@ const findBookingAtTime = (
 
   return (
     bookings.find((booking) => {
-      const bookingStart = new Date(booking.startTime);
-      const bookingTime = bookingStart.toTimeString().slice(0, 5);
-      return bookingTime === timeStr;
+      // Check if any service in the booking matches the time
+      return booking.services.some((service: Service) => {
+        const serviceStart = new Date(service.startTime);
+        const serviceTime = serviceStart.toTimeString().slice(0, 5);
+        return serviceTime === timeStr;
+      });
     }) || null
   );
 };

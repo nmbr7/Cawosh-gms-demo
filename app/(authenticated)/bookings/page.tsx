@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Booking, BookingStatus, BookingUtil } from "@/app/models/booking";
+import { Booking as StoreBooking } from "@/types/booking";
+import { BookingStatus, BookingUtil } from "@/app/models/booking";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -23,8 +24,9 @@ import { format } from "date-fns";
 import React from "react";
 import { BookingDetailsModal } from "@/app/components/booking-details-modal";
 import { BookingCreateModal } from "@/app/components/BookingCreateModal";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+// import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { useGarageStore } from "@/store/garage";
+import { useBookingStore } from "@/store/booking";
 import { DataTable } from "@/components/ui/data-table";
 
 interface PaginationInfo {
@@ -46,11 +48,12 @@ interface FilterState {
   endDate: string | null;
   sortBy: string;
   sortOrder: "asc" | "desc";
+  dateFilter: "created" | "booking"; // New filter for date type
 }
 
 export default function BookingsPage() {
   const [selectedBay, setSelectedBay] = useState<number | "all">("all");
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<StoreBooking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,18 +82,22 @@ export default function BookingsPage() {
     endDate: null,
     sortBy: "date",
     sortOrder: "desc",
+    dateFilter: "created", // Default to date created
   });
   const [showFilters, setShowFilters] = useState(false);
 
   // Get garage from store
   const garage = useGarageStore((state) => state.garage);
 
+  // Get bookings from store
+  const storeBookings = useBookingStore((state) => state.bookings);
+
   // Define table columns
   const columns = [
     {
       header: "Booking ID",
-      accessorKey: "bookingId" as keyof Booking,
-      cell: (booking: Booking) => (
+      accessorKey: "bookingId" as keyof StoreBooking,
+      cell: (booking: StoreBooking) => (
         <span className="font-medium text-gray-900">
           {booking.bookingId || booking._id || "N/A"}
         </span>
@@ -98,22 +105,27 @@ export default function BookingsPage() {
     },
     {
       header: "Customer",
-      accessorKey: "customer" as keyof Booking,
-      cell: (booking: Booking) => (
+      accessorKey: "customer" as keyof StoreBooking,
+      cell: (booking: StoreBooking) => (
         <div>
-          <div className="font-medium">{booking.customer.name}</div>
-          <div className="text-xs text-gray-400">{booking.customer.email}</div>
+          <div className="font-medium">
+            {booking.customer?.name || "Unknown Customer"}
+          </div>
+          <div className="text-xs text-gray-400">
+            {booking.customer?.email || "No email"}
+          </div>
         </div>
       ),
     },
     {
       header: "Service & Vehicle",
-      accessorKey: "services" as keyof Booking,
-      cell: (booking: Booking) => (
+      accessorKey: "services" as keyof StoreBooking,
+      cell: (booking: StoreBooking) => (
         <div>
           <div className="font-medium">
-            {booking.vehicle.make} {booking.vehicle.model} (
-            {booking.vehicle.year})
+            {booking.vehicle?.make || "Unknown"}{" "}
+            {booking.vehicle?.model || "Vehicle"} (
+            {booking.vehicle?.year || "N/A"})
           </div>
           <div className="mt-1 text-xs text-gray-400">
             {booking.services && booking.services.length
@@ -134,10 +146,10 @@ export default function BookingsPage() {
     },
     {
       header: "Date",
-      accessorKey: "bookingDate" as keyof Booking,
-      cell: (booking: Booking) => {
+      accessorKey: "bookingDate" as keyof StoreBooking,
+      cell: (booking: StoreBooking) => {
         try {
-          const date = new Date(booking.bookingDate);
+          const date = new Date(booking.bookingDate || "");
           if (isNaN(date.getTime())) {
             return <span className="text-red-500">Invalid Date</span>;
           }
@@ -149,20 +161,21 @@ export default function BookingsPage() {
     },
     {
       header: "Time",
-      accessorKey: "services" as keyof Booking,
-      cell: (booking: Booking) => {
+      accessorKey: "services" as keyof StoreBooking,
+      cell: (booking: StoreBooking) => {
         if (!booking.services || booking.services.length === 0) return "N/A";
         const sorted = [...booking.services].sort(
           (a, b) =>
-            new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+            new Date(a.startTime || 0).getTime() -
+            new Date(b.startTime || 0).getTime()
         );
         const first = sorted[0];
         const last = sorted[sorted.length - 1];
-        const start = new Date(first.startTime).toLocaleTimeString([], {
+        const start = new Date(first.startTime || 0).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         });
-        const end = new Date(last.endTime).toLocaleTimeString([], {
+        const end = new Date(last.endTime || 0).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         });
@@ -171,26 +184,28 @@ export default function BookingsPage() {
     },
     {
       header: "Bay",
-      accessorKey: "services" as keyof Booking,
-      cell: (booking: Booking) => {
+      accessorKey: "services" as keyof StoreBooking,
+      cell: (booking: StoreBooking) => {
         if (!booking.services?.length) return "";
         // Get unique bay IDs from all services
         const uniqueBays = [
-          ...new Set(booking.services.map((svc) => svc.bayId)),
+          ...new Set(booking.services.map((svc) => svc.bayId || "Unknown")),
         ];
         return uniqueBays.join(", ");
       },
     },
     {
       header: "Technician",
-      accessorKey: "services" as keyof Booking,
-      cell: (booking: Booking) => {
+      accessorKey: "services" as keyof StoreBooking,
+      cell: (booking: StoreBooking) => {
         if (!booking.services?.length) return "";
         // Get unique technicians from all services
         const technicians = booking.services
           .map((svc) => {
             if (typeof svc.technicianId === "object" && svc.technicianId) {
-              return `${svc.technicianId.firstName} ${svc.technicianId.lastName}`;
+              return `${svc.technicianId.firstName || "Unknown"} ${
+                svc.technicianId.lastName || "Technician"
+              }`;
             }
             return svc.technicianId || "Not assigned";
           })
@@ -200,16 +215,16 @@ export default function BookingsPage() {
     },
     {
       header: "Status",
-      accessorKey: "status" as keyof Booking,
-      cell: (booking: Booking) => {
+      accessorKey: "status" as keyof StoreBooking,
+      cell: (booking: StoreBooking) => {
         return (
           <span
             className={cn(
               "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-              BookingUtil.getStatusColor(booking.status)
+              BookingUtil.getStatusColor(booking.status || "pending")
             )}
           >
-            {booking.status}
+            {booking.status || "pending"}
           </span>
         );
       },
@@ -217,80 +232,178 @@ export default function BookingsPage() {
   ];
 
   const fetchBookings = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
+    // try {
+    //   setIsLoading(true);
+    //   setError(null);
 
-      // Check if garage is available
-      if (!garage?.id) {
-        setError("Garage information not available");
-        return;
+    //   // Check if garage is available
+    //   if (!garage?.id) {
+    //     setError("Garage information not available");
+    //     return;
+    //   }
+
+    //   // Build query parameters
+    //   const params = new URLSearchParams({
+    //     garageId: garage.id,
+    //     page: currentPage.toString(),
+    //     limit: "10",
+    //     sortBy: filters.sortBy,
+    //     sortOrder: filters.sortOrder,
+    //   });
+
+    //   // Add bay filter if selected
+    //   if (selectedBay !== "all") {
+    //     params.append("bay", selectedBay.toString());
+    //   }
+
+    //   // Add status filter if not "all"
+    //   if (filters.status !== "all") {
+    //     params.append("status", filters.status);
+    //   }
+
+    //   // Add service status filter if exists
+    //   if (filters.serviceStatus) {
+    //     params.append("serviceStatus", filters.serviceStatus);
+    //   }
+
+    //   // Add price range filters if exist
+    //   if (filters.minPrice) {
+    //     params.append("minPrice", filters.minPrice);
+    //   }
+    //   if (filters.maxPrice) {
+    //     params.append("maxPrice", filters.maxPrice);
+    //   }
+
+    //   // Add date range filters if exist
+    //   if (filters.startDate) {
+    //     params.append("startDate", filters.startDate);
+    //   }
+    //   if (filters.endDate) {
+    //     params.append("endDate", filters.endDate);
+    //   }
+
+    //   // console.log("API Request:", Object.fromEntries(params));
+
+    //   const response = await fetchWithAuth(
+    //     `/api/bookings?${params.toString()}`
+    //   );
+    //   if (!response.ok) {
+    //     throw new Error("Failed to fetch bookings");
+    //   }
+    //   const data = await response.json();
+    //   // console.log("API Response:", data);
+
+    //   setBookings(data.bookings);
+    //   setPaginationInfo(data.pagination);
+    // } catch (err) {
+    //   setError(err instanceof Error ? err.message : "An error occurred");
+    // } finally {
+    //   setIsLoading(false);
+    // }
+
+    setIsLoading(true);
+    setError(null);
+
+    // source: store
+    const all = storeBookings || [];
+
+    // filters
+    const filtered = all.filter((b) => {
+      const bayOk =
+        selectedBay === "all" ||
+        (b.services?.some((s) => s.bayId?.endsWith(String(selectedBay))) ??
+          false);
+
+      const statusOk = filters.status === "all" || b.status === filters.status;
+
+      const customerOk =
+        !filters.customerName ||
+        b.customer?.name
+          ?.toLowerCase()
+          .includes(filters.customerName.toLowerCase());
+
+      const serviceOk =
+        !filters.serviceId ||
+        (b.services?.some((s) =>
+          s.name?.toLowerCase().includes(filters.serviceId!.toLowerCase())
+        ) ??
+          false);
+
+      // optional date range
+      const date = new Date(b.bookingDate);
+      const startOk = !filters.startDate || date >= new Date(filters.startDate);
+      const endOk = !filters.endDate || date <= new Date(filters.endDate);
+
+      return bayOk && statusOk && customerOk && serviceOk && startOk && endOk;
+    });
+
+    // sort
+    const sorted = [...filtered].sort((a, b) => {
+      const dir = filters.sortOrder === "asc" ? 1 : -1;
+
+      if (filters.sortBy === "date") {
+        if (filters.dateFilter === "created") {
+          // Sort by creation date (latest first by default)
+          if (filters.sortOrder === "desc") {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          } else {
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
+          }
+        } else {
+          // Sort by booking date (upcoming first by default)
+          if (filters.sortOrder === "desc") {
+            return (
+              new Date(a.bookingDate).getTime() -
+              new Date(b.bookingDate).getTime()
+            );
+          } else {
+            return (
+              new Date(b.bookingDate).getTime() -
+              new Date(a.bookingDate).getTime()
+            );
+          }
+        }
       }
 
-      // Build query parameters
-      const params = new URLSearchParams({
-        garageId: garage.id,
-        page: currentPage.toString(),
-        limit: "10",
-        sortBy: filters.sortBy,
-        sortOrder: filters.sortOrder,
-      });
-
-      // Add bay filter if selected
-      if (selectedBay !== "all") {
-        params.append("bay", selectedBay.toString());
+      if (filters.sortBy === "customerName") {
+        return a.customer?.name?.localeCompare(b.customer?.name || "") * dir;
+      }
+      if (filters.sortBy === "serviceId") {
+        const an = a.services?.[0]?.name || "";
+        const bn = b.services?.[0]?.name || "";
+        return an.localeCompare(bn) * dir;
       }
 
-      // Add status filter if not "all"
-      if (filters.status !== "all") {
-        params.append("status", filters.status);
-      }
+      // Default: sort by creation date (latest first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
-      // Add service status filter if exists
-      if (filters.serviceStatus) {
-        params.append("serviceStatus", filters.serviceStatus);
-      }
+    // pagination
+    const itemsPerPage = 10;
+    const totalItems = sorted.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+    const start = (currentPage - 1) * itemsPerPage;
+    const pageData = sorted.slice(start, start + itemsPerPage);
 
-      // Add price range filters if exist
-      if (filters.minPrice) {
-        params.append("minPrice", filters.minPrice);
-      }
-      if (filters.maxPrice) {
-        params.append("maxPrice", filters.maxPrice);
-      }
-
-      // Add date range filters if exist
-      if (filters.startDate) {
-        params.append("startDate", filters.startDate);
-      }
-      if (filters.endDate) {
-        params.append("endDate", filters.endDate);
-      }
-
-      // console.log("API Request:", Object.fromEntries(params));
-
-      const response = await fetchWithAuth(
-        `/api/bookings?${params.toString()}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch bookings");
-      }
-      const data = await response.json();
-      // console.log("API Response:", data);
-
-      setBookings(data.bookings);
-      setPaginationInfo(data.pagination);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+    // set state
+    setBookings(pageData);
+    setPaginationInfo({
+      currentPage,
+      totalPages,
+      totalItems,
+      itemsPerPage,
+    });
+    setIsLoading(false);
   };
 
   useEffect(() => {
     fetchBookings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, selectedBay, filters, garage?.id]);
+  }, [storeBookings, currentPage, selectedBay, filters, garage?.id]);
 
   const handleFilterChange = (key: keyof FilterState, value: string | null) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -315,67 +428,7 @@ export default function BookingsPage() {
   const handleRefresh = async () => {
     try {
       setIsRefreshing(true);
-      setError(null);
-      setCurrentPage(1); // Reset to first page
-
-      // Check if garage is available
-      if (!garage?.id) {
-        setError("Garage information not available");
-        return;
-      }
-
-      // Build query parameters
-      const params = new URLSearchParams({
-        garageId: garage.id,
-        page: "1",
-        limit: "10",
-        sortBy: filters.sortBy,
-        sortOrder: filters.sortOrder,
-      });
-
-      // Add bay filter if selected
-      if (selectedBay !== "all") {
-        params.append("bay", selectedBay.toString());
-      }
-
-      // Add status filter if not "all"
-      if (filters.status !== "all") {
-        params.append("status", filters.status);
-      }
-
-      // Add service status filter if exists
-      if (filters.serviceStatus) {
-        params.append("serviceStatus", filters.serviceStatus);
-      }
-
-      // Add price range filters if exist
-      if (filters.minPrice) {
-        params.append("minPrice", filters.minPrice);
-      }
-      if (filters.maxPrice) {
-        params.append("maxPrice", filters.maxPrice);
-      }
-
-      // Add date range filters if exist
-      if (filters.startDate) {
-        params.append("startDate", filters.startDate);
-      }
-      if (filters.endDate) {
-        params.append("endDate", filters.endDate);
-      }
-
-      const response = await fetchWithAuth(
-        `/api/bookings?${params.toString()}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch bookings");
-      }
-      const data = await response.json();
-
-      setBookings(data.bookings);
-      setPaginationInfo(data.pagination);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      await fetchBookings();
     } finally {
       setIsRefreshing(false);
     }
@@ -529,7 +582,7 @@ export default function BookingsPage() {
         {/* Filter panel */}
         {showFilters && (
           <div className="mb-6 p-4 bg-white rounded-lg shadow">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Customer name filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -581,6 +634,34 @@ export default function BookingsPage() {
                     <SelectItem value="in-progress">In Progress</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
                     <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Date filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Sort By Date
+                </label>
+                <Select
+                  value={filters.dateFilter}
+                  onValueChange={(value) =>
+                    handleFilterChange(
+                      "dateFilter",
+                      value as "created" | "booking"
+                    )
+                  }
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Select date type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="created">
+                      Date Created (Latest First)
+                    </SelectItem>
+                    <SelectItem value="booking">
+                      Booking Date (Upcoming First)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -920,6 +1001,7 @@ export default function BookingsPage() {
                     endDate: null,
                     sortBy: "date",
                     sortOrder: "desc",
+                    dateFilter: "created",
                   });
                 },
               }

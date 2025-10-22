@@ -6,12 +6,11 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Booking } from "@/app/models/booking";
+import { Booking } from "@/types/booking";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { BookingDetailsShimmer } from "./BookingDetailsShimmer";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { toast } from "sonner";
+import { useBookingStore } from "@/store/booking";
 
 interface BookingDetailsModalProps {
   bookingId: string | null;
@@ -45,24 +44,18 @@ const getTechnicianName = (technicianId: unknown): string => {
 
   if (typeof technicianId === "object" && technicianId !== null) {
     const tech = technicianId as Record<string, unknown>;
-    console.log("Processing technician object:", tech);
 
     if (tech.firstName && tech.lastName) {
-      const fullName = `${tech.firstName} ${tech.lastName}`;
-      console.log("Found full name:", fullName);
-      return fullName;
+      return `${tech.firstName} ${tech.lastName}`;
     }
     if (tech.name) {
-      console.log("Found name field:", tech.name);
       return String(tech.name);
     }
     if (tech._id) {
-      console.log("Found only ID:", tech._id);
       return String(tech._id);
     }
   }
 
-  console.log("No technician data found, returning 'Not assigned'");
   return "Not assigned";
 };
 
@@ -75,6 +68,9 @@ export function BookingDetailsModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Get bookings from store
+  const bookings = useBookingStore((state) => state.bookings);
+
   // Fetch booking details when modal opens
   useEffect(() => {
     if (isOpen && bookingId) {
@@ -85,7 +81,7 @@ export function BookingDetailsModal({
       setError(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, bookingId]);
+  }, [isOpen, bookingId, bookings]);
 
   const fetchBookingDetails = async () => {
     if (!bookingId) return;
@@ -94,37 +90,18 @@ export function BookingDetailsModal({
     setError(null);
 
     try {
-      const response = await fetchWithAuth(`/api/bookings/${bookingId}`);
+      // Find booking in store
+      const foundBooking = bookings.find((b) => b._id === bookingId);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch booking details");
-      }
-
-      const result = await response.json();
-      console.log("Booking details response:", result);
-
-      if (result.success && result.data) {
-        console.log("Setting booking data:", {
-          bookingId: result.data.bookingId,
-          customerName: result.data.customer?.name,
-          servicesCount: result.data.services?.length,
-          firstServiceTechnician: result.data.services?.[0]?.technicianId,
-          firstServiceTechnicianType:
-            typeof result.data.services?.[0]?.technicianId,
-          firstServiceTechnicianKeys: result.data.services?.[0]?.technicianId
-            ? Object.keys(result.data.services[0].technicianId)
-            : [],
-        });
-        setBooking(result.data);
+      if (foundBooking) {
+        setBooking(foundBooking);
       } else {
-        throw new Error("Invalid response format");
+        throw new Error("Booking not found");
       }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch booking details";
       setError(errorMessage);
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -400,26 +377,6 @@ export function BookingDetailsModal({
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-500">
-                      Garage
-                    </label>
-                    <p className="mt-1 text-sm text-gray-900">
-                      {booking.garage_id?.name}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500">
-                      Garage Address
-                    </label>
-                    <p className="mt-1 text-sm text-gray-900">
-                      {booking.garage_id?.address?.street},{" "}
-                      {booking.garage_id?.address?.city},{" "}
-                      {booking.garage_id?.address?.state},{" "}
-                      {booking.garage_id?.address?.zipCode},{" "}
-                      {booking.garage_id?.address?.country}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500">
                       Total Duration
                     </label>
                     <p className="mt-1 text-sm text-gray-900">
@@ -505,17 +462,17 @@ export function BookingDetailsModal({
                             <div className="mt-2 flex items-center space-x-2">
                               <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
                                 <span className="text-xs font-medium text-blue-600">
-                                  {entry.changedBy.firstName.charAt(0)}
-                                  {entry.changedBy.lastName.charAt(0)}
+                                  {entry.changedBy?.firstName?.charAt(0) || "U"}
+                                  {entry.changedBy?.lastName?.charAt(0) || "N"}
                                 </span>
                               </div>
                               <div>
                                 <p className="text-sm font-medium text-gray-900">
-                                  {entry.changedBy.firstName}{" "}
-                                  {entry.changedBy.lastName}
+                                  {entry.changedBy?.firstName || "Unknown"}{" "}
+                                  {entry.changedBy?.lastName || "User"}
                                 </p>
                                 <p className="text-xs text-gray-500">
-                                  {entry.changedBy.email}
+                                  {entry.changedBy?.email || "No email"}
                                 </p>
                               </div>
                             </div>

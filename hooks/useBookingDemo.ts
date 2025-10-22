@@ -1,50 +1,38 @@
 import { useBookingStore } from "@/store/booking";
+import { useJobSheetStore } from "@/store/jobSheet";
 import { useEffect } from "react";
 
-// Static data - always available
-const staticBays = [
-  { id: "bay-1", name: "Bay 1" },
-  { id: "bay-2", name: "Bay 2" },
-  { id: "bay-3", name: "Bay 3" },
-  { id: "bay-4", name: "Bay 4" },
-];
-
-const staticTechnicians = [
-  {
-    id: "tech-1",
-    firstName: "John",
-    lastName: "Smith",
-    role: "Senior Mechanic",
-  },
-  { id: "tech-2", firstName: "Sarah", lastName: "Johnson", role: "Mechanic" },
-  {
-    id: "tech-3",
-    firstName: "Mike",
-    lastName: "Davis",
-    role: "Junior Mechanic",
-  },
-  { id: "tech-4", firstName: "Lisa", lastName: "Wilson", role: "Specialist" },
-];
-
 /**
- * Hook to demonstrate booking functionality with static data
- * Returns only static data - no API calls, no store dependencies
+ * Hook to provide booking data from the Zustand store
+ * Seeds bookings for the next 7 days (1-5/day across 5 bays) once on mount
+ * Also creates corresponding jobsheets for each booking
  */
 export const useBookingDemo = () => {
-  const store = useBookingStore();
-  const { generateDummyBookings, getBookingsForBayAndDate } = store;
+  const bookingStore = useBookingStore();
+  const jobSheetStore = useJobSheetStore();
+  const { seedBookings, getBookingsForBayAndDate } = bookingStore;
+  const { createFromBooking } = jobSheetStore;
 
   useEffect(() => {
-    // Generate dummy bookings when the hook is used
-    generateDummyBookings();
-  }, [generateDummyBookings]);
+    // Only seed if no bookings exist
+    if (bookingStore.bookings.length === 0) {
+      seedBookings({ days: 7, minPerDay: 1, maxPerDay: 5, bayCount: 5 });
 
-  // Return only static data for dropdowns, use store for bookings
+      // Create jobsheets for all seeded bookings
+      setTimeout(() => {
+        bookingStore.bookings.forEach((booking) => {
+          createFromBooking(booking._id);
+        });
+      }, 100); // Small delay to ensure bookings are created first
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return {
-    bays: staticBays,
-    technicians: staticTechnicians,
-    services: store.services,
+    bays: bookingStore.bays,
+    technicians: bookingStore.technicians,
+    services: bookingStore.services,
     getBookingsForBayAndDate,
-    bookings: store.bookings,
+    bookings: bookingStore.bookings,
   };
 };

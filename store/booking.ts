@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useGarageStore } from "./garage";
+import type { Booking, Customer, Vehicle } from "@/types/booking";
 
 export interface Bay {
   id: string;
@@ -13,22 +15,7 @@ export interface Technician {
   role?: string;
 }
 
-export interface Booking {
-  id: string;
-  customer: {
-    name: string;
-  };
-  services: Array<{
-    name: string;
-  }>;
-  startTime: string;
-  endTime: string;
-  bayId: string;
-  technicianId: string;
-  date: string;
-}
-
-export interface Service {
+export interface StoreService {
   id: string;
   name: string;
   duration: number;
@@ -39,7 +26,7 @@ interface BookingState {
   // Static data
   bays: Bay[];
   technicians: Technician[];
-  services: Service[];
+  services: StoreService[];
 
   // Dynamic data
   bookings: Booking[];
@@ -47,7 +34,7 @@ interface BookingState {
   // Actions
   setBays: (bays: Bay[]) => void;
   setTechnicians: (technicians: Technician[]) => void;
-  setServices: (services: Service[]) => void;
+  setServices: (services: StoreService[]) => void;
   addBooking: (booking: Booking) => void;
   removeBooking: (bookingId: string) => void;
   getBookingsForBayAndDate: (
@@ -55,7 +42,28 @@ interface BookingState {
     date: string,
     technicianId?: string
   ) => Booking[];
-  generateDummyBookings: () => void;
+  seedBookings: (args?: {
+    days?: number;
+    minPerDay?: number;
+    maxPerDay?: number;
+    bayCount?: number;
+  }) => void;
+  createBooking: (args: {
+    customer: Customer;
+    vehicle: Vehicle;
+    services: Array<{
+      serviceId: string;
+      name: string;
+      description: string;
+      duration: number;
+      price: number;
+    }>;
+    bayId: string;
+    technicianId: string;
+    startTimeHHMM: string; // HH:MM
+    date: string; // YYYY-MM-DD
+    notes?: string;
+  }) => Booking;
 }
 
 // Static data
@@ -64,6 +72,7 @@ const staticBays: Bay[] = [
   { id: "bay-2", name: "Bay 2" },
   { id: "bay-3", name: "Bay 3" },
   { id: "bay-4", name: "Bay 4" },
+  { id: "bay-5", name: "Bay 5" },
 ];
 
 const staticTechnicians: Technician[] = [
@@ -106,98 +115,6 @@ const staticServices = [
   },
 ];
 
-// Generate dummy bookings for demonstration
-const generateDummyBookings = (): Booking[] => {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const dateStr = tomorrow.toISOString().split("T")[0]; // YYYY-MM-DD format
-
-  return [
-    {
-      id: "booking-1",
-      customer: { name: "Alice Johnson" },
-      services: [{ name: "Oil Change" }],
-      startTime: `${dateStr}T10:00:00`,
-      endTime: `${dateStr}T10:30:00`,
-      bayId: "bay-1",
-      technicianId: "tech-1",
-      date: dateStr,
-    },
-    {
-      id: "booking-2",
-      customer: { name: "Bob Smith" },
-      services: [{ name: "Tire Rotation" }],
-      startTime: `${dateStr}T11:00:00`,
-      endTime: `${dateStr}T11:30:00`,
-      bayId: "bay-1",
-      technicianId: "tech-2",
-      date: dateStr,
-    },
-    {
-      id: "booking-3",
-      customer: { name: "Carol Davis" },
-      services: [{ name: "Brake Inspection" }],
-      startTime: `${dateStr}T12:00:00`,
-      endTime: `${dateStr}T12:30:00`,
-      bayId: "bay-2",
-      technicianId: "tech-1",
-      date: dateStr,
-    },
-    {
-      id: "booking-4",
-      customer: { name: "David Wilson" },
-      services: [{ name: "Engine Diagnostic" }],
-      startTime: `${dateStr}T13:00:00`,
-      endTime: `${dateStr}T13:30:00`,
-      bayId: "bay-1",
-      technicianId: "tech-3",
-      date: dateStr,
-    },
-    {
-      id: "booking-5",
-      customer: { name: "Emma Brown" },
-      services: [{ name: "AC Service" }],
-      startTime: `${dateStr}T14:00:00`,
-      endTime: `${dateStr}T14:30:00`,
-      bayId: "bay-3",
-      technicianId: "tech-4",
-      date: dateStr,
-    },
-    {
-      id: "booking-6",
-      customer: { name: "Frank Miller" },
-      services: [{ name: "Transmission Service" }],
-      startTime: `${dateStr}T15:00:00`,
-      endTime: `${dateStr}T15:30:00`,
-      bayId: "bay-2",
-      technicianId: "tech-4",
-      date: dateStr,
-    },
-    {
-      id: "booking-7",
-      customer: { name: "Grace Lee" },
-      services: [{ name: "Battery Check" }],
-      startTime: `${dateStr}T16:00:00`,
-      endTime: `${dateStr}T16:30:00`,
-      bayId: "bay-1",
-      technicianId: "tech-1",
-      date: dateStr,
-    },
-    {
-      id: "booking-8",
-      customer: { name: "Henry Taylor" },
-      services: [{ name: "Wheel Alignment" }],
-      startTime: `${dateStr}T17:00:00`,
-      endTime: `${dateStr}T17:30:00`,
-      bayId: "bay-3",
-      technicianId: "tech-3",
-      date: dateStr,
-    },
-  ];
-};
-
 export const useBookingStore = create<BookingState>()(
   persist(
     (set, get) => ({
@@ -205,7 +122,7 @@ export const useBookingStore = create<BookingState>()(
       bays: staticBays,
       technicians: staticTechnicians,
       services: staticServices,
-      bookings: generateDummyBookings(),
+      bookings: [], // Start with empty bookings
 
       // Actions
       setBays: (bays) => set({ bays }),
@@ -220,22 +137,319 @@ export const useBookingStore = create<BookingState>()(
       removeBooking: (bookingId) =>
         set((state) => ({
           bookings: state.bookings.filter(
-            (booking) => booking.id !== bookingId
+            (booking) => booking._id !== bookingId
           ),
         })),
 
       getBookingsForBayAndDate: (bayId, date) => {
         const { bookings } = get();
         return bookings.filter((booking) => {
-          const matchesBay = booking.bayId === bayId;
-          const matchesDate = booking.date === date;
+          // Safety check for services array
+          if (!booking.services || !Array.isArray(booking.services)) {
+            return false;
+          }
+
+          const matchesBay = booking.services.some(
+            (service) => service.bayId === bayId
+          );
+          // Check bookingDate for date matching
+          const matchesDate =
+            booking.bookingDate && booking.bookingDate.startsWith(date);
           // Show all bookings for the bay regardless of technician
           // A busy bay is busy for all technicians
           return matchesBay && matchesDate;
         });
       },
 
-      generateDummyBookings: () => set({ bookings: generateDummyBookings() }),
+      seedBookings: (args) => {
+        const {
+          days = 7,
+          minPerDay = 1,
+          maxPerDay = 5,
+          bayCount = 5,
+        } = args || {};
+
+        const state = get();
+        const bays = state.bays.slice(0, bayCount);
+        const today = new Date();
+
+        const garage = useGarageStore.getState().garage;
+        const getHoursForDate = (d: Date) => {
+          const dayName = d.toLocaleDateString("en-US", { weekday: "long" });
+          const bh = garage?.businessHours?.find(
+            (h) => h.day.toLowerCase() === dayName.toLowerCase()
+          );
+          if (bh && !bh.isClosed) {
+            return { open: bh.open, close: bh.close };
+          }
+          return { open: "10:00", close: "17:00" };
+        };
+
+        const makeSlots = (open: string, close: string) => {
+          const [openH] = open.split(":").map((n) => parseInt(n));
+          const [closeH, closeM] = close.split(":").map((n) => parseInt(n));
+          const slots: string[] = [];
+          for (let h = openH; h < closeH || (h === closeH && 0 < closeM); h++) {
+            slots.push(`${h.toString().padStart(2, "0")}:00`);
+            slots.push(`${h.toString().padStart(2, "0")}:30`);
+          }
+          return slots;
+        };
+
+        const newBookings: Booking[] = [];
+        for (let d = 0; d < days; d++) {
+          const day = new Date(today);
+          day.setDate(today.getDate() + d);
+          const dateStr = day.toISOString().split("T")[0];
+          const { open, close } = getHoursForDate(day);
+          const slots = makeSlots(open, close);
+
+          const countForDay = Math.max(
+            minPerDay,
+            Math.min(
+              maxPerDay,
+              Math.floor(Math.random() * (maxPerDay - minPerDay + 1)) +
+                minPerDay
+            )
+          );
+
+          const usedByBay: Record<string, Set<string>> = Object.fromEntries(
+            bays.map((b) => [b.id, new Set<string>()])
+          );
+
+          for (let i = 0; i < countForDay; i++) {
+            const bay = bays[i % bays.length];
+            // pick a free slot for this bay
+            const available = slots.filter((t) => !usedByBay[bay.id].has(t));
+            if (available.length === 0) continue;
+            const time =
+              available[Math.floor(Math.random() * available.length)];
+            usedByBay[bay.id].add(time);
+
+            // pick a technician
+            const tech =
+              state.technicians[
+                Math.floor(Math.random() * state.technicians.length)
+              ];
+
+            // pick a service
+            const svc =
+              state.services[Math.floor(Math.random() * state.services.length)];
+
+            const startTime = `${dateStr}T${time}:00`;
+            const endDate = new Date(startTime);
+            endDate.setMinutes(endDate.getMinutes() + (svc?.duration || 30));
+            const endTime = endDate.toISOString().slice(0, 19);
+
+            newBookings.push({
+              _id: crypto.randomUUID(),
+              customer: {
+                name: "Walk-in Customer",
+                phone: "+971501234567",
+                email: "walkin@example.com",
+              },
+              vehicle: {
+                make: "Toyota",
+                model: "Camry",
+                year: 2022,
+                license: "UAE12345",
+                vin: "1HGCM82633A004352",
+              },
+              services: [
+                {
+                  serviceId: {
+                    _id: svc?.id || "service-1",
+                    name: svc?.name || "Service",
+                    description: "Service description",
+                    category: "Maintenance",
+                  },
+                  name: svc?.name || "Service",
+                  description: "Service description",
+                  duration: svc?.duration || 30,
+                  price: svc?.price || 20.0,
+                  currency: "GBP",
+                  currencySymbol: "£",
+                  status: "pending",
+                  technicianId: {
+                    _id: tech?.id || "tech-1",
+                    firstName: tech?.firstName || "John",
+                    lastName: tech?.lastName || "Smith",
+                    email: "tech@garage.com",
+                    phone: "1234567890",
+                    role: "technician",
+                  },
+                  bayId: bay.id,
+                  startTime,
+                  endTime,
+                  _id: crypto.randomUUID(),
+                  pauses: [],
+                },
+              ],
+              bookingDate: `${dateStr}T00:00:00.000Z`,
+              totalDuration: svc?.duration || 30,
+              totalPrice: svc?.price || 20.0,
+              status: "pending",
+              notes: "Walk-in booking",
+              history: [
+                {
+                  status: "pending",
+                  changedBy: {
+                    _id: "admin",
+                    firstName: "Admin",
+                    lastName: "User",
+                    email: "admin@local.garage.com",
+                  },
+                  changedAt: new Date().toISOString(),
+                  notes: "Booking created",
+                  _id: crypto.randomUUID(),
+                },
+              ],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              bookingId: `LOC-${Math.floor(Math.random() * 10000)
+                .toString()
+                .padStart(4, "0")}`,
+              garage_id: {
+                _id: "garage-1",
+                name: "Cawosh Garage",
+                address: {
+                  street: "123 Main Street",
+                  city: "Dubai",
+                  state: "Dubai",
+                  zipCode: "00000",
+                  country: "UAE",
+                },
+                bays: [
+                  { _id: "bay-1", name: "Bay 1" },
+                  { _id: "bay-2", name: "Bay 2" },
+                  { _id: "bay-3", name: "Bay 3" },
+                  { _id: "bay-4", name: "Bay 4" },
+                  { _id: "bay-5", name: "Bay 5" },
+                ],
+              },
+              __v: 0,
+            });
+          }
+        }
+
+        // Replace existing bookings with seeded ones (avoid duplicates)
+        set({ bookings: newBookings });
+      },
+
+      createBooking: ({
+        customer,
+        vehicle,
+        services,
+        bayId,
+        technicianId,
+        startTimeHHMM,
+        date,
+        notes = "",
+      }) => {
+        const currentState = get();
+        const totalDuration = services.reduce(
+          (acc, s) => acc + (s.duration || 30),
+          0
+        );
+        const totalPrice = services.reduce((acc, s) => acc + (s.price || 0), 0);
+        const startTime = `${date}T${startTimeHHMM}:00.000Z`;
+        const endDate = new Date(startTime);
+        endDate.setMinutes(endDate.getMinutes() + totalDuration);
+
+        const booking: Booking = {
+          _id: crypto.randomUUID(),
+          customer,
+          vehicle,
+          services: services.map((s, index) => {
+            const serviceStartTime = new Date(startTime);
+            serviceStartTime.setMinutes(
+              serviceStartTime.getMinutes() + index * 30
+            );
+            const serviceEndTime = new Date(serviceStartTime);
+            serviceEndTime.setMinutes(
+              serviceEndTime.getMinutes() + (s.duration || 30)
+            );
+
+            return {
+              serviceId: {
+                _id: s.serviceId,
+                name: s.name,
+                description: s.description,
+                category: "Maintenance",
+              },
+              name: s.name,
+              description: s.description,
+              duration: s.duration,
+              price: s.price,
+              currency: "GBP",
+              currencySymbol: "£",
+              status: "pending" as const,
+              technicianId: {
+                _id: technicianId,
+                firstName:
+                  currentState.technicians.find((t) => t.id === technicianId)
+                    ?.firstName || "Unknown",
+                lastName:
+                  currentState.technicians.find((t) => t.id === technicianId)
+                    ?.lastName || "Technician",
+                email: "tech@garage.com",
+                phone: "1234567890",
+                role: "technician",
+              },
+              bayId,
+              startTime: serviceStartTime.toISOString(),
+              endTime: serviceEndTime.toISOString(),
+              _id: crypto.randomUUID(),
+              pauses: [],
+            };
+          }),
+          bookingDate: `${date}T00:00:00.000Z`,
+          totalDuration,
+          totalPrice,
+          status: "pending",
+          notes,
+          history: [
+            {
+              status: "pending",
+              changedBy: {
+                _id: "admin",
+                firstName: "Admin",
+                lastName: "User",
+                email: "admin@local.garage.com",
+              },
+              changedAt: new Date().toISOString(),
+              notes: "Booking created",
+              _id: crypto.randomUUID(),
+            },
+          ],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          bookingId: `LOC-${Math.floor(Math.random() * 10000)
+            .toString()
+            .padStart(4, "0")}`,
+          garage_id: {
+            _id: "garage-1",
+            name: "Cawosh Garage",
+            address: {
+              street: "123 Main Street",
+              city: "Dubai",
+              state: "Dubai",
+              zipCode: "00000",
+              country: "UAE",
+            },
+            bays: [
+              { _id: "bay-1", name: "Bay 1" },
+              { _id: "bay-2", name: "Bay 2" },
+              { _id: "bay-3", name: "Bay 3" },
+              { _id: "bay-4", name: "Bay 4" },
+              { _id: "bay-5", name: "Bay 5" },
+            ],
+          },
+          __v: 0,
+        };
+        set((state) => ({ bookings: [...state.bookings, booking] }));
+        return booking;
+      },
     }),
     {
       name: "booking-storage",
