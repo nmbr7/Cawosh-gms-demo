@@ -355,7 +355,7 @@ export const BookingCreateModal = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-7xl w-full max-h-[90vh] flex flex-col">
+        <DialogContent className="max-w-7xl w-full max-h-[90vh] flex flex-col px-10">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
               Create Booking
