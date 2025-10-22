@@ -19,21 +19,23 @@ export async function POST(request: Request) {
     }
 
     // Forward the request to the real backend
-    const response = await fetch(`${backendUrl}/api/auth/login`, {
+    const response = await fetch(`${backendUrl}/api/v1/auth/login`, {
       method: "POST",
       headers: {
+        "X-Tenant-Slug": "autocare-pro",
         "Content-Type": "application/json",
         Accept: "application/json",
-        Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:8000",
       },
       body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
+    console.log(data)
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.error || data.message || "Invalid email or password" },
+        { error: data.error.message || data.message || "Invalid email or password" },
         { status: response.status }
       );
     }
@@ -42,12 +44,12 @@ export async function POST(request: Request) {
     const nextResponse = NextResponse.json({
       success: true,
       message: "Login successful",
-      data: data.data,
+      data: data,
     });
 
     // Set the access token in an HTTP-only cookie
-    if (data.data.token) {
-      nextResponse.cookies.set("access_token", data.data.token, {
+    if (data.tokens) {
+      nextResponse.cookies.set("access_token", data.tokens.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",

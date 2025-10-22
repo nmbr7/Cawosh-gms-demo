@@ -1,128 +1,170 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-import { SignOut } from "phosphor-react";
-
 import {
-  SquaresFour,
-  CalendarBlank,
-  Note,
-  Files,
-  Wallet,
+  Calendar,
+  ClipboardList,
+  Handshake,
   Headphones,
-  UserList,
-  Gear,
+  LayoutDashboard,
+  LogOut,
+  Receipt,
+  Settings,
+  Users,
+  Wrench,
+  Award,
   Package,
-} from "phosphor-react";
-
+  File,
+  ChevronLeft as LucideChevronLeft,
+  ChevronRight as LucideChevronRight,
+} from "lucide-react";
 import { useUIStore } from "@/store/ui";
 import { useAuthStore } from "@/store/auth";
+import React from "react";
 
+// Use correct icon imports, fix missing/incorrect ones
 export const links = [
-  { name: "Dashboard", href: "/dashboard", icon: SquaresFour },
-  { name: "Calendar", href: "/schedule", icon: CalendarBlank },
-  { name: "Bookings", href: "/bookings", icon: Note },
-  { name: "Job Sheet", href: "/job-sheet", icon: Files },
-  { name: "Billings", href: "/billings", icon: Wallet },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Calendar", href: "/schedule", icon: Calendar },
+  { name: "Bookings", href: "/bookings", icon: Handshake },
+  { name: "Job Sheet", href: "/job-sheet", icon: ClipboardList },
+  { name: "Billings", href: "/billings", icon: Receipt },
   { name: "Stock Management", href: "/inventory", icon: Package },
   {
     name: "Vehicle Health Checks",
     href: "/vehicle-health-checks",
-    icon: Files,
+    icon: File,
   },
-  {
-    name: "Customer Support",
-    href: "/customer-support",
-    icon: Headphones,
-  },
-  { name: "Staff Management", href: "/users", icon: UserList },
-  { name: "Settings", href: "/settings", icon: Gear },
+  { name: "Customer Support", href: "/customer-support", icon: Headphones },
+  { name: "Workshop", href: "/workshop", icon: Wrench },
+  { name: "MOT", href: "/mot", icon: Award },
+  { name: "Staff Management", href: "/users", icon: Users },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
+
+function SidebarLink({
+  name,
+  href,
+  Icon,
+  active,
+  expanded,
+}: {
+  name: string;
+  href: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  active: boolean;
+  expanded: boolean;
+}) {
+  return (
+    <Link
+      key={href}
+      href={href}
+      className={cn(
+        "flex items-center gap-4 px-4 py-3 rounded-md text-base font-medium transition-colors focus:outline-none focus:ring-2 ring-blue-200",
+        active ? "bg-blue-100 text-blue-700" : "text-gray-700 hover:bg-gray-100"
+      )}
+      tabIndex={0}
+      aria-current={active ? "page" : undefined}
+    >
+      <Icon className="w-6 h-6 flex-shrink-0" />
+      {expanded && <span>{name}</span>}
+    </Link>
+  );
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { sidebarOpen, toggleSidebar } = useUIStore();
   const logout = useAuthStore((state) => state.logout);
 
-  const handleLogout = () => {
-    // Clear the auth store and handle all logout logic
+  // NEW: State to help delay the label/links expanding
+  const [expandText, setExpandText] = React.useState(sidebarOpen);
+
+  // Delay for expansion in ms (syncs with tailwind transition duration-300)
+  const TRANSITION_DELAY = 260;
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null;
+
+    if (sidebarOpen) {
+      // Delay revealing the expanded text/icons until after transition
+      timeout = setTimeout(() => setExpandText(true), TRANSITION_DELAY);
+    } else {
+      // Immediately hide text on collapse
+      setExpandText(false);
+      // No timeout needed on collapse
+    }
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [sidebarOpen]);
+
+  // Improved: Accessibility, aria-label, keyboard cues
+  const handleLogout = React.useCallback(() => {
     logout();
-  };
+  }, [logout]);
 
   return (
     <aside
       className={cn(
-        "h-screen bg-white shadow-md transition-all duration-300 ease-in-out flex flex-col justify-between",
+        "h-screen bg-white shadow-md flex flex-col justify-between transition-all duration-300 ease-in-out",
         sidebarOpen ? "w-64" : "w-20"
       )}
+      aria-label="Sidebar navigation"
     >
       {/* Top: Logo + Nav */}
       <div>
-        <div className="p-4 text-xl font-semibold border-b flex items-center justify-center">
-          {sidebarOpen ? (
-            "Cawosh Admin"
+        <div
+          className={cn(
+            "p-4 text-xl font-semibold border-b h-16 flex items-center transition-all",
+            sidebarOpen ? "justify-start" : "justify-center"
+          )}
+        >
+          {expandText ? (
+            <span aria-label="Cawosh Admin">Cawosh Dashboard</span>
           ) : (
-            // <Image
-            //   src="/images/cawosh-logo-with-tm.jpg"
-            //   alt="Cawosh Logo"
-            //   width={200}
-            //   height={50}
-            //   className="object-contain"
-            // />
-            <Image
-              src="/images/cawosh-logo.jpg"
-              alt="Cawosh Logo"
-              width={100}
-              height={100}
-              className="object-contain"
-            />
+            <span aria-label="Cawosh Logo">C</span>
           )}
         </div>
 
-        <nav className="flex flex-col gap-1 p-3">
-          {links.map(({ name, href, icon: Icon }) => (
-            <Link
+        <nav className="flex flex-col gap-2 p-3" aria-label="Main navigation">
+          {links.map(({ name, href, icon }) => (
+            <SidebarLink
               key={href}
+              name={name}
               href={href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-md text-base font-medium",
-                pathname === href
-                  ? "bg-blue-100 text-blue-700"
-                  : "text-gray-700 hover:bg-gray-100"
-              )}
-              onClick={() => {
-                if (href === "/settings" && sidebarOpen) {
-                  toggleSidebar();
-                }
-              }}
-            >
-              <Icon className="w-5 h-5 flex-shrink-0" />
-              {sidebarOpen && <span className="text-sm">{name}</span>}
-            </Link>
+              Icon={icon}
+              active={pathname === href}
+              expanded={expandText}
+            />
           ))}
         </nav>
       </div>
 
-      {/* Bottom: Logout + Toggle */}
-      <div className="p-2 border-t flex flex-col gap-2">
+      {/* Bottom: Logout + Collapse Toggle */}
+      <div className="p-2 border-t flex flex-row items-center gap-2">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 w-full px-2 py-1"
+          className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 w-full px-2 py-2 rounded transition-colors focus:outline-none focus:ring-2 ring-red-200"
+          aria-label="Logout"
         >
-          <SignOut size={20} />
-          {sidebarOpen && <span>Logout</span>}
+          <LogOut className="w-4 h-4" />
+          {expandText && <span>Logout</span>}
         </button>
-
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded hover:bg-gray-100 transition self-end"
+          aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          className="p-2 rounded hover:bg-gray-100 transition focus:outline-none focus:ring-2 ring-blue-200"
+          style={{ minWidth: 36, minHeight: 36 }}
         >
-          {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          {sidebarOpen ? (
+            <LucideChevronLeft size={20} />
+          ) : (
+            <LucideChevronRight size={20} />
+          )}
         </button>
       </div>
     </aside>
