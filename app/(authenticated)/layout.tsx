@@ -20,16 +20,13 @@ export default function AuthenticatedLayout({
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      console.log("No user found, redirecting to login");
-      router.replace("/login");
-    } else {
-      setIsLoading(false);
-    }
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    // if (!user) {
+    //   console.log("No user found, redirecting to login");
+    //   router.replace("/login");
+    // } else {
+    //   setIsLoading(false);
+    // }
+    setIsLoading(false);
   }, [user, router]);
 
   // Prevent any rendering until we know the auth state
@@ -39,27 +36,22 @@ export default function AuthenticatedLayout({
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {!isMobile && (
-        <div
-          className={cn(
-            "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
-            sidebarOpen ? "w-64" : "w-20"
-          )}
-        >
-          <Sidebar />
-        </div>
-      )}
+      <div
+        className={cn(
+          "fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out",
+          sidebarOpen ? "w-64" : "w-16"
+        )}
+      >
+        <Sidebar />
+      </div>
       <main
         className={cn(
-          "flex-1 transition-all duration-300 ease-in-out min-h-screen flex flex-col",
-          sidebarOpen ? "ml-64" : "ml-20",
-          isMobile ? "ml-0" : ""
+          "flex-1 transition-all duration-300 ease-in-out",
+          sidebarOpen ? "ml-64" : "ml-16"
         )}
       >
         <Header />
-        <div className="flex-1 overflow-x-auto overflow-y-auto p-4 md:p-6">
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </main>
     </div>
   );

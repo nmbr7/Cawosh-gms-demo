@@ -5,14 +5,16 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   Calendar,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   Handshake,
-  Headphones,
+  HeadphonesIcon,
   LayoutDashboard,
   LogOut,
   Receipt,
   Settings,
-  Users,
+  UsersIcon,
   Wrench,
   Award,
   Package,
@@ -25,24 +27,18 @@ import { useUIStore } from "@/store/ui";
 import { useAuthStore } from "@/store/auth";
 import React from "react";
 
-// Use correct icon imports, fix missing/incorrect ones
-export const links = [
+// Navigation links for sidebar
+const links = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Calendar", href: "/schedule", icon: Calendar },
   { name: "Bookings", href: "/bookings", icon: Handshake },
   { name: "Job Sheet", href: "/job-sheet", icon: ClipboardList },
   { name: "Approvals", href: "/approvals", icon: CheckCircle },
   { name: "Billings", href: "/billings", icon: Receipt },
-  { name: "Stock Management", href: "/inventory", icon: Package },
-  {
-    name: "Vehicle Health Checks",
-    href: "/vehicle-health-checks",
-    icon: File,
-  },
-  { name: "Customer Support", href: "/customer-support", icon: Headphones },
+  { name: "Customer Support", href: "/customer-support", icon: HeadphonesIcon },
   { name: "Workshop", href: "/workshop", icon: Wrench },
   { name: "MOT", href: "/mot", icon: Award },
-  { name: "Staff Management", href: "/users", icon: Users },
+  { name: "Staff Management", href: "/users", icon: UsersIcon },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -177,9 +173,9 @@ export default function Sidebar() {
           style={{ minWidth: 36, minHeight: 36 }}
         >
           {sidebarOpen ? (
-            <LucideChevronLeft size={20} />
+            <ChevronLeft size={20} />
           ) : (
-            <LucideChevronRight size={20} />
+            <ChevronRight size={20} />
           )}
         </button>
       </div>

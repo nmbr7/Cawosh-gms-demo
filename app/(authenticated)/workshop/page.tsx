@@ -107,25 +107,21 @@ const SAMPLE_WARNING_LIGHTS_DATA: Array<{
     icon: "🚗", // Example placeholder (should be replaced with SVG url/sprite in production)
     name: "Engine/ECU Malfunction",
     color: "yellow",
-    meaning:
-      "Indicates a malfunction in the engine management system (ECU) or emission control system.",
-    action:
-      "Have the vehicle checked as soon as possible. Vehicle may enter limp mode.",
+    meaning: "Indicates a malfunction in the engine management system (ECU) or emission control system.",
+    action: "Have the vehicle checked as soon as possible. Vehicle may enter limp mode.",
   },
   {
     icon: "🛑",
     name: "Brake System Warning",
     color: "red",
     meaning: "Problem with the braking system or low brake fluid.",
-    action:
-      "Stop the vehicle safely and check brake fluid level. If light remains on, do not continue driving—call for assistance.",
+    action: "Stop the vehicle safely and check brake fluid level. If light remains on, do not continue driving—call for assistance.",
   },
   {
     icon: "⚠️",
     name: "General Warning Indicator",
     color: "yellow",
-    meaning:
-      "General warning message. Check instrument panel display for more information.",
+    meaning: "General warning message. Check instrument panel display for more information.",
     action: "Read the cluster message and refer to the vehicle manual.",
   },
   {
@@ -163,40 +159,16 @@ const SAMPLE_ADJUSTMENT_DATA: AdjustmentGroup[] = [
   {
     group: "Engine",
     items: [
-      {
-        parameter: "Valve Clearance (Intake)",
-        value: "0.20",
-        unit: "mm",
-        notes: "Engine cold",
-      },
-      {
-        parameter: "Valve Clearance (Exhaust)",
-        value: "0.35",
-        unit: "mm",
-        notes: "Engine cold",
-      },
-      {
-        parameter: "Idle Speed",
-        value: "800",
-        unit: "rpm",
-        notes: "Auto-adaptive/controlled",
-      },
-      {
-        parameter: "CO Content at Idle",
-        value: "<0.5",
-        unit: "%",
-        notes: "Lambda controlled",
-      },
+      { parameter: "Valve Clearance (Intake)", value: "0.20", unit: "mm", notes: "Engine cold" },
+      { parameter: "Valve Clearance (Exhaust)", value: "0.35", unit: "mm", notes: "Engine cold" },
+      { parameter: "Idle Speed", value: "800", unit: "rpm", notes: "Auto-adaptive/controlled" },
+      { parameter: "CO Content at Idle", value: "<0.5", unit: "%", notes: "Lambda controlled" },
     ],
   },
   {
     group: "Ignition",
     items: [
-      {
-        parameter: "Ignition Timing",
-        value: "Not adjustable",
-        notes: "Controlled by ECU",
-      },
+      { parameter: "Ignition Timing", value: "Not adjustable", notes: "Controlled by ECU" },
       { parameter: "Spark Plug Gap", value: "1.0", unit: "mm" },
       { parameter: "Firing Order", value: "1-3-4-2" },
     ],
@@ -204,18 +176,8 @@ const SAMPLE_ADJUSTMENT_DATA: AdjustmentGroup[] = [
   {
     group: "Wheels & Tyres",
     items: [
-      {
-        parameter: "Front Tyre Pressure",
-        value: "2.2",
-        unit: "bar",
-        notes: "Unladen",
-      },
-      {
-        parameter: "Rear Tyre Pressure",
-        value: "2.0",
-        unit: "bar",
-        notes: "Unladen",
-      },
+      { parameter: "Front Tyre Pressure", value: "2.2", unit: "bar", notes: "Unladen" },
+      { parameter: "Rear Tyre Pressure", value: "2.0", unit: "bar", notes: "Unladen" },
       { parameter: "Wheel Nut Torque", value: "110", unit: "Nm" },
     ],
   },
@@ -602,50 +564,35 @@ const REPAIR_SUBTABS = [
 function RecallSection({ data }: { data: typeof SAMPLE_RECALL_DATA }) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">
-        Vehicle Recalls
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-3">Vehicle Recalls</h3>
       <div className="text-sm text-gray-600 mb-4 max-w-2xl">
         <p>
-          This table lists vehicle recalls that may affect this vehicle. Always
-          verify with an authorized dealer for the latest and complete status.
+          This table lists vehicle recalls that may affect this vehicle.
+          Always verify with an authorized dealer for the latest and complete status.
         </p>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-[900px] w-full table-auto border border-gray-200 bg-gray-50 rounded">
           <thead>
             <tr className="bg-gray-100 text-sm">
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Recall No
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Date
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Affected Models
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Issue
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Consequence
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Action
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Status
-              </th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Recall No</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Date</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Affected Models</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Issue</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Consequence</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Action</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Status</th>
             </tr>
           </thead>
           <tbody>
             {data.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-4 text-center text-gray-500">
-                  No active recalls for this vehicle.
-                </td>
+                <td colSpan={7} className="py-4 text-center text-gray-500">No active recalls for this vehicle.</td>
               </tr>
             ) : (
+              data.map((recall, idx) => (
+                <tr key={recall.recallNumber} className="border-t border-gray-100 text-sm">
+                  <td className="px-3 py-2 font-mono font-semibold">{recall.recallNumber}</td>
               data.map((recall) => (
                 <tr
                   key={recall.recallNumber}
@@ -658,9 +605,7 @@ function RecallSection({ data }: { data: typeof SAMPLE_RECALL_DATA }) {
                   <td className="px-3 py-2">{recall.affectedModels}</td>
                   <td className="px-3 py-2 max-w-xs">{recall.issue}</td>
                   <td className="px-3 py-2 max-w-xs">{recall.consequence}</td>
-                  <td className="px-3 py-2 max-w-xs">
-                    {recall.correctiveAction}
-                  </td>
+                  <td className="px-3 py-2 max-w-xs">{recall.correctiveAction}</td>
                   <td className="px-3 py-2">
                     <span
                       className={`inline-block px-2 py-1 text-xs rounded ${
@@ -732,14 +677,13 @@ export default function WorkshopPage() {
   >(null);
 
   // --- Track open Section (for Repair Manuals, inline, not modal) ---
+  const [openRepairManualSectionId, setOpenRepairManualSectionId] = useState<string | null>(null);
   // const [openRepairManualSectionId, setOpenRepairManualSectionId] = useState<
   //   string | null
   // >(null);
 
   // Deep state for open/close nested repair manual accordion
-  const [openRepairManualPath, setOpenRepairManualPath] = useState<string[]>(
-    []
-  );
+  const [openRepairManualPath, setOpenRepairManualPath] = useState<string[]>([]);
 
   // Fetch billings from API
   const fetchBillings = async () => {
@@ -927,9 +871,9 @@ export default function WorkshopPage() {
                   // Get initial vrid
                   try {
                     vrid = await getVrid({
-                      distributorUsername: "<REDACTED_DISTRIBUTOR_USERNAME>",
-                      distributorPassword: "<REDACTED_DISTRIBUTOR_PASSWORD>",
-                      username: "<REDACTED_USERNAME>",
+                      distributorUsername: "cawosh_dx_demo",
+                      distributorPassword: "34CaKSwSk597pM63",
+                      username: "firaz.zakariya@hotmail.com",
                     });
                   } catch {
                     vrid = null;
@@ -955,9 +899,9 @@ export default function WorkshopPage() {
                     // Call getVrid to get a new vrid
                     try {
                       const newVrid = await getVrid({
-                        distributorUsername: "<REDACTED_DISTRIBUTOR_USERNAME>",
-                        distributorPassword: "<REDACTED_DISTRIBUTOR_PASSWORD>",
-                        username: "<REDACTED_USERNAME>",
+                        distributorUsername: "cawosh_dx_demo",
+                        distributorPassword: "34CaKSwSk597pM63",
+                        username: "firaz.zakariya@hotmail.com",
                       });
                       if (typeof newVrid === "string" && newVrid) {
                         vrid = newVrid;
@@ -1432,7 +1376,9 @@ function VehicleTabs({
           </div>
         )}
 
-        {mainTab === "recalls" && <RecallSection data={SAMPLE_RECALL_DATA} />}
+        {mainTab === "recalls" && (
+          <RecallSection data={SAMPLE_RECALL_DATA} />
+        )}
 
         {mainTab === "electronics" && (
           <div>
@@ -1486,40 +1432,25 @@ function LubricantSection({
         Lubricants and Fluids
       </h3>
       <div className="text-sm text-gray-600 mb-4">
-        Key specifications, recommended oils, fluids and fill capacities for
-        this vehicle. Always check your vehicle handbook for definitive
-        fills/specification details.
+        Key specifications, recommended oils, fluids and fill capacities for this vehicle. Always check your vehicle handbook for definitive fills/specification details.
       </div>
       <div className="overflow-x-auto mb-2">
         <table className="min-w-[520px] w-full table-auto border border-gray-200 bg-gray-50 rounded">
           <thead>
             <tr className="bg-gray-100 text-sm">
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Type
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Specification
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Capacity
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Notes
-              </th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Type</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Specification</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Capacity</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Notes</th>
             </tr>
           </thead>
           <tbody>
             {data.map((fluid, idx) => (
-              <tr
-                key={fluid.type + idx}
-                className="border-t border-gray-100 text-sm"
-              >
+              <tr key={fluid.type + idx} className="border-t border-gray-100 text-sm">
                 <td className="px-3 py-2 font-semibold">{fluid.type}</td>
                 <td className="px-3 py-2">{fluid.specification}</td>
                 <td className="px-3 py-2">{fluid.capacity}</td>
-                <td className="px-3 py-2 text-xs text-gray-700">
-                  {fluid.notes || <span className="text-gray-400">—</span>}
-                </td>
+                <td className="px-3 py-2 text-xs text-gray-700">{fluid.notes || <span className="text-gray-400">—</span>}</td>
               </tr>
             ))}
           </tbody>
@@ -1558,9 +1489,7 @@ function WarningLightsSection({
         <table className="min-w-[640px] w-full table-auto border border-gray-200 bg-gray-50 rounded">
           <thead>
             <tr className="bg-gray-100 text-sm">
-              <th className="px-3 py-2 border-b-2 border-gray-200 font-medium text-left">
-                Icon
-              </th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 font-medium text-left">Icon</th>
               <th className="px-3 py-2 border-b-2 border-gray-200 font-medium text-left">
                 Name
               </th>
@@ -1577,10 +1506,7 @@ function WarningLightsSection({
           </thead>
           <tbody>
             {data.map((item, idx) => (
-              <tr
-                key={item.name + idx}
-                className="border-t border-gray-100 text-sm"
-              >
+              <tr key={item.name + idx} className="border-t border-gray-100 text-sm">
                 <td className="px-3 py-2 text-2xl font-normal">{item.icon}</td>
                 <td className="px-3 py-2 font-semibold">{item.name}</td>
                 <td className="px-3 py-2">
@@ -1612,6 +1538,7 @@ function WarningLightsSection({
         </table>
       </div>
       <div className="mt-2 text-xs text-gray-500">
+        Note: The appearance and color of lights may vary. Check the owner's handbook for your specific vehicle.
         Note: The appearance and color of lights may vary. Check the
         owner&apos;s handbook for your specific vehicle.
       </div>
@@ -1620,69 +1547,47 @@ function WarningLightsSection({
 }
 
 // --- New Section: Repair Times with Table View ---
-function RepairTimesSection({
-  data,
-}: {
-  data: typeof SAMPLE_REPAIR_TIMES_DATA;
-}) {
+function RepairTimesSection({ data }: { data: typeof SAMPLE_REPAIR_TIMES_DATA }) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">Repair Times</h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+        Repair Times
+      </h3>
       <div className="text-sm text-gray-600 mb-4 max-w-2xl">
-        Standard times for common repair jobs, including typical parts and
-        comments. All values are for a vehicle of the shown configuration.
+        Standard times for common repair jobs, including typical parts and comments. All values are for a vehicle of the shown configuration.
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-[600px] w-full table-auto border border-gray-200 bg-gray-50 rounded">
           <thead>
             <tr className="bg-gray-100 text-sm">
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Operation
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Code
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Parts Required
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Time
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Unit
-              </th>
-              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                Remarks
-              </th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Operation</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Code</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Parts Required</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Time</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Unit</th>
+              <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Remarks</th>
             </tr>
           </thead>
           <tbody>
             {data.map((row, idx) => (
-              <tr
-                key={row.code + idx}
-                className="border-t border-gray-100 text-sm"
-              >
+              <tr key={row.code + idx} className="border-t border-gray-100 text-sm">
                 <td className="px-3 py-2 font-medium">{row.operation}</td>
                 <td className="px-3 py-2">{row.code}</td>
                 <td className="px-3 py-2">
-                  {row.partsRequired && row.partsRequired.length > 0 ? (
-                    row.partsRequired.map((part, i) => (
-                      <span
-                        key={part + i}
-                        className="inline-block mr-2 mb-1 px-2 py-1 bg-gray-100 rounded text-xs"
-                      >
-                        {part}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
+                  {row.partsRequired && row.partsRequired.length > 0
+                    ? row.partsRequired.map((part, i) => (
+                        <span
+                          key={part + i}
+                          className="inline-block mr-2 mb-1 px-2 py-1 bg-gray-100 rounded text-xs"
+                        >
+                          {part}
+                        </span>
+                      ))
+                    : <span className="text-gray-400">—</span>}
                 </td>
                 <td className="px-3 py-2 font-semibold">{row.time}</td>
                 <td className="px-3 py-2">{row.unit}</td>
-                <td className="px-3 py-2 text-xs text-gray-700">
-                  {row.remarks || <span className="text-gray-400">—</span>}
-                </td>
+                <td className="px-3 py-2 text-xs text-gray-700">{row.remarks || <span className="text-gray-400">—</span>}</td>
               </tr>
             ))}
           </tbody>
@@ -1699,50 +1604,30 @@ function RepairTimesSection({
 function AdjustmentDataSection({ groups }: { groups: AdjustmentGroup[] }) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900 mb-3">
-        Adjustment Data
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-3">Adjustment Data</h3>
       <div className="text-sm text-gray-600 mb-4">
-        Key adjustment specifications for common maintenance and repair tasks.
-        All values apply to the current vehicle model.
+        Key adjustment specifications for common maintenance and repair tasks. All values apply to the current vehicle model.
       </div>
       {groups.map((group) => (
         <div key={group.group} className="mb-6">
-          <h4 className="font-semibold text-blue-700 text-md mb-2">
-            {group.group}
-          </h4>
+          <h4 className="font-semibold text-blue-700 text-md mb-2">{group.group}</h4>
           <div className="overflow-x-auto">
             <table className="min-w-[350px] w-full table-auto border border-gray-200 bg-gray-50 rounded">
               <thead>
                 <tr className="bg-gray-100 text-sm">
-                  <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                    Parameter
-                  </th>
-                  <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                    Value
-                  </th>
-                  <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                    Unit
-                  </th>
-                  <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">
-                    Notes
-                  </th>
+                  <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Parameter</th>
+                  <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Value</th>
+                  <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Unit</th>
+                  <th className="px-3 py-2 border-b-2 border-gray-200 text-left font-medium">Notes</th>
                 </tr>
               </thead>
               <tbody>
                 {group.items.map((item, idx) => (
-                  <tr
-                    key={item.parameter + idx}
-                    className="border-t border-gray-100 text-sm"
-                  >
+                  <tr key={item.parameter + idx} className="border-t border-gray-100 text-sm">
                     <td className="px-3 py-2">{item.parameter}</td>
                     <td className="px-3 py-2 font-semibold">{item.value}</td>
-                    <td className="px-3 py-2">
-                      {item.unit || <span className="text-gray-400">—</span>}
-                    </td>
-                    <td className="px-3 py-2 text-xs text-gray-700">
-                      {item.notes || <span className="text-gray-400">—</span>}
-                    </td>
+                    <td className="px-3 py-2">{item.unit || <span className="text-gray-400">—</span>}</td>
+                    <td className="px-3 py-2 text-xs text-gray-700">{item.notes || <span className="text-gray-400">—</span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1832,9 +1717,7 @@ function RepairManualsSection({
           aria-expanded={isOpen}
           tabIndex={0}
         >
-          <span
-            className={`mr-3 transition-transform ${isOpen ? "rotate-90" : ""}`}
-          >
+          <span className={`mr-3 transition-transform ${isOpen ? "rotate-90" : ""}`}>
             ▶
           </span>
           <span className="flex-1">{sectionObj.title}</span>
@@ -1980,10 +1863,7 @@ function RepairManualsSection({
         Repair Manuals
       </h3>
       <div className="text-sm text-gray-600 mb-4 max-w-2xl">
-        Below are available sections with repair instructions. Click a section
-        to view details and images (if available). No more than two nesting
-        levels: any additional subsections are flattened and shown as siblings
-        inside the 2nd section.
+        Below are available sections with repair instructions. Click a section to view details and images (if available). No more than two nesting levels: any additional subsections are flattened and shown as siblings inside the 2nd section.
       </div>
       <div className="overflow-x-auto">
         <div className="divide-y border rounded">

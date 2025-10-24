@@ -40,44 +40,35 @@ export default function LoginPage() {
         return;
       }
 
-      // Set the user in the auth store with the complete user data
-      setUser({
-        _id: data.data.user._id,
-        employeeId: data.data.user.employeeId,
-        firstName: data.data.user.firstName,
-        lastName: data.data.user.lastName,
-        email: data.data.user.email,
-        phone: data.data.user.phone,
-        role: data.data.user.role,
-        position: data.data.user.position,
-        status: data.data.user.status,
-        permissions: data.data.permissions,
-        accessLevel: data.data.user.accessLevel,
-        department: data.data.user.department,
-        joiningDate: data.data.user.joiningDate,
-        employmentType: data.data.user.employmentType,
-        workingHours: data.data.user.workingHours,
-        skills: data.data.user.skills,
-        certifications: data.data.user.certifications,
-        systemAccess: data.data.systemAccess,
-        lastLogin: data.data.user.lastLogin,
-        createdAt: data.data.user.createdAt,
-        updatedAt: data.data.user.updatedAt,
-        __v: data.data.user.__v,
-        userId: data.data.user.userId,
-      });
+      // // Set the user in the auth store with the complete user data
+      // setUser({
+      //   _id: data.data.user._id,
+      //   employeeId: data.data.user.employeeId,
+      //   firstName: data.data.user.firstName,
+      //   lastName: data.data.user.lastName,
+      //   email: data.data.user.email,
+      //   phone: data.data.user.phone,
+      //   role: data.data.user.role,
+      //   position: data.data.user.position,
+      //   status: data.data.user.status,
+      //   permissions: data.data.permissions,
+      //   accessLevel: data.data.user.accessLevel,
+      //   department: data.data.user.department,
+      //   joiningDate: data.data.user.joiningDate,
+      //   employmentType: data.data.user.employmentType,
+      //   workingHours: data.data.user.workingHours,
+      //   skills: data.data.user.skills,
+      //   certifications: data.data.user.certifications,
+      //   systemAccess: data.data.systemAccess,
+      //   lastLogin: data.data.user.lastLogin,
+      //   createdAt: data.data.user.createdAt,
+      //   updatedAt: data.data.user.updatedAt,
+      //   __v: data.data.user.__v,
+      //   userId: data.data.user.userId
+      // });
 
-      try {
-        const garageResponse = await fetch("/api/garage-settings");
-        if (garageResponse.ok) {
-          const garageData = await garageResponse.json();
-          if (garageData.data) {
-            useGarageStore.getState().setGarage(garageData.data);
-          }
-        }
-      } catch (garageError) {
-        console.error("Failed to fetch garage settings:", garageError);
-      }
+      // Wait for the cookie to be set and auth store to be updated
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Navigate to dashboard
       router.push("/dashboard");
