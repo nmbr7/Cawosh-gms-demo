@@ -127,7 +127,7 @@ export default function MotVehiclesOverview() {
       setLoading(true);
       setFetchError(null);
       try {
-        const url = process.env.BACKEND_URL + "api/auth/mot/all";
+        const url = "http://localhost:8090/api/auth/mot/all";
         const res = await fetch(url, {
           method: "GET",
           headers: {

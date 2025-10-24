@@ -1,4 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+
+const API_URL = "http://localhost:8090"
+console.log(API_URL)
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     // Forward the request to the real backend
-    const response = await fetch(`${backendUrl}/api/auth/login`, {
+    const response = await fetch(`${backendUrl}/api/v1/auth/login`, {
       method: "POST",
       headers: {
         "X-Tenant-Slug": "autocare-pro",
@@ -51,8 +54,8 @@ export async function POST(request: Request) {
     });
 
     // Set the access token in an HTTP-only cookie
-    if (data.data.token) {
-      nextResponse.cookies.set("access_token", data.data.token, {
+    if (data.tokens) {
+      nextResponse.cookies.set("access_token", data.tokens.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
