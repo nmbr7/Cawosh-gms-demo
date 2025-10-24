@@ -14,26 +14,8 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import React from "react";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-
-interface Billing {
-  id: string;
-  customerName: string;
-  serviceDetails: {
-    description: string;
-    date: string;
-    duration: string;
-  };
-  carDetails: {
-    make: string;
-    model: string;
-    registrationNumber: string;
-  };
-  charges: {
-    total: number;
-  };
-  invoiceNumber: string;
-}
+import { useInvoiceStore } from "@/store/invoice";
+import type { Invoice } from "@/types/invoice";
 
 interface PaginationInfo {
   currentPage: number;
@@ -42,16 +24,9 @@ interface PaginationInfo {
   itemsPerPage: number;
 }
 
-interface ApiResponse {
-  billings: Billing[];
-  pagination: PaginationInfo;
-  filters: {
-    serviceTypes: string[];
-  };
-}
-
 export default function BillingsPage() {
-  const [billings, setBillings] = useState<Billing[]>([]);
+  const { invoices } = useInvoiceStore();
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [serviceFilter, setServiceFilter] = useState("all");
@@ -67,24 +42,60 @@ export default function BillingsPage() {
   const fetchBillings = useCallback(async () => {
     try {
       setIsLoading(true);
-      const params = new URLSearchParams({
-        page: paginationInfo.currentPage.toString(),
-        limit: paginationInfo.itemsPerPage.toString(),
-        search: searchTerm,
-        service: serviceFilter,
-        date: dateFilter,
+
+      // Get all invoices from store
+      const allInvoices = invoices;
+
+      // Apply filters
+      const filtered = allInvoices.filter((invoice) => {
+        const matchesSearch =
+          invoice.customer.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          invoice.invoiceNumber
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+
+        const matchesService =
+          serviceFilter === "all" ||
+          invoice.services.some((service) => service.name === serviceFilter);
+
+        const matchesDate =
+          dateFilter === "" || invoice.issuedDate.includes(dateFilter);
+
+        return matchesSearch && matchesService && matchesDate;
       });
 
-      const response = await fetchWithAuth(
-        `/api/billings?${params.toString()}`
+      // Apply pagination
+      const startIndex =
+        (paginationInfo.currentPage - 1) * paginationInfo.itemsPerPage;
+      const paginatedInvoices = filtered.slice(
+        startIndex,
+        startIndex + paginationInfo.itemsPerPage
       );
-      if (!response.ok) {
-        throw new Error("Failed to fetch billings");
-      }
-      const data: ApiResponse = await response.json();
-      setBillings(data.billings);
-      setPaginationInfo(data.pagination);
-      setServiceTypes(data.filters.serviceTypes);
+
+      // Store filtered invoices for display
+      setFilteredInvoices(paginatedInvoices);
+
+      // Update pagination info
+      setPaginationInfo((prev) => ({
+        ...prev,
+        totalItems: filtered.length,
+        totalPages: Math.max(
+          1,
+          Math.ceil(filtered.length / paginationInfo.itemsPerPage)
+        ),
+      }));
+
+      // Get service types for filter
+      const uniqueServiceTypes = Array.from(
+        new Set(
+          allInvoices.flatMap((invoice) =>
+            invoice.services.map((service) => service.name)
+          )
+        )
+      );
+      setServiceTypes(uniqueServiceTypes);
     } catch (error) {
       console.error("Error fetching billings:", error);
     } finally {
@@ -96,6 +107,7 @@ export default function BillingsPage() {
     searchTerm,
     serviceFilter,
     dateFilter,
+    invoices,
   ]);
 
   useEffect(() => {
@@ -108,9 +120,9 @@ export default function BillingsPage() {
     }
   };
 
-  const handleDownloadInvoice = (billing: Billing) => {
+  const handleDownloadInvoice = (invoice: Invoice) => {
     // TODO: Implement actual PDF generation
-    console.log(`Downloading invoice ${billing.invoiceNumber}`);
+    console.log(`Downloading invoice ${invoice.invoiceNumber}`);
     alert("PDF download functionality will be implemented soon!");
   };
 
@@ -241,6 +253,38 @@ export default function BillingsPage() {
         <h1 className="text-2xl font-semibold text-gray-900">
           Billings & Invoices
         </h1>
+        <div className="text-sm text-gray-600">
+          Total: {invoices.length} invoices
+        </div>
+      </div>
+
+      {/* Invoice Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="text-2xl font-bold text-blue-600">
+            {invoices.length}
+          </div>
+          <div className="text-sm text-gray-600">Total Invoices</div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="text-2xl font-bold text-green-600">
+            £
+            {invoices.reduce((sum, inv) => sum + inv.totalAmount, 0).toFixed(2)}
+          </div>
+          <div className="text-sm text-gray-600">Total Value</div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="text-2xl font-bold text-amber-600">
+            {invoices.filter((inv) => inv.status === "DRAFT").length}
+          </div>
+          <div className="text-sm text-gray-600">Draft</div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="text-2xl font-bold text-green-600">
+            {invoices.filter((inv) => inv.status === "PAID").length}
+          </div>
+          <div className="text-sm text-gray-600">Paid</div>
+        </div>
       </div>
 
       {/* Filters */}
@@ -301,15 +345,18 @@ export default function BillingsPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Amount
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {billings.length === 0 ? (
+              {filteredInvoices.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center">
+                  <td colSpan={8} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center space-y-4">
                       <div className="p-4 bg-gray-50 rounded-full">
                         <svg
@@ -365,44 +412,68 @@ export default function BillingsPage() {
                   </td>
                 </tr>
               ) : (
-                billings.map((billing) => (
-                  <tr key={billing.id} className="hover:bg-gray-50">
+                filteredInvoices.map((invoice) => (
+                  <tr key={invoice.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {billing.invoiceNumber}
+                      {invoice.invoiceNumber}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {billing.customerName}
+                      {invoice.customer.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex flex-col">
-                        <span>{billing.serviceDetails.description}</span>
+                        <span>
+                          {invoice.services[0]?.name || "Multiple Services"}
+                        </span>
                         <span className="text-xs text-gray-500">
-                          Duration: {billing.serviceDetails.duration}
+                          Duration:{" "}
+                          {invoice.services.reduce(
+                            (sum, s) => sum + s.duration,
+                            0
+                          )}{" "}
+                          min
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex flex-col">
                         <span>
-                          {billing.carDetails.make} {billing.carDetails.model}
+                          {invoice.vehicle.make} {invoice.vehicle.model}
                         </span>
                         <span className="text-xs text-gray-500">
-                          Reg: {billing.carDetails.registrationNumber}
+                          Reg: {invoice.vehicle.license}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatDate(billing.serviceDetails.date)}
+                      {formatDate(invoice.issuedDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${billing.charges.total.toFixed(2)}
+                      £{invoice.totalAmount.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          invoice.status === "DRAFT"
+                            ? "bg-gray-100 text-gray-800"
+                            : invoice.status === "SENT"
+                            ? "bg-blue-100 text-blue-800"
+                            : invoice.status === "PAID"
+                            ? "bg-green-100 text-green-800"
+                            : invoice.status === "OVERDUE"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {invoice.status}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Button
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-2"
-                        onClick={() => handleDownloadInvoice(billing)}
+                        onClick={() => handleDownloadInvoice(invoice)}
                       >
                         <FileDoc size={16} />
                         Download

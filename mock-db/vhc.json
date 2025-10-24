@@ -530,6 +530,18 @@
   ],
   "responses": [
     {
+      "id": "e3c08bcf-5726-497c-9dc5-a5bc66fbb1f1",
+      "templateId": "vhc_template_v2",
+      "templateVersion": 2,
+      "powertrain": "ice",
+      "status": "in_progress",
+      "vehicleId": "JIFELFJ",
+      "answers": [],
+      "createdBy": "Afsal",
+      "createdAt": "2025-10-24T12:38:11.126Z",
+      "updatedAt": "2025-10-24T12:38:11.126Z"
+    },
+    {
       "id": "9cdf9daf-bcbf-49d3-a65e-14fbc7a21fcb",
       "templateId": "vhc_template_v2",
       "templateVersion": 2,

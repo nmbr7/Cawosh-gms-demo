@@ -29,7 +29,8 @@ import { useJobSheetStore, JobSheet as StoreJobSheet } from "@/store/jobSheet";
 import { useBookingStore } from "@/store/booking";
 import { format } from "date-fns";
 import { DiagnosisSubmissionModal } from "@/app/components/job-sheet/DiagnosisSubmissionModal";
-import { Stethoscope, AlertCircle, CheckCircle } from "lucide-react";
+import { WorkTrackingModal } from "@/app/components/job-sheet/WorkTrackingModal";
+import { Stethoscope, AlertCircle, CheckCircle, Play } from "lucide-react";
 
 // Removed old JobSheet interface - using StoreJobSheet from store
 
@@ -80,6 +81,9 @@ export default function JobSheetPage() {
   const [selectedJobSheet, setSelectedJobSheet] =
     useState<StoreJobSheet | null>(null);
   const [showDiagnosisModal, setShowDiagnosisModal] = useState(false);
+  const [showWorkTrackingModal, setShowWorkTrackingModal] = useState(false);
+  const [workTrackingJobSheetId, setWorkTrackingJobSheetId] =
+    useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -413,12 +417,18 @@ export default function JobSheetPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Work Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Diagnosis
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white">
               {/* Progress bar as divider */}
               <tr>
-                <td colSpan={6} className="p-0">
+                <td colSpan={8} className="p-0">
                   <div className="h-1 bg-blue-500 animate-pulse"></div>
                 </td>
               </tr>
@@ -453,10 +463,16 @@ export default function JobSheetPage() {
                     <td className="px-6 py-4">
                       <div className="h-4 bg-gray-200 rounded w-20"></div>
                     </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-24"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-20"></div>
+                    </td>
                   </tr>
                   {row < 3 && (
                     <tr>
-                      <td colSpan={6} className="p-0">
+                      <td colSpan={8} className="p-0">
                         <div className="h-px bg-gray-200"></div>
                       </td>
                     </tr>
@@ -863,6 +879,29 @@ export default function JobSheetPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={cn(
+                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
+                        jobSheet.status === "PENDING" &&
+                          "bg-blue-100 text-blue-800",
+                        jobSheet.status === "IN_PROGRESS" &&
+                          "bg-green-100 text-green-800",
+                        jobSheet.status === "PAUSED" &&
+                          "bg-yellow-100 text-yellow-800",
+                        jobSheet.status === "HALTED" &&
+                          "bg-red-100 text-red-800",
+                        jobSheet.status === "COMPLETED" &&
+                          "bg-green-100 text-green-800"
+                      )}
+                    >
+                      {jobSheet.status === "PENDING" && "Not Started"}
+                      {jobSheet.status === "IN_PROGRESS" && "In Progress"}
+                      {jobSheet.status === "PAUSED" && "Paused"}
+                      {jobSheet.status === "HALTED" && "Halted"}
+                      {jobSheet.status === "COMPLETED" && "Completed"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     {jobSheet.requiresDiagnosis ? (
                       <div className="flex flex-col gap-1">
                         {jobSheet.approvalStatus === "approved" ? (
@@ -1109,6 +1148,24 @@ export default function JobSheetPage() {
                     </Button>
                   </div>
                 )}
+
+              {/* Start Work Button */}
+              {selectedJobSheet.approvalStatus === "approved" &&
+                selectedJobSheet.status === "PENDING" && (
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      onClick={() => {
+                        setWorkTrackingJobSheetId(selectedJobSheet.id);
+                        setShowWorkTrackingModal(true);
+                        setSelectedJobSheet(null); // Close the job sheet details modal
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      Start Work
+                    </Button>
+                  </div>
+                )}
             </div>
           )}
         </DialogContent>
@@ -1177,6 +1234,18 @@ export default function JobSheetPage() {
           }}
         />
       )}
+
+      {/* Work Tracking Modal */}
+      <WorkTrackingModal
+        isOpen={showWorkTrackingModal}
+        onClose={() => setShowWorkTrackingModal(false)}
+        jobSheetId={workTrackingJobSheetId}
+        onWorkCompleted={() => {
+          setShowWorkTrackingModal(false);
+          setWorkTrackingJobSheetId("");
+          fetchJobSheets();
+        }}
+      />
     </div>
   );
 }

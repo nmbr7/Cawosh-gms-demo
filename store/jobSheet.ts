@@ -5,8 +5,18 @@ import type { Booking } from "@/types/booking";
 export type JobSheetStatus =
   | "PENDING"
   | "IN_PROGRESS"
+  | "PAUSED"
+  | "HALTED"
   | "COMPLETED"
   | "CANCELLED";
+
+export interface TimeLog {
+  id: string;
+  action: "START" | "PAUSE" | "RESUME" | "HALT" | "COMPLETE";
+  timestamp: string;
+  technicianId: string;
+  notes?: string;
+}
 
 export interface JobSheet {
   id: string;
@@ -29,6 +39,14 @@ export interface JobSheet {
   approvedBy?: string; // advisor user ID
   approvedAt?: string; // timestamp
   customerApprovalMethod?: "manual" | "api"; // for future API integration
+  // Work tracking fields
+  startedAt?: string;
+  pausedAt?: string;
+  completedAt?: string;
+  timeLogs: TimeLog[];
+  totalWorkDuration: number; // in minutes
+  haltReason?: string;
+  inventoryDeducted: boolean;
 }
 
 export interface FilterOptions {
@@ -59,6 +77,13 @@ type JobSheetState = {
     status: "pending" | "approved" | "rejected",
     approvedBy?: string
   ) => void;
+  // Work tracking actions
+  startJob: (jobSheetId: string, technicianId: string) => void;
+  pauseJob: (jobSheetId: string, technicianId: string, notes?: string) => void;
+  resumeJob: (jobSheetId: string, technicianId: string) => void;
+  haltJob: (jobSheetId: string, technicianId: string, reason: string) => void;
+  completeJob: (jobSheetId: string, technicianId: string) => void;
+  calculateWorkDuration: (timeLogs: TimeLog[]) => number;
 };
 
 export const useJobSheetStore = create<JobSheetState>((set, get) => ({
@@ -67,6 +92,8 @@ export const useJobSheetStore = create<JobSheetState>((set, get) => ({
     statuses: [
       { value: "PENDING", label: "Pending" },
       { value: "IN_PROGRESS", label: "In Progress" },
+      { value: "PAUSED", label: "Paused" },
+      { value: "HALTED", label: "Halted" },
       { value: "COMPLETED", label: "Completed" },
       { value: "CANCELLED", label: "Cancelled" },
     ],
@@ -96,6 +123,9 @@ export const useJobSheetStore = create<JobSheetState>((set, get) => ({
       status: "PENDING",
       createdAt: new Date().toISOString(),
       requiresDiagnosis: booking?.requiresDiagnosis || false,
+      timeLogs: [],
+      totalWorkDuration: 0,
+      inventoryDeducted: false,
     };
     set((s) => ({ jobSheets: [...s.jobSheets, js] }));
     return js;
@@ -133,4 +163,134 @@ export const useJobSheetStore = create<JobSheetState>((set, get) => ({
       ),
     })),
   getFilterOptions: () => get().filterOptions,
+  // Work tracking actions
+  startJob: (jobSheetId, technicianId) => {
+    const timeLog: TimeLog = {
+      id: crypto.randomUUID(),
+      action: "START",
+      timestamp: new Date().toISOString(),
+      technicianId,
+    };
+
+    set((s) => ({
+      jobSheets: s.jobSheets.map((j) =>
+        j.id === jobSheetId
+          ? {
+              ...j,
+              status: "IN_PROGRESS" as const,
+              startedAt: timeLog.timestamp,
+              timeLogs: [...j.timeLogs, timeLog],
+            }
+          : j
+      ),
+    }));
+  },
+  pauseJob: (jobSheetId, technicianId, notes) => {
+    const timeLog: TimeLog = {
+      id: crypto.randomUUID(),
+      action: "PAUSE",
+      timestamp: new Date().toISOString(),
+      technicianId,
+      notes,
+    };
+
+    set((s) => ({
+      jobSheets: s.jobSheets.map((j) =>
+        j.id === jobSheetId
+          ? {
+              ...j,
+              status: "PAUSED" as const,
+              pausedAt: timeLog.timestamp,
+              timeLogs: [...j.timeLogs, timeLog],
+            }
+          : j
+      ),
+    }));
+  },
+  resumeJob: (jobSheetId, technicianId) => {
+    const timeLog: TimeLog = {
+      id: crypto.randomUUID(),
+      action: "RESUME",
+      timestamp: new Date().toISOString(),
+      technicianId,
+    };
+
+    set((s) => ({
+      jobSheets: s.jobSheets.map((j) =>
+        j.id === jobSheetId
+          ? {
+              ...j,
+              status: "IN_PROGRESS" as const,
+              timeLogs: [...j.timeLogs, timeLog],
+            }
+          : j
+      ),
+    }));
+  },
+  haltJob: (jobSheetId, technicianId, reason) => {
+    const timeLog: TimeLog = {
+      id: crypto.randomUUID(),
+      action: "HALT",
+      timestamp: new Date().toISOString(),
+      technicianId,
+      notes: reason,
+    };
+
+    set((s) => ({
+      jobSheets: s.jobSheets.map((j) =>
+        j.id === jobSheetId
+          ? {
+              ...j,
+              status: "HALTED" as const,
+              haltReason: reason,
+              timeLogs: [...j.timeLogs, timeLog],
+            }
+          : j
+      ),
+    }));
+  },
+  completeJob: (jobSheetId, technicianId) => {
+    const timeLog: TimeLog = {
+      id: crypto.randomUUID(),
+      action: "COMPLETE",
+      timestamp: new Date().toISOString(),
+      technicianId,
+    };
+
+    set((s) => ({
+      jobSheets: s.jobSheets.map((j) =>
+        j.id === jobSheetId
+          ? {
+              ...j,
+              status: "COMPLETED" as const,
+              completedAt: timeLog.timestamp,
+              timeLogs: [...j.timeLogs, timeLog],
+            }
+          : j
+      ),
+    }));
+  },
+  calculateWorkDuration: (timeLogs) => {
+    let totalMinutes = 0;
+    let lastStart: Date | null = null;
+
+    timeLogs.forEach((log) => {
+      if (log.action === "START" || log.action === "RESUME") {
+        lastStart = new Date(log.timestamp);
+      } else if (
+        (log.action === "PAUSE" ||
+          log.action === "HALT" ||
+          log.action === "COMPLETE") &&
+        lastStart
+      ) {
+        const duration =
+          (new Date(log.timestamp).getTime() - lastStart.getTime()) /
+          (1000 * 60);
+        totalMinutes += duration;
+        lastStart = null;
+      }
+    });
+
+    return Math.round(totalMinutes);
+  },
 }));

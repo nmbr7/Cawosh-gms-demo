@@ -100,11 +100,6 @@ export const BookingCreateModal = ({
     );
   };
 
-  // Calculate total price and check if undiagnosed
-  const totalPrice = selectedServices.reduce(
-    (acc, service) => acc + service.price,
-    0
-  );
   const isUndiagnosed = selectedServices.some(
     (service) => service.id === "service-undiagnosed"
   );
@@ -438,33 +433,6 @@ export const BookingCreateModal = ({
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                   />
-                </div>
-
-                {/* Price Summary */}
-                <div>
-                  <h3 className="text-sm font-semibold mb-2">Price Summary</h3>
-                  <div className="bg-gray-50 rounded-md p-3">
-                    {isUndiagnosed ? (
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-amber-600">
-                          £0.00
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">
-                          Price to be determined after diagnosis
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-gray-900">
-                          £{totalPrice.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-gray-600 mt-1">
-                          {selectedServices.length} service
-                          {selectedServices.length !== 1 ? "s" : ""} selected
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
 
