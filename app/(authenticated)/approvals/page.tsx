@@ -200,12 +200,29 @@ export default function ApprovalsPage() {
   };
 
   const getTotalPrice = (diagnosedServices: Array<{ price: number }>) => {
-    return (
-      diagnosedServices?.reduce((acc, service) => acc + service.price, 0) || 0
-    );
+    const servicesSubtotal =
+      diagnosedServices?.reduce((acc, service) => acc + service.price, 0) || 0;
+    const serviceCharge = 15.0; // Fixed service charge
+    const subtotal = servicesSubtotal + serviceCharge;
+    const vat = subtotal * 0.2; // 20% VAT
+    return subtotal + vat;
   };
 
-  const getTechnicianName = (technicianId: string) => {
+  const getTechnicianName = (technicianId: string, jobSheet: StoreJobSheet) => {
+    // First try to get from assigned technicians in the booking
+    if (
+      jobSheet.booking?.assignedTechnicians &&
+      jobSheet.booking.assignedTechnicians.length > 0
+    ) {
+      const assignedTech = jobSheet.booking.assignedTechnicians.find(
+        (tech) => tech.technicianId === technicianId
+      );
+      if (assignedTech) {
+        return assignedTech.technicianName;
+      }
+    }
+
+    // Fallback to filter options
     const technician = filterOptions.technicians.find(
       (t) => t.id === technicianId
     );
@@ -436,13 +453,15 @@ export default function ApprovalsPage() {
                         £
                         {getTotalPrice(
                           jobSheet.diagnosedServices || []
-                        ).toFixed(2)}
+                        ).toFixed(2)}{" "}
+                        (inc. VAT)
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
                         {getTechnicianName(
-                          jobSheet.diagnosedServices?.[0]?.addedBy || ""
+                          jobSheet.diagnosedServices?.[0]?.addedBy || "",
+                          jobSheet
                         )}
                       </div>
                       <div className="text-sm text-gray-500">

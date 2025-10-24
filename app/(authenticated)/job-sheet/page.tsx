@@ -28,6 +28,8 @@ import {
 import { useJobSheetStore, JobSheet as StoreJobSheet } from "@/store/jobSheet";
 import { useBookingStore } from "@/store/booking";
 import { format } from "date-fns";
+import { DiagnosisSubmissionModal } from "@/app/components/job-sheet/DiagnosisSubmissionModal";
+import { Stethoscope, AlertCircle, CheckCircle } from "lucide-react";
 
 // Removed old JobSheet interface - using StoreJobSheet from store
 
@@ -77,6 +79,7 @@ export default function JobSheetPage() {
   const [jobSheets, setJobSheets] = useState<StoreJobSheet[]>([]);
   const [selectedJobSheet, setSelectedJobSheet] =
     useState<StoreJobSheet | null>(null);
+  const [showDiagnosisModal, setShowDiagnosisModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -732,6 +735,7 @@ export default function JobSheetPage() {
                             status: "all",
                             bookingId: null,
                             technicianId: null,
+                            diagnosisStatus: null,
                             sortBy: "id",
                             sortOrder: "desc",
                           });
@@ -911,6 +915,43 @@ export default function JobSheetPage() {
 
           {selectedJobSheet && (
             <div className="space-y-6">
+              {/* Diagnosis Required Banner */}
+              {selectedJobSheet.requiresDiagnosis &&
+                selectedJobSheet.approvalStatus !== "approved" && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-amber-600" />
+                      <div>
+                        <h3 className="text-sm font-semibold text-amber-800">
+                          Diagnosis Required
+                        </h3>
+                        <p className="text-sm text-amber-700">
+                          This job requires diagnosis before work can begin.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              {/* Diagnosis Approved Banner */}
+              {selectedJobSheet.requiresDiagnosis &&
+                selectedJobSheet.approvalStatus === "approved" && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <div>
+                        <h3 className="text-sm font-semibold text-green-800">
+                          Diagnosis Approved
+                        </h3>
+                        <p className="text-sm text-green-700">
+                          Diagnosis has been completed and approved. Work can
+                          now begin.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
               {/* Basic Information */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -1052,6 +1093,22 @@ export default function JobSheetPage() {
                   )?.label || selectedJobSheet.status}
                 </span>
               </div>
+
+              {/* Submit Diagnosis Button */}
+              {selectedJobSheet.requiresDiagnosis &&
+                selectedJobSheet.approvalStatus !== "pending" &&
+                selectedJobSheet.approvalStatus !== "approved" &&
+                selectedJobSheet.approvalStatus !== "rejected" && (
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      onClick={() => setShowDiagnosisModal(true)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Stethoscope className="w-4 h-4 mr-2" />
+                      Submit Diagnosis
+                    </Button>
+                  </div>
+                )}
             </div>
           )}
         </DialogContent>
@@ -1106,6 +1163,20 @@ export default function JobSheetPage() {
           </Button>
         </div>
       </div>
+
+      {/* Diagnosis Submission Modal */}
+      {selectedJobSheet && (
+        <DiagnosisSubmissionModal
+          jobSheet={selectedJobSheet}
+          isOpen={showDiagnosisModal}
+          onClose={() => setShowDiagnosisModal(false)}
+          onDiagnosisSubmitted={() => {
+            setShowDiagnosisModal(false);
+            // Refresh the job sheets to show updated status
+            fetchJobSheets();
+          }}
+        />
+      )}
     </div>
   );
 }

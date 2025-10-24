@@ -41,10 +41,14 @@ export function ApprovalDetailsModal({
   const booking = jobSheet.booking;
   const diagnosedServices = jobSheet.diagnosedServices || [];
 
-  const totalPrice = diagnosedServices.reduce(
+  const servicesSubtotal = diagnosedServices.reduce(
     (acc, service) => acc + service.price,
     0
   );
+  const serviceCharge = 15.0; // Fixed service charge
+  const subtotal = servicesSubtotal + serviceCharge;
+  const vat = subtotal * 0.2; // 20% VAT
+  const totalPrice = subtotal + vat;
   const totalDuration = diagnosedServices.reduce(
     (acc, service) => acc + service.duration,
     0
@@ -68,6 +72,9 @@ export function ApprovalDetailsModal({
         }));
 
         bookingStore.updateBookingServices(booking._id, servicesToUpdate);
+
+        // TODO: Add history entry for diagnosis approval
+        // This would need to be implemented in the booking store
       }
 
       toast.success("Work order approved successfully!");
@@ -127,7 +134,20 @@ export function ApprovalDetailsModal({
   };
 
   const getTechnicianName = (technicianId: string) => {
-    // This would normally come from a technicians store or API
+    // First try to get from assigned technicians in the booking
+    if (
+      booking?.assignedTechnicians &&
+      booking.assignedTechnicians.length > 0
+    ) {
+      const assignedTech = booking.assignedTechnicians.find(
+        (tech) => tech.technicianId === technicianId
+      );
+      if (assignedTech) {
+        return assignedTech.technicianName;
+      }
+    }
+
+    // Fallback to hardcoded map
     const technicianMap: Record<string, string> = {
       "tech-1": "John Smith",
       "tech-2": "Sarah Johnson",
@@ -356,16 +376,30 @@ export function ApprovalDetailsModal({
             <h3 className="text-lg font-semibold mb-3">Price Summary</h3>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Services ({diagnosedServices.length})</span>
-                <span>£{totalPrice.toFixed(2)}</span>
+                <span>
+                  Services Subtotal ({diagnosedServices.length} items)
+                </span>
+                <span>£{servicesSubtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Service Charge</span>
+                <span>£{serviceCharge.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm font-medium">
+                <span>Subtotal</span>
+                <span>£{subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>VAT (20%)</span>
+                <span>£{vat.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Estimated Duration</span>
                 <span>{totalDuration} minutes</span>
               </div>
               <div className="border-t border-gray-300 pt-2">
-                <div className="flex justify-between font-semibold">
-                  <span>Total</span>
+                <div className="flex justify-between font-bold text-lg text-green-600">
+                  <span>Total (inc. VAT)</span>
                   <span>£{totalPrice.toFixed(2)}</span>
                 </div>
               </div>

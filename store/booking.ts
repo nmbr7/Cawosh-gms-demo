@@ -109,6 +109,7 @@ const staticServices = [
     duration: 60,
     price: 0.0,
   },
+  // Original services
   { id: "service-1", name: "Oil Change", duration: 30, price: 20.0 },
   { id: "service-2", name: "Tire Rotation", duration: 30, price: 12.0 },
   { id: "service-3", name: "Brake Inspection", duration: 30, price: 28.0 },
@@ -128,6 +129,129 @@ const staticServices = [
     name: "Air Filter Replacement",
     duration: 30,
     price: 24.0,
+  },
+  // Fluids & Filters
+  {
+    id: "service-11",
+    name: "Oil Change (Full Synthetic 5W-30)",
+    duration: 30,
+    price: 45.0,
+  },
+  {
+    id: "service-12",
+    name: "Oil Change (Conventional 10W-30)",
+    duration: 30,
+    price: 35.0,
+  },
+  {
+    id: "service-13",
+    name: "Oil Filter Replacement",
+    duration: 15,
+    price: 12.0,
+  },
+  {
+    id: "service-14",
+    name: "Cabin Air Filter Replacement",
+    duration: 15,
+    price: 20.0,
+  },
+  { id: "service-15", name: "Coolant Flush", duration: 45, price: 55.0 },
+  {
+    id: "service-16",
+    name: "Transmission Fluid Change",
+    duration: 60,
+    price: 85.0,
+  },
+  { id: "service-17", name: "Brake Fluid Flush", duration: 30, price: 45.0 },
+  // Parts Replacement
+  {
+    id: "service-18",
+    name: "Front Brake Pads Replacement",
+    duration: 60,
+    price: 120.0,
+  },
+  {
+    id: "service-19",
+    name: "Rear Brake Pads Replacement",
+    duration: 60,
+    price: 110.0,
+  },
+  {
+    id: "service-20",
+    name: "Front Brake Rotors Replacement",
+    duration: 90,
+    price: 180.0,
+  },
+  { id: "service-21", name: "Battery Replacement", duration: 20, price: 95.0 },
+  {
+    id: "service-22",
+    name: "Spark Plugs Replacement (4-cylinder)",
+    duration: 45,
+    price: 80.0,
+  },
+  {
+    id: "service-23",
+    name: "Spark Plugs Replacement (6-cylinder)",
+    duration: 60,
+    price: 110.0,
+  },
+  {
+    id: "service-24",
+    name: "Wiper Blades Replacement",
+    duration: 10,
+    price: 25.0,
+  },
+  {
+    id: "service-25",
+    name: "Headlight Bulb Replacement",
+    duration: 15,
+    price: 30.0,
+  },
+  {
+    id: "service-26",
+    name: "Serpentine Belt Replacement",
+    duration: 45,
+    price: 75.0,
+  },
+  // Cleaning & Maintenance
+  { id: "service-27", name: "Engine Bay Cleaning", duration: 30, price: 40.0 },
+  {
+    id: "service-28",
+    name: "Throttle Body Cleaning",
+    duration: 45,
+    price: 60.0,
+  },
+  {
+    id: "service-29",
+    name: "Fuel Injection System Cleaning",
+    duration: 60,
+    price: 85.0,
+  },
+  { id: "service-30", name: "AC System Cleaning", duration: 45, price: 65.0 },
+  // Inspection & Diagnostic
+  {
+    id: "service-31",
+    name: "Engine Diagnostic Scan",
+    duration: 30,
+    price: 40.0,
+  },
+  {
+    id: "service-32",
+    name: "Brake System Inspection",
+    duration: 30,
+    price: 28.0,
+  },
+  {
+    id: "service-33",
+    name: "Suspension Inspection",
+    duration: 30,
+    price: 35.0,
+  },
+  {
+    id: "service-34",
+    name: "Electrical System Diagnostic",
+    duration: 45,
+    price: 55.0,
   },
 ];
 
@@ -377,6 +501,33 @@ export const useBookingStore = create<BookingState>()(
           (s) => s.serviceId === "service-undiagnosed"
         );
 
+        // Extract technician assignments
+        const assignedTechnicians = services
+          .map((service) => {
+            const technician = currentState.technicians.find(
+              (t) => t.id === service.technicianId
+            );
+            return technician
+              ? {
+                  technicianId: service.technicianId,
+                  technicianName: `${technician.firstName} ${technician.lastName}`,
+                  assignedAt: new Date().toISOString(),
+                  role: "primary" as const,
+                }
+              : null;
+          })
+          .filter((tech) => tech !== null)
+          .filter(
+            (tech, index, arr) =>
+              arr.findIndex((t) => t?.technicianId === tech?.technicianId) ===
+              index
+          ) as Array<{
+          technicianId: string;
+          technicianName: string;
+          assignedAt: string;
+          role: string;
+        }>;
+
         const booking: Booking = {
           _id: crypto.randomUUID(),
           customer,
@@ -471,6 +622,7 @@ export const useBookingStore = create<BookingState>()(
           __v: 0,
           requiresDiagnosis: isUndiagnosed,
           diagnosisNotes: isUndiagnosed ? notes : undefined,
+          assignedTechnicians,
         };
         set((state) => ({ bookings: [...state.bookings, booking] }));
         return booking;

@@ -59,7 +59,7 @@ function SidebarLink({
   active: boolean;
   expanded: boolean;
 }) {
-  return (
+  const linkContent = (
     <Link
       key={href}
       href={href}
@@ -74,6 +74,20 @@ function SidebarLink({
       {expanded && <span>{name}</span>}
     </Link>
   );
+
+  // Show tooltip only when sidebar is collapsed
+  if (!expanded) {
+    return (
+      <div className="relative group">
+        {linkContent}
+        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-sm rounded-md px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+          {name}
+        </div>
+      </div>
+    );
+  }
+
+  return linkContent;
 }
 
 export default function Sidebar() {

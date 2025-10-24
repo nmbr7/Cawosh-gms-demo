@@ -90,6 +90,12 @@ export interface HistoryEntry {
   changedAt: string;
   notes: string;
   _id: string;
+  type?:
+    | "diagnosis_submitted"
+    | "diagnosis_approved"
+    | "diagnosis_rejected"
+    | "booking_created"
+    | "status_changed";
 }
 
 export interface Booking {
@@ -110,4 +116,10 @@ export interface Booking {
   __v: number;
   requiresDiagnosis?: boolean;
   diagnosisNotes?: string;
+  assignedTechnicians?: Array<{
+    technicianId: string;
+    technicianName: string;
+    assignedAt: string;
+    role: string; // "primary" | "assistant"
+  }>;
 }
