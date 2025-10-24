@@ -64,6 +64,16 @@ interface BookingState {
     date: string; // YYYY-MM-DD
     notes?: string;
   }) => Booking;
+  updateBookingServices: (
+    bookingId: string,
+    services: Array<{
+      serviceId: string;
+      name: string;
+      description: string;
+      duration: number;
+      price: number;
+    }>
+  ) => void;
 }
 
 // Static data
@@ -93,6 +103,12 @@ const staticTechnicians: Technician[] = [
 ];
 
 const staticServices = [
+  {
+    id: "service-undiagnosed",
+    name: "Undiagnosed - Requires Diagnosis",
+    duration: 60,
+    price: 0.0,
+  },
   { id: "service-1", name: "Oil Change", duration: 30, price: 20.0 },
   { id: "service-2", name: "Tire Rotation", duration: 30, price: 12.0 },
   { id: "service-3", name: "Brake Inspection", duration: 30, price: 28.0 },
@@ -356,6 +372,11 @@ export const useBookingStore = create<BookingState>()(
         const endDate = new Date(startTime);
         endDate.setMinutes(endDate.getMinutes() + totalDuration);
 
+        // Check if this is an undiagnosed booking
+        const isUndiagnosed = services.some(
+          (s) => s.serviceId === "service-undiagnosed"
+        );
+
         const booking: Booking = {
           _id: crypto.randomUUID(),
           customer,
@@ -383,7 +404,9 @@ export const useBookingStore = create<BookingState>()(
               price: s.price,
               currency: "GBP",
               currencySymbol: "£",
-              status: "pending" as const,
+              status: isUndiagnosed
+                ? ("awaiting_diagnosis" as const)
+                : ("pending" as const),
               technicianId: {
                 _id: technicianId,
                 firstName:
@@ -403,7 +426,7 @@ export const useBookingStore = create<BookingState>()(
               pauses: [],
             };
           }),
-          bookingDate: `${date}T00:00:00.000Z`,
+          bookingDate: new Date(`${date}T00:00:00.000Z`).toISOString(),
           totalDuration,
           totalPrice,
           status: "pending",
@@ -446,9 +469,72 @@ export const useBookingStore = create<BookingState>()(
             ],
           },
           __v: 0,
+          requiresDiagnosis: isUndiagnosed,
+          diagnosisNotes: isUndiagnosed ? notes : undefined,
         };
         set((state) => ({ bookings: [...state.bookings, booking] }));
         return booking;
+      },
+      updateBookingServices: (bookingId, services) => {
+        set((state) => ({
+          bookings: state.bookings.map((booking) => {
+            if (booking._id === bookingId) {
+              const totalDuration = services.reduce(
+                (acc, s) => acc + s.duration,
+                0
+              );
+              const totalPrice = services.reduce((acc, s) => acc + s.price, 0);
+
+              return {
+                ...booking,
+                services: services.map((s, index) => {
+                  const serviceStartTime = new Date(booking.bookingDate);
+                  serviceStartTime.setMinutes(
+                    serviceStartTime.getMinutes() + index * 30
+                  );
+                  const serviceEndTime = new Date(serviceStartTime);
+                  serviceEndTime.setMinutes(
+                    serviceEndTime.getMinutes() + s.duration
+                  );
+
+                  return {
+                    serviceId: {
+                      _id: s.serviceId,
+                      name: s.name,
+                      description: s.description,
+                      category: "Maintenance",
+                    },
+                    name: s.name,
+                    description: s.description,
+                    duration: s.duration,
+                    price: s.price,
+                    currency: "GBP",
+                    currencySymbol: "£",
+                    status: "pending" as const,
+                    technicianId: booking.services[0]?.technicianId || {
+                      _id: "tech-1",
+                      firstName: "Tech",
+                      lastName: "Name",
+                      email: "tech@garage.com",
+                      phone: "1234567890",
+                      role: "technician",
+                    },
+                    bayId: booking.services[0]?.bayId || "bay-1",
+                    startTime: serviceStartTime.toISOString(),
+                    endTime: serviceEndTime.toISOString(),
+                    _id: crypto.randomUUID(),
+                    pauses: [],
+                  };
+                }),
+                totalDuration,
+                totalPrice,
+                updatedAt: new Date().toISOString(),
+                requiresDiagnosis: false, // Clear diagnosis flag after services are added
+              };
+            }
+            return booking;
+          }),
+        }));
       },
     }),
     {

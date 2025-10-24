@@ -100,6 +100,15 @@ export const BookingCreateModal = ({
     );
   };
 
+  // Calculate total price and check if undiagnosed
+  const totalPrice = selectedServices.reduce(
+    (acc, service) => acc + service.price,
+    0
+  );
+  const isUndiagnosed = selectedServices.some(
+    (service) => service.id === "service-undiagnosed"
+  );
+
   // Reset all form fields
   const resetForm = () => {
     setCustomerName("");
@@ -414,17 +423,48 @@ export const BookingCreateModal = ({
                 {/* Notes */}
                 <div>
                   <h3 className="text-sm font-semibold mb-2">
-                    Notes (optional)
+                    Notes {isUndiagnosed && "(Required for undiagnosed issues)"}
                   </h3>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Notes
                   </label>
                   <textarea
                     className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] min-h-[48px]"
-                    placeholder="Additional notes..."
+                    placeholder={
+                      isUndiagnosed
+                        ? "Describe the issue (e.g., engine light, strange noise, etc.)..."
+                        : "Additional notes..."
+                    }
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                   />
+                </div>
+
+                {/* Price Summary */}
+                <div>
+                  <h3 className="text-sm font-semibold mb-2">Price Summary</h3>
+                  <div className="bg-gray-50 rounded-md p-3">
+                    {isUndiagnosed ? (
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-amber-600">
+                          £0.00
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          Price to be determined after diagnosis
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-gray-900">
+                          £{totalPrice.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          {selectedServices.length} service
+                          {selectedServices.length !== 1 ? "s" : ""} selected
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

@@ -15,6 +15,20 @@ export interface JobSheet {
   createdAt: string;
   // Linked booking data for display
   booking?: Booking;
+  requiresDiagnosis?: boolean;
+  diagnosedServices?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    duration: number;
+    price: number;
+    addedBy: string; // technician ID
+    addedAt: string;
+  }>;
+  approvalStatus?: "pending" | "approved" | "rejected";
+  approvedBy?: string; // advisor user ID
+  approvedAt?: string; // timestamp
+  customerApprovalMethod?: "manual" | "api"; // for future API integration
 }
 
 export interface FilterOptions {
@@ -29,6 +43,22 @@ type JobSheetState = {
   createFromBooking: (bookingId: string) => JobSheet;
   setStatus: (id: string, status: JobSheetStatus) => void;
   getFilterOptions: () => FilterOptions;
+  addDiagnosedServices: (
+    jobSheetId: string,
+    services: Array<{
+      id: string;
+      name: string;
+      description: string;
+      duration: number;
+      price: number;
+      addedBy: string;
+    }>
+  ) => void;
+  setApprovalStatus: (
+    jobSheetId: string,
+    status: "pending" | "approved" | "rejected",
+    approvedBy?: string
+  ) => void;
 };
 
 export const useJobSheetStore = create<JobSheetState>((set, get) => ({
@@ -55,11 +85,17 @@ export const useJobSheetStore = create<JobSheetState>((set, get) => ({
   createFromBooking: (bookingId) => {
     const { jobSheets } = get();
     const nextId = jobSheets.length + 1;
+
+    // Get booking to check if it requires diagnosis
+    const bookingStore = useBookingStore.getState();
+    const booking = bookingStore.bookings.find((b) => b._id === bookingId);
+
     const js: JobSheet = {
       id: `JB-${nextId.toString().padStart(4, "0")}`,
       bookingId,
       status: "PENDING",
       createdAt: new Date().toISOString(),
+      requiresDiagnosis: booking?.requiresDiagnosis || false,
     };
     set((s) => ({ jobSheets: [...s.jobSheets, js] }));
     return js;
@@ -67,6 +103,34 @@ export const useJobSheetStore = create<JobSheetState>((set, get) => ({
   setStatus: (id, status) =>
     set((s) => ({
       jobSheets: s.jobSheets.map((j) => (j.id === id ? { ...j, status } : j)),
+    })),
+  addDiagnosedServices: (jobSheetId, services) =>
+    set((s) => ({
+      jobSheets: s.jobSheets.map((j) =>
+        j.id === jobSheetId
+          ? {
+              ...j,
+              diagnosedServices: services.map((service) => ({
+                ...service,
+                addedAt: new Date().toISOString(),
+              })),
+              approvalStatus: "pending" as const,
+            }
+          : j
+      ),
+    })),
+  setApprovalStatus: (jobSheetId, status, approvedBy) =>
+    set((s) => ({
+      jobSheets: s.jobSheets.map((j) =>
+        j.id === jobSheetId
+          ? {
+              ...j,
+              approvalStatus: status,
+              approvedBy,
+              approvedAt: new Date().toISOString(),
+            }
+          : j
+      ),
     })),
   getFilterOptions: () => get().filterOptions,
 }));

@@ -43,6 +43,7 @@ interface FilterState {
   status: string | "all";
   bookingId: string | null;
   technicianId: string | null;
+  diagnosisStatus: string | null;
   sortBy: string;
   sortOrder: "asc" | "desc";
 }
@@ -108,6 +109,7 @@ export default function JobSheetPage() {
     status: "all",
     bookingId: null,
     technicianId: null,
+    diagnosisStatus: null,
     sortBy: "id",
     sortOrder: "desc",
   });
@@ -144,7 +146,31 @@ export default function JobSheetPage() {
         ) ??
           false);
 
-      return statusOk && bookingIdOk && technicianOk;
+      const diagnosisOk =
+        !filters.diagnosisStatus ||
+        (() => {
+          if (filters.diagnosisStatus === "standard") {
+            return !js.requiresDiagnosis;
+          }
+          if (filters.diagnosisStatus === "awaiting-diagnosis") {
+            return (
+              js.requiresDiagnosis &&
+              (!js.diagnosedServices || js.diagnosedServices.length === 0)
+            );
+          }
+          if (filters.diagnosisStatus === "pending-approval") {
+            return js.requiresDiagnosis && js.approvalStatus === "pending";
+          }
+          if (filters.diagnosisStatus === "approved") {
+            return js.requiresDiagnosis && js.approvalStatus === "approved";
+          }
+          if (filters.diagnosisStatus === "rejected") {
+            return js.requiresDiagnosis && js.approvalStatus === "rejected";
+          }
+          return true;
+        })();
+
+      return statusOk && bookingIdOk && technicianOk && diagnosisOk;
     });
 
     // Apply sorting
@@ -587,6 +613,41 @@ export default function JobSheetPage() {
               </Select>
             </div>
           </div>
+
+          {/* Additional filters row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {/* Diagnosis filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Diagnosis Status
+              </label>
+              <Select
+                value={filters.diagnosisStatus || "all"}
+                onValueChange={(value) =>
+                  handleFilterChange(
+                    "diagnosisStatus",
+                    value === "all" ? null : value
+                  )
+                }
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Select diagnosis status" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="standard">Standard Jobs</SelectItem>
+                  <SelectItem value="awaiting-diagnosis">
+                    Awaiting Diagnosis
+                  </SelectItem>
+                  <SelectItem value="pending-approval">
+                    Pending Approval
+                  </SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
       )}
 
@@ -618,6 +679,9 @@ export default function JobSheetPage() {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Diagnosis
               </th>
             </tr>
           </thead>
@@ -765,9 +829,12 @@ export default function JobSheetPage() {
                       {jobSheet.booking?.services?.map((service) => (
                         <div
                           key={service._id}
-                          className="text-xs px-2 py-1 rounded-full inline-block mr-1 bg-blue-100 text-blue-800"
+                          className="text-xs px-2 py-1 rounded-full inline-block mr-1 bg-blue-100 text-blue-800 max-w-[120px] truncate"
+                          title={service.name}
                         >
-                          {service.name}
+                          {service.name.length > 15
+                            ? `${service.name.substring(0, 15)}...`
+                            : service.name}
                         </div>
                       )) || "No services"}
                     </div>
@@ -790,6 +857,38 @@ export default function JobSheetPage() {
                         (s) => s.value === jobSheet.status
                       )?.label || jobSheet.status}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {jobSheet.requiresDiagnosis ? (
+                      <div className="flex flex-col gap-1">
+                        {jobSheet.approvalStatus === "approved" ? (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                            Approved
+                          </span>
+                        ) : jobSheet.approvalStatus === "rejected" ? (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                            Rejected
+                          </span>
+                        ) : jobSheet.diagnosedServices &&
+                          jobSheet.diagnosedServices.length > 0 ? (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800">
+                            Pending Approval
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                            Awaiting Diagnosis
+                          </span>
+                        )}
+                        {jobSheet.diagnosedServices &&
+                          jobSheet.diagnosedServices.length > 0 && (
+                            <span className="text-xs text-gray-500">
+                              {jobSheet.diagnosedServices.length} services
+                            </span>
+                          )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-400">Standard</span>
+                    )}
                   </td>
                 </tr>
               ))

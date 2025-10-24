@@ -17,6 +17,7 @@ import {
   Award,
   Package,
   File,
+  CheckCircle,
   ChevronLeft as LucideChevronLeft,
   ChevronRight as LucideChevronRight,
 } from "lucide-react";
@@ -30,6 +31,7 @@ export const links = [
   { name: "Calendar", href: "/schedule", icon: Calendar },
   { name: "Bookings", href: "/bookings", icon: Handshake },
   { name: "Job Sheet", href: "/job-sheet", icon: ClipboardList },
+  { name: "Approvals", href: "/approvals", icon: CheckCircle },
   { name: "Billings", href: "/billings", icon: Receipt },
   { name: "Stock Management", href: "/inventory", icon: Package },
   {

@@ -43,7 +43,12 @@ export interface Service {
   price: number;
   currency: string;
   currencySymbol: string;
-  status: "pending" | "in_progress" | "completed" | "cancelled";
+  status:
+    | "pending"
+    | "in_progress"
+    | "completed"
+    | "cancelled"
+    | "awaiting_diagnosis";
   technicianId: TechnicianId;
   bayId: string;
   startTime: string;
@@ -103,4 +108,6 @@ export interface Booking {
   bookingId: string;
   garage_id: Garage;
   __v: number;
+  requiresDiagnosis?: boolean;
+  diagnosisNotes?: string;
 }
