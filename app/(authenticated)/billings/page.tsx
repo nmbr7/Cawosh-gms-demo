@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import React from "react";
-import { useInvoiceStore } from "@/store/invoice";
+import { useBillingStore } from "@/store/billing";
 import type { Invoice } from "@/types/invoice";
 
 interface PaginationInfo {
@@ -25,7 +25,7 @@ interface PaginationInfo {
 }
 
 export default function BillingsPage() {
-  const { invoices } = useInvoiceStore();
+  const { invoices } = useBillingStore();
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");

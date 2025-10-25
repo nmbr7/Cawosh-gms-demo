@@ -96,7 +96,7 @@ export default function Header() {
             {user?.lastName?.[0]}
           </div>
         )}
-        <div className="flex flex-col">
+        <div className="flex flex-col px-2">
           <span className="text-[15px] font-medium text-gray-800">
             {user?.firstName} {user?.lastName}
           </span>

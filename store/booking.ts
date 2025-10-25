@@ -74,6 +74,7 @@ interface BookingState {
       price: number;
     }>
   ) => void;
+  updateBooking: (bookingId: string, updates: Partial<Booking>) => void;
 }
 
 // Static data
@@ -502,31 +503,19 @@ export const useBookingStore = create<BookingState>()(
         );
 
         // Extract technician assignments
-        const assignedTechnicians = services
-          .map((service) => {
-            const technician = currentState.technicians.find(
-              (t) => t.id === service.technicianId
-            );
-            return technician
-              ? {
-                  technicianId: service.technicianId,
-                  technicianName: `${technician.firstName} ${technician.lastName}`,
-                  assignedAt: new Date().toISOString(),
-                  role: "primary" as const,
-                }
-              : null;
-          })
-          .filter((tech) => tech !== null)
-          .filter(
-            (tech, index, arr) =>
-              arr.findIndex((t) => t?.technicianId === tech?.technicianId) ===
-              index
-          ) as Array<{
-          technicianId: string;
-          technicianName: string;
-          assignedAt: string;
-          role: string;
-        }>;
+        const technician = currentState.technicians.find(
+          (t) => t.id === technicianId
+        );
+        const assignedTechnicians = technician
+          ? [
+              {
+                technicianId: technicianId,
+                technicianName: `${technician.firstName} ${technician.lastName}`,
+                assignedAt: new Date().toISOString(),
+                role: "primary" as const,
+              },
+            ]
+          : [];
 
         const booking: Booking = {
           _id: crypto.randomUUID(),
@@ -686,6 +675,15 @@ export const useBookingStore = create<BookingState>()(
             }
             return booking;
           }),
+        }));
+      },
+      updateBooking: (bookingId, updates) => {
+        set((state) => ({
+          bookings: state.bookings.map((booking) =>
+            booking._id === bookingId
+              ? { ...booking, ...updates, updatedAt: new Date().toISOString() }
+              : booking
+          ),
         }));
       },
     }),

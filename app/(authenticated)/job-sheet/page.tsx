@@ -16,6 +16,7 @@ import {
   Filter,
   SortAsc,
   SortDesc,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
@@ -1140,7 +1141,10 @@ export default function JobSheetPage() {
                 selectedJobSheet.approvalStatus !== "rejected" && (
                   <div className="flex justify-center pt-4">
                     <Button
-                      onClick={() => setShowDiagnosisModal(true)}
+                      onClick={() => {
+                        setShowDiagnosisModal(true);
+                        setSelectedJobSheet(null); // Close the job sheet details modal
+                      }}
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       <Stethoscope className="w-4 h-4 mr-2" />
@@ -1149,14 +1153,25 @@ export default function JobSheetPage() {
                   </div>
                 )}
 
-              {/* Start Work Button */}
-              {selectedJobSheet.approvalStatus === "approved" &&
-                selectedJobSheet.status === "PENDING" && (
+              {/* Work Action Buttons */}
+              {selectedJobSheet.status === "PENDING" &&
+                (!selectedJobSheet.requiresDiagnosis ||
+                  selectedJobSheet.approvalStatus === "approved") && (
                   <div className="flex justify-center pt-4">
                     <Button
                       onClick={() => {
+                        console.log(
+                          "Start Work clicked - selectedJobSheet:",
+                          selectedJobSheet
+                        );
+                        console.log(
+                          "Setting workTrackingJobSheetId to:",
+                          selectedJobSheet.id
+                        );
                         setWorkTrackingJobSheetId(selectedJobSheet.id);
+                        console.log("Setting showWorkTrackingModal to true");
                         setShowWorkTrackingModal(true);
+                        console.log("Setting selectedJobSheet to null");
                         setSelectedJobSheet(null); // Close the job sheet details modal
                       }}
                       className="bg-green-600 hover:bg-green-700 text-white"
@@ -1166,6 +1181,64 @@ export default function JobSheetPage() {
                     </Button>
                   </div>
                 )}
+
+              {/* Diagnosis Required Message */}
+              {selectedJobSheet.status === "PENDING" &&
+                selectedJobSheet.requiresDiagnosis &&
+                selectedJobSheet.approvalStatus !== "approved" && (
+                  <div className="flex justify-center pt-4">
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 text-amber-800">
+                        <AlertTriangle className="w-5 h-5" />
+                        <span className="font-medium">Diagnosis Required</span>
+                      </div>
+                      <p className="text-sm text-amber-700 mt-1">
+                        This job requires diagnosis and approval before work can
+                        begin.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+              {selectedJobSheet.status === "HALTED" && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    onClick={() => {
+                      console.log(
+                        "Resume Work clicked - selectedJobSheet:",
+                        selectedJobSheet
+                      );
+                      setWorkTrackingJobSheetId(selectedJobSheet.id);
+                      setShowWorkTrackingModal(true);
+                      setSelectedJobSheet(null);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Resume Work
+                  </Button>
+                </div>
+              )}
+
+              {selectedJobSheet.status === "PAUSED" && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    onClick={() => {
+                      console.log(
+                        "Resume Work clicked - selectedJobSheet:",
+                        selectedJobSheet
+                      );
+                      setWorkTrackingJobSheetId(selectedJobSheet.id);
+                      setShowWorkTrackingModal(true);
+                      setSelectedJobSheet(null);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Resume Work
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
@@ -1240,11 +1313,11 @@ export default function JobSheetPage() {
         isOpen={showWorkTrackingModal}
         onClose={() => setShowWorkTrackingModal(false)}
         jobSheetId={workTrackingJobSheetId}
-        onWorkCompleted={() => {
-          setShowWorkTrackingModal(false);
-          setWorkTrackingJobSheetId("");
-          fetchJobSheets();
-        }}
+        // onWorkCompleted={() => {
+        //   setShowWorkTrackingModal(false);
+        //   setWorkTrackingJobSheetId("");
+        //   fetchJobSheets();
+        // }}
       />
     </div>
   );

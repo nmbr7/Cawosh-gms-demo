@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,6 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useJobSheetStore } from "@/store/jobSheet";
+import { useBookingStore } from "@/store/booking";
+import { useInventory } from "@/store/inventory";
+import { useBillingStore } from "@/store/billing";
+import {
+  getInventoryRequirementsForServices,
+  checkInventoryAvailability,
+} from "@/utils/serviceInventoryMap";
 import {
   Play,
   Pause,
@@ -33,29 +41,17 @@ import {
   CheckSquare,
   Square as EmptySquare,
 } from "lucide-react";
-import { useJobSheetStore } from "@/store/jobSheet";
-import { useInvoiceStore } from "@/store/invoice";
-import { useInventory } from "@/store/inventory";
-import {
-  getInventoryRequirementsForServices,
-  checkInventoryAvailability,
-} from "@/utils/serviceInventoryMap";
-import { format } from "date-fns";
-import { toast } from "sonner";
 
 interface WorkTrackingModalProps {
   isOpen: boolean;
   onClose: () => void;
   jobSheetId: string;
-  onWorkCompleted?: () => void;
+  // onWorkCompleted?: () => void;
 }
 
 interface ServiceChecklistItem {
-  id: string;
-  name: string;
-  description: string;
-  duration: number;
-  price: number;
+  serviceId: string;
+  serviceName: string;
   completed: boolean;
   notes: string;
 }
@@ -64,7 +60,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
   isOpen,
   onClose,
   jobSheetId,
-  onWorkCompleted,
+  // onWorkCompleted,
 }) => {
   const {
     jobSheets,
@@ -75,253 +71,226 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
     completeJob,
     calculateWorkDuration,
   } = useJobSheetStore();
-  const { createInvoiceFromJobSheet } = useInvoiceStore();
+  const { bookings, updateBooking } = useBookingStore();
   const { allItems, adjustStock } = useInventory();
+  const { createInvoice } = useBillingStore();
 
+  const jobSheet = jobSheets.find((js) => js.id === jobSheetId);
+  const booking = bookings.find((b) => b._id === jobSheet?.bookingId);
+
+  // State for pause/halt reasons
   const [pauseReason, setPauseReason] = useState("");
   const [haltReason, setHaltReason] = useState("");
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [showHaltDialog, setShowHaltDialog] = useState(false);
   const [showCompleteDialog, setShowCompleteDialog] = useState(false);
+
+  // Service checklist state
   const [serviceChecklist, setServiceChecklist] = useState<
     ServiceChecklistItem[]
   >([]);
   const [inventoryWarnings, setInventoryWarnings] = useState<string[]>([]);
 
-  const jobSheet = jobSheets.find((js) => js.id === jobSheetId);
-  const booking = jobSheet?.booking;
-
-  // Initialize service checklist when job sheet changes
+  // Initialize service checklist when modal opens
   useEffect(() => {
-    if (jobSheet && booking) {
-      const services =
-        jobSheet.diagnosedServices ||
-        booking.services.map((s) => ({
-          id: s.serviceId._id,
-          name: s.name,
-          description: s.description || s.name,
-          duration: s.duration,
-          price: s.price,
-        }));
-
-      setServiceChecklist(
-        services.map((service) => ({
-          id: service.id,
-          name: service.name,
-          description: service.description,
-          duration: service.duration,
-          price: service.price,
-          completed: false,
-          notes: "",
-        }))
-      );
-    }
-  }, [jobSheet, booking]);
-
-  // Check inventory availability
-  useEffect(() => {
-    if (jobSheet && booking && !jobSheet.inventoryDeducted) {
-      const services =
-        jobSheet.diagnosedServices ||
-        booking.services.map((s) => ({
-          id: s.serviceId._id,
-          name: s.name,
-          description: s.description || s.name,
-          duration: s.duration,
-          price: s.price,
-        }));
-
-      const requiredItems = getInventoryRequirementsForServices(
-        services.map((s) => s.id)
-      );
-      const availableInventory = allItems.map((item) => ({
-        id: item.id,
-        quantity: item.quantity,
-        name: item.name,
+    if (isOpen && jobSheet && booking) {
+      const services = jobSheet.diagnosedServices || booking.services;
+      const checklist = services.map((service) => ({
+        serviceId: "id" in service ? service.id : service.serviceId._id,
+        serviceName: service.name,
+        completed: false,
+        notes: "",
       }));
+      setServiceChecklist(checklist);
 
-      const { available, missingItems } = checkInventoryAvailability(
-        requiredItems,
-        availableInventory
+      // Check inventory availability
+      const serviceIds = services.map((s) =>
+        "id" in s ? s.id : s.serviceId._id
       );
+      const requiredItems = getInventoryRequirementsForServices(serviceIds);
+      const availability = checkInventoryAvailability(requiredItems, allItems);
 
-      if (!available) {
-        setInventoryWarnings(
-          missingItems.map(
-            (item) =>
-              `${item.itemName}: ${item.quantity} ${item.unit} (Required but not available)`
-          )
+      if (!availability.available) {
+        const warnings = availability.missingItems.map(
+          (item) =>
+            `Insufficient stock: ${item.itemName} (need ${
+              item.quantity
+            }, have ${
+              allItems.find((i) => i.id === item.itemId)?.quantity || 0
+            })`
         );
+        setInventoryWarnings(warnings);
       } else {
         setInventoryWarnings([]);
       }
     }
-  }, [jobSheet, booking, allItems]);
+  }, [isOpen, jobSheet, booking, allItems]);
 
-  if (!jobSheet || !booking) {
-    return null;
-  }
+  // Calculate total work duration
+  const totalWorkDuration = jobSheet
+    ? calculateWorkDuration(jobSheet.timeLogs)
+    : 0;
 
-  const totalWorkDuration = calculateWorkDuration(jobSheet.timeLogs);
-  const estimatedDuration = serviceChecklist.reduce(
-    (sum, service) => sum + service.duration,
-    0
-  );
-  const completedServices = serviceChecklist.filter((s) => s.completed).length;
-  const allServicesCompleted = completedServices === serviceChecklist.length;
-
+  // Action handlers
   const handleStartWork = () => {
-    try {
-      if (!jobSheet) {
-        toast.error("Job sheet not found!");
-        return;
-      }
+    if (jobSheet && !jobSheet.inventoryDeducted) {
+      // Deduct inventory
+      const serviceIds = (
+        jobSheet.diagnosedServices ||
+        booking?.services ||
+        []
+      ).map((s) => ("id" in s ? s.id : s.serviceId._id));
+      const requiredItems = getInventoryRequirementsForServices(serviceIds);
 
-      // Deduct inventory if not already deducted
-      if (!jobSheet.inventoryDeducted) {
-        const services =
-          jobSheet.diagnosedServices ||
-          booking.services.map((s) => ({
-            id: s.serviceId._id,
-            name: s.name,
-            description: s.description || s.name,
-            duration: s.duration,
-            price: s.price,
-          }));
-
-        const requiredItems = getInventoryRequirementsForServices(
-          services.map((s) => s.id)
-        );
-
-        // Deduct inventory for each required item
-        requiredItems.forEach((item) => {
-          const inventoryItem = allItems.find((i) => i.id === item.itemId);
-          if (inventoryItem) {
-            adjustStock({
-              itemId: item.itemId,
-              mode: "DECREASE",
-              quantity: item.quantity,
-              reason: `Job ${jobSheet.id} - ${item.itemName}`,
-              reference: jobSheet.id,
-              performedBy: "technician", // TODO: Get from auth context
-            });
-          }
+      requiredItems.forEach((item) => {
+        adjustStock({
+          itemId: item.itemId,
+          mode: "DECREASE",
+          quantity: item.quantity,
+          reason: "Job started",
+          reference: jobSheet.id,
+          performedBy: "system",
         });
-      }
-
-      startJob(jobSheetId, "technician"); // TODO: Get actual technician ID
-      toast.success("Work started successfully!");
-    } catch (error) {
-      console.error("Error starting work:", error);
-      toast.error("Failed to start work. Please try again.");
+      });
     }
+
+    startJob(jobSheetId, "Starting work on job");
   };
 
   const handlePauseWork = () => {
-    if (!pauseReason.trim()) {
-      toast.error("Please provide a reason for pausing work.");
-      return;
+    if (pauseReason.trim()) {
+      pauseJob(jobSheetId, pauseReason);
+      setPauseReason("");
+      setShowPauseDialog(false);
     }
-
-    pauseJob(jobSheetId, "technician", pauseReason);
-    setPauseReason("");
-    setShowPauseDialog(false);
-    toast.success("Work paused successfully!");
   };
 
   const handleResumeWork = () => {
-    resumeJob(jobSheetId, "technician");
-    toast.success("Work resumed successfully!");
+    resumeJob(jobSheetId, "Resuming work");
+    onClose(); // Close the modal after resuming
   };
 
   const handleHaltWork = () => {
-    if (!haltReason.trim()) {
-      toast.error("Please provide a reason for halting work.");
-      return;
+    if (haltReason.trim()) {
+      haltJob(jobSheetId, haltReason, "system");
+      setHaltReason("");
+      setShowHaltDialog(false);
     }
-
-    haltJob(jobSheetId, "technician", haltReason);
-    setHaltReason("");
-    setShowHaltDialog(false);
-    toast.success("Work halted successfully!");
   };
 
-  const handleCompleteWork = async () => {
-    if (!allServicesCompleted) {
-      toast.error("Please complete all services before finishing the job.");
-      return;
-    }
+  const handleCompleteWork = () => {
+    const allServicesCompleted = serviceChecklist.every(
+      (item) => item.completed
+    );
+    if (allServicesCompleted) {
+      // Complete the job
+      completeJob(jobSheetId, "All services completed");
 
-    try {
-      completeJob(jobSheetId, "technician");
+      // Update booking status to completed
+      if (booking) {
+        updateBooking(booking._id, { status: "completed" });
+      }
 
-      // Create invoice
-      const invoice = createInvoiceFromJobSheet(jobSheet);
-      toast.success(
-        `Work completed! Invoice ${invoice.invoiceNumber} created.`
-      );
+      // Generate invoice
+      if (jobSheet && booking) {
+        try {
+          // Get services from diagnosed services or original booking services
+          const services =
+            jobSheet.diagnosedServices ||
+            booking.services.map((s) => ({
+              id: s.serviceId._id,
+              name: s.name,
+              description: s.description || s.name,
+              duration: s.duration,
+              price: s.price,
+            }));
 
-      onWorkCompleted?.();
+          // Calculate totals
+          const subtotal = services.reduce(
+            (sum, service) => sum + service.price,
+            0
+          );
+          const serviceCharge = 15.0; // Fixed service charge
+          const vatRate = 0.2; // 20% VAT
+          const vat = (subtotal + serviceCharge) * vatRate;
+          const totalAmount = subtotal + serviceCharge + vat;
+
+          const invoice = createInvoice({
+            jobSheetId: jobSheet.id,
+            bookingId: booking._id,
+            customer: {
+              name: booking.customer.name,
+              email: booking.customer.email,
+              phone: booking.customer.phone,
+            },
+            vehicle: {
+              make: booking.vehicle.make,
+              model: booking.vehicle.model,
+              year: booking.vehicle.year,
+              license: booking.vehicle.license,
+            },
+            services,
+            subtotal,
+            serviceCharge,
+            vat: vat,
+            totalAmount,
+            status: "DRAFT",
+            notes: `Invoice for job ${jobSheet.id}`,
+            createdBy: "system",
+            createdAt: new Date().toISOString(),
+          });
+
+          console.log("Invoice generated:", invoice.invoiceNumber);
+        } catch (error) {
+          console.error("Failed to generate invoice:", error);
+        }
+      }
+
+      setShowCompleteDialog(false);
       onClose();
-    } catch (error) {
-      console.error("Error completing work:", error);
-      toast.error("Failed to complete work. Please try again.");
+    } else {
+      alert("Please complete all services before finishing the job.");
     }
   };
 
   const toggleServiceCompleted = (serviceId: string) => {
     setServiceChecklist((prev) =>
-      prev.map((service) =>
-        service.id === serviceId
-          ? { ...service, completed: !service.completed }
-          : service
+      prev.map((item) =>
+        item.serviceId === serviceId
+          ? { ...item, completed: !item.completed }
+          : item
       )
     );
   };
 
   const updateServiceNotes = (serviceId: string, notes: string) => {
     setServiceChecklist((prev) =>
-      prev.map((service) =>
-        service.id === serviceId ? { ...service, notes } : service
+      prev.map((item) =>
+        item.serviceId === serviceId ? { ...item, notes } : item
       )
     );
   };
 
   const getStatusBadge = () => {
-    switch (jobSheet.status) {
-      case "PENDING":
-        return (
-          <Badge variant="outline" className="bg-blue-50 text-blue-700">
-            Not Started
-          </Badge>
-        );
-      case "IN_PROGRESS":
-        return (
-          <Badge variant="outline" className="bg-green-50 text-green-700">
-            In Progress
-          </Badge>
-        );
-      case "PAUSED":
-        return (
-          <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
-            Paused
-          </Badge>
-        );
-      case "HALTED":
-        return (
-          <Badge variant="outline" className="bg-red-50 text-red-700">
-            Halted
-          </Badge>
-        );
-      case "COMPLETED":
-        return (
-          <Badge variant="outline" className="bg-green-50 text-green-700">
-            Completed
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">Unknown</Badge>;
-    }
+    if (!jobSheet) return null;
+
+    const statusConfig = {
+      PENDING: { label: "Pending", className: "bg-yellow-100 text-yellow-800" },
+      IN_PROGRESS: {
+        label: "In Progress",
+        className: "bg-blue-100 text-blue-800",
+      },
+      PAUSED: { label: "Paused", className: "bg-orange-100 text-orange-800" },
+      HALTED: { label: "Halted", className: "bg-red-100 text-red-800" },
+      COMPLETED: {
+        label: "Completed",
+        className: "bg-green-100 text-green-800",
+      },
+      CANCELLED: { label: "Cancelled", className: "bg-gray-100 text-gray-800" },
+    };
+
+    const config = statusConfig[jobSheet.status] || statusConfig.PENDING;
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
   const formatDuration = (minutes: number) => {
@@ -330,335 +299,350 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
+  console.log(
+    "WorkTrackingModal render - isOpen:",
+    isOpen,
+    "jobSheetId:",
+    jobSheetId,
+    "jobSheet:",
+    jobSheet
+  );
+
+  if (!jobSheet || !booking) {
+    return null;
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Wrench className="w-5 h-5" />
-            Work Tracking - {jobSheet.id}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wrench className="w-5 h-5" />
+              Work Tracking - {jobSheet?.id}
+            </DialogTitle>
+          </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Header Information */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  {getStatusBadge()}
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Clock className="w-4 h-4" />
-                    <span>Elapsed: {formatDuration(totalWorkDuration)}</span>
-                  </div>
-                </div>
-                <div className="text-sm text-gray-600">
-                  {jobSheet.startedAt && (
-                    <span>
-                      Started:{" "}
-                      {format(
-                        new Date(jobSheet.startedAt),
-                        "MMM dd, yyyy 'at' HH:mm"
-                      )}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-blue-500" />
-                    <span className="font-medium">{booking.customer.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Car className="w-4 h-4 text-green-500" />
-                    <span>
-                      {booking.vehicle.make} {booking.vehicle.model} (
-                      {booking.vehicle.year})
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-purple-500" />
-                    <span>{booking.vehicle.license}</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-green-500" />
-                    <span>
-                      Est. Duration: {formatDuration(estimatedDuration)}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckSquare className="w-4 h-4 text-blue-500" />
-                    <span>
-                      Services: {completedServices}/{serviceChecklist.length}{" "}
-                      completed
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Inventory Warnings */}
-          {inventoryWarnings.length > 0 && (
-            <Card className="border-amber-200 bg-amber-50">
+          <div className="p-6 space-y-6">
+            {/* Header Information */}
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-amber-800">
-                  <AlertTriangle className="w-5 h-5" />
-                  Inventory Warnings
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {getStatusBadge()}
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Clock className="w-4 h-4" />
+                      <span>Elapsed: {formatDuration(totalWorkDuration)}</span>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {jobSheet.startedAt && (
+                      <span>
+                        Started: {new Date(jobSheet.startedAt).toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-1">
-                  {inventoryWarnings.map((warning, index) => (
-                    <li key={index} className="text-sm text-amber-700">
-                      • {warning}
-                    </li>
-                  ))}
-                </ul>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-gray-500" />
+                      <span className="font-medium">
+                        {booking.customer.name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Car className="w-4 h-4 text-gray-500" />
+                      <span>
+                        {booking.vehicle.make} {booking.vehicle.model} (
+                        {booking.vehicle.license})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-gray-500" />
+                      <span>
+                        {new Date(booking.bookingDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-gray-500" />
+                      <span>Total: £{booking.totalPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Services: {serviceChecklist.length}
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-          )}
 
-          {/* Service Checklist */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckSquare className="w-5 h-5" />
-                Service Checklist
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {serviceChecklist.map((service) => (
-                  <div key={service.id} className="border rounded-lg p-4">
-                    <div className="flex items-start gap-3">
+            {/* Inventory Warnings */}
+            {inventoryWarnings.length > 0 && (
+              <Card className="border-orange-200 bg-orange-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-orange-800">
+                    <AlertTriangle className="w-5 h-5" />
+                    <span className="font-medium">Inventory Warnings</span>
+                  </div>
+                  <ul className="mt-2 space-y-1">
+                    {inventoryWarnings.map((warning, index) => (
+                      <li key={index} className="text-sm text-orange-700">
+                        • {warning}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Service Checklist */}
+            <Card>
+              <CardHeader>
+                <h3 className="text-lg font-semibold">Service Checklist</h3>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {serviceChecklist.map((item) => (
+                    <div
+                      key={item.serviceId}
+                      className="flex items-start gap-3 p-3 border rounded-lg"
+                    >
                       <button
-                        onClick={() => toggleServiceCompleted(service.id)}
+                        onClick={() => toggleServiceCompleted(item.serviceId)}
                         className="mt-1"
                       >
-                        {service.completed ? (
+                        {item.completed ? (
                           <CheckSquare className="w-5 h-5 text-green-600" />
                         ) : (
                           <EmptySquare className="w-5 h-5 text-gray-400" />
                         )}
                       </button>
                       <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium">{service.name}</h4>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span>{formatDuration(service.duration)}</span>
-                            <span>£{service.price.toFixed(2)}</span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {service.description}
-                        </p>
-                        <div className="mt-2">
-                          <Label
-                            htmlFor={`notes-${service.id}`}
-                            className="text-xs"
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`font-medium ${
+                              item.completed ? "line-through text-gray-500" : ""
+                            }`}
                           >
-                            Notes:
-                          </Label>
-                          <textarea
-                            id={`notes-${service.id}`}
-                            value={service.notes}
-                            onChange={(e) =>
-                              updateServiceNotes(service.id, e.target.value)
-                            }
-                            placeholder="Add notes about this service..."
-                            className="mt-1 text-sm w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            rows={2}
-                          />
+                            {item.serviceName}
+                          </span>
+                          {item.completed && (
+                            <Badge className="bg-green-100 text-green-800">
+                              Completed
+                            </Badge>
+                          )}
                         </div>
+                        <textarea
+                          placeholder="Add notes..."
+                          value={item.notes}
+                          onChange={(e) =>
+                            updateServiceNotes(item.serviceId, e.target.value)
+                          }
+                          className="mt-2 w-full p-2 border rounded text-sm resize-none"
+                          rows={2}
+                        />
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-3 justify-center">
-            {jobSheet.status === "PENDING" && (
-              <Button
-                onClick={handleStartWork}
-                className="bg-green-600 hover:bg-green-700 text-white"
-                disabled={inventoryWarnings.length > 0}
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Start Work
-              </Button>
-            )}
-
-            {jobSheet.status === "IN_PROGRESS" && (
-              <>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-3 justify-center">
+              {jobSheet.status === "PENDING" && (
                 <Button
-                  onClick={() => setShowPauseDialog(true)}
-                  variant="outline"
-                  className="border-yellow-500 text-yellow-700 hover:bg-yellow-50"
-                >
-                  <Pause className="w-4 h-4 mr-2" />
-                  Pause Work
-                </Button>
-                <Button
-                  onClick={() => setShowHaltDialog(true)}
-                  variant="outline"
-                  className="border-red-500 text-red-700 hover:bg-red-50"
-                >
-                  <Square className="w-4 h-4 mr-2" />
-                  Halt Work
-                </Button>
-                <Button
-                  onClick={() => setShowCompleteDialog(true)}
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  disabled={!allServicesCompleted}
-                >
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Complete Work
-                </Button>
-              </>
-            )}
-
-            {jobSheet.status === "PAUSED" && (
-              <>
-                <Button
-                  onClick={handleResumeWork}
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={handleStartWork}
+                  className="bg-green-600 hover:bg-green-700"
                 >
                   <Play className="w-4 h-4 mr-2" />
-                  Resume Work
+                  Start Work
                 </Button>
-                <Button
-                  onClick={() => setShowHaltDialog(true)}
-                  variant="outline"
-                  className="border-red-500 text-red-700 hover:bg-red-50"
-                >
-                  <Square className="w-4 h-4 mr-2" />
-                  Halt Work
-                </Button>
-              </>
-            )}
+              )}
+
+              {jobSheet.status === "IN_PROGRESS" && (
+                <>
+                  <Button
+                    onClick={() => setShowPauseDialog(true)}
+                    variant="outline"
+                  >
+                    <Pause className="w-4 h-4 mr-2" />
+                    Pause Work
+                  </Button>
+                  <Button
+                    onClick={() => setShowHaltDialog(true)}
+                    variant="destructive"
+                  >
+                    <Square className="w-4 h-4 mr-2" />
+                    Halt Work
+                  </Button>
+                  <Button
+                    onClick={() => setShowCompleteDialog(true)}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Complete Job
+                  </Button>
+                </>
+              )}
+
+              {jobSheet.status === "PAUSED" && (
+                <>
+                  <Button
+                    onClick={handleResumeWork}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Resume Work
+                  </Button>
+                  <Button
+                    onClick={() => setShowHaltDialog(true)}
+                    variant="destructive"
+                  >
+                    <Square className="w-4 h-4 mr-2" />
+                    Halt Work
+                  </Button>
+                </>
+              )}
+
+              {jobSheet.status === "HALTED" && (
+                <>
+                  <Button
+                    onClick={handleResumeWork}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Resume Work
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        </DialogContent>
+      </Dialog>
 
-        {/* Pause Dialog */}
-        <Dialog open={showPauseDialog} onOpenChange={setShowPauseDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Pause Work</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="pause-reason">Reason for pausing:</Label>
-                <textarea
-                  id="pause-reason"
-                  value={pauseReason}
-                  onChange={(e) => setPauseReason(e.target.value)}
-                  placeholder="Enter reason for pausing work..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows={3}
-                />
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowPauseDialog(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handlePauseWork}>Pause Work</Button>
-              </div>
+      {/* Pause Work Dialog */}
+      <Dialog open={showPauseDialog} onOpenChange={setShowPauseDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Pause Work</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="pause-reason">Reason for pausing:</Label>
+              <Select value={pauseReason} onValueChange={setPauseReason}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a reason" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="break">Break</SelectItem>
+                  <SelectItem value="waiting-parts">
+                    Waiting for parts
+                  </SelectItem>
+                  <SelectItem value="customer-consultation">
+                    Customer consultation needed
+                  </SelectItem>
+                  <SelectItem value="technical-issue">
+                    Technical issue
+                  </SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </DialogContent>
-        </Dialog>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowPauseDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handlePauseWork} disabled={!pauseReason}>
+                Pause Work
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-        {/* Halt Dialog */}
-        <Dialog open={showHaltDialog} onOpenChange={setShowHaltDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Halt Work</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="halt-reason">Reason for halting:</Label>
-                <Select value={haltReason} onValueChange={setHaltReason}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select reason..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="parts-unavailable">
-                      Parts unavailable
-                    </SelectItem>
-                    <SelectItem value="customer-requested">
-                      Customer requested stop
-                    </SelectItem>
-                    <SelectItem value="equipment-failure">
-                      Equipment failure
-                    </SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowHaltDialog(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleHaltWork}
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                >
-                  Halt Work
-                </Button>
-              </div>
+      {/* Halt Work Dialog */}
+      <Dialog open={showHaltDialog} onOpenChange={setShowHaltDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Halt Work</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="halt-reason">Reason for halting:</Label>
+              <Select value={haltReason} onValueChange={setHaltReason}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a reason" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="customer-cancelled">
+                    Customer cancelled
+                  </SelectItem>
+                  <SelectItem value="vehicle-issue">Vehicle issue</SelectItem>
+                  <SelectItem value="safety-concern">Safety concern</SelectItem>
+                  <SelectItem value="parts-unavailable">
+                    Parts unavailable
+                  </SelectItem>
+                  <SelectItem value="technical-problem">
+                    Technical problem
+                  </SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </DialogContent>
-        </Dialog>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowHaltDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleHaltWork}
+                disabled={!haltReason}
+                variant="destructive"
+              >
+                Halt Work
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-        {/* Complete Dialog */}
-        <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Complete Work</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="flex items-center gap-2 text-green-800">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-medium">Ready to complete!</span>
-                </div>
-                <p className="text-sm text-green-700 mt-1">
-                  All services have been completed. An invoice will be generated
-                  automatically.
-                </p>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowCompleteDialog(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleCompleteWork}
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                >
-                  Complete Work
-                </Button>
-              </div>
+      {/* Complete Work Dialog */}
+      <Dialog open={showCompleteDialog} onOpenChange={setShowCompleteDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Complete Job</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-sm text-gray-600">
+              Make sure all services are completed before finishing the job.
             </div>
-          </DialogContent>
-        </Dialog>
-      </DialogContent>
-    </Dialog>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowCompleteDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCompleteWork}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Complete Job
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

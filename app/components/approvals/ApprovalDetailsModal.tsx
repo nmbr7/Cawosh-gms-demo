@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useJobSheetStore } from "@/store/jobSheet";
 import { useBookingStore } from "@/store/booking";
+import { useApprovalStore } from "@/store/approval";
 import { toast } from "sonner";
 import type { JobSheet } from "@/store/jobSheet";
 
@@ -37,6 +38,7 @@ export function ApprovalDetailsModal({
 
   const jobSheetStore = useJobSheetStore();
   const bookingStore = useBookingStore();
+  const { addApproval, updateApprovalStatus } = useApprovalStore();
 
   const booking = jobSheet.booking;
   const diagnosedServices = jobSheet.diagnosedServices || [];
@@ -58,6 +60,32 @@ export function ApprovalDetailsModal({
     try {
       setIsLoading(true);
 
+      // Create approval record
+      const approval = addApproval({
+        jobSheetId: jobSheet.id,
+        bookingId: jobSheet.bookingId,
+        customerName: booking?.customer?.name || "Unknown",
+        vehicleInfo: `${booking?.vehicle?.make} ${booking?.vehicle?.model} (${booking?.vehicle?.license})`,
+        services: diagnosedServices.map((service) => ({
+          id: service.id,
+          name: service.name,
+          description: service.description,
+          duration: service.duration,
+          price: service.price,
+        })),
+        totalAmount: totalPrice,
+        status: "approved",
+        notes: approvalNotes,
+      });
+
+      // Update approval status
+      updateApprovalStatus(
+        approval.id,
+        "approved",
+        "current-user",
+        approvalNotes
+      );
+
       // Update job sheet approval status
       jobSheetStore.setApprovalStatus(jobSheet.id, "approved", "current-user");
 
@@ -72,9 +100,6 @@ export function ApprovalDetailsModal({
         }));
 
         bookingStore.updateBookingServices(booking._id, servicesToUpdate);
-
-        // TODO: Add history entry for diagnosis approval
-        // This would need to be implemented in the booking store
       }
 
       toast.success("Work order approved successfully!");
@@ -96,6 +121,33 @@ export function ApprovalDetailsModal({
 
     try {
       setIsLoading(true);
+
+      // Create approval record
+      const approval = addApproval({
+        jobSheetId: jobSheet.id,
+        bookingId: jobSheet.bookingId,
+        customerName: booking?.customer?.name || "Unknown",
+        vehicleInfo: `${booking?.vehicle?.make} ${booking?.vehicle?.model} (${booking?.vehicle?.license})`,
+        services: diagnosedServices.map((service) => ({
+          id: service.id,
+          name: service.name,
+          description: service.description,
+          duration: service.duration,
+          price: service.price,
+        })),
+        totalAmount: totalPrice,
+        status: "rejected",
+        notes: approvalNotes,
+      });
+
+      // Update approval status
+      updateApprovalStatus(
+        approval.id,
+        "rejected",
+        "current-user",
+        approvalNotes,
+        rejectReason
+      );
 
       // Update job sheet approval status
       jobSheetStore.setApprovalStatus(jobSheet.id, "rejected", "current-user");

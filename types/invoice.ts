@@ -38,12 +38,12 @@ export interface Invoice {
 export type InvoiceStatus = "DRAFT" | "SENT" | "PAID" | "OVERDUE" | "CANCELLED";
 
 export interface InvoiceFilters {
-  status?: InvoiceStatus;
+  status?: InvoiceStatus | "ALL";
   customerName?: string;
   dateFrom?: string;
   dateTo?: string;
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface InvoiceSummary {
