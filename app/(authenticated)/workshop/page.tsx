@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import React from "react";
+import Image from "next/image";
 
 // --- Types ---
 interface Billing {
@@ -77,9 +78,9 @@ type DrawingResponse = {
         description: string;
       }[]
     | null;
-  repairTasks: any;
-  generalCriteria: any;
-  status: any;
+  repairTasks: unknown;
+  generalCriteria: unknown;
+  status: unknown;
 };
 
 type AdjustmentItem = {
@@ -220,7 +221,7 @@ const SAMPLE_ADJUSTMENT_DATA: AdjustmentGroup[] = [
   },
 ];
 
-const SAMPLE_REPAIR_MANUAL_SECTIONS: any[] = [
+const SAMPLE_REPAIR_MANUAL_SECTIONS: unknown[] = [
   // Existing data for repair manuals as before...
 ];
 
@@ -524,49 +525,49 @@ const subjectDetails: Record<string, string> = {
   RECALLS: "Details about RECALLS: Vehicle recalls and safety notices.",
 };
 
-const SAMPLE_MAINTENANCE_TASKS: Record<
-  number,
-  {
-    name: string;
-    tasks: Array<{
-      name: string;
-      remark?: string | null;
-      mandatory: boolean;
-      parts: string[];
-    }>;
-  }
-> = {
-  319810603: {
-    name: "15,000 km / 12 months",
-    tasks: [
-      {
-        name: "Renew the engine oil",
-        mandatory: true,
-        parts: [
-          "Engine oil",
-          "Screw plug, oil sump",
-          "Seal ring, oil drain plug",
-        ],
-      },
-      {
-        name: "Renew the oil filter",
-        mandatory: true,
-        parts: ["Oil filter", "Seal, oil filter", "Gasket, oil filter housing"],
-      },
-      {
-        name: "Check the air filter; renew if necessary",
-        mandatory: false,
-        parts: ["Air filter"],
-      },
-      {
-        name: "Renew the air filter",
-        remark: "every 60,000 km / 48 months",
-        mandatory: false,
-        parts: ["Air filter"],
-      },
-    ],
-  },
-};
+// const SAMPLE_MAINTENANCE_TASKS: Record<
+//   number,
+//   {
+//     name: string;
+//     tasks: Array<{
+//       name: string;
+//       remark?: string | null;
+//       mandatory: boolean;
+//       parts: string[];
+//     }>;
+//   }
+// > = {
+//   319810603: {
+//     name: "15,000 km / 12 months",
+//     tasks: [
+//       {
+//         name: "Renew the engine oil",
+//         mandatory: true,
+//         parts: [
+//           "Engine oil",
+//           "Screw plug, oil sump",
+//           "Seal ring, oil drain plug",
+//         ],
+//       },
+//       {
+//         name: "Renew the oil filter",
+//         mandatory: true,
+//         parts: ["Oil filter", "Seal, oil filter", "Gasket, oil filter housing"],
+//       },
+//       {
+//         name: "Check the air filter; renew if necessary",
+//         mandatory: false,
+//         parts: ["Air filter"],
+//       },
+//       {
+//         name: "Renew the air filter",
+//         remark: "every 60,000 km / 48 months",
+//         mandatory: false,
+//         parts: ["Air filter"],
+//       },
+//     ],
+//   },
+// };
 
 const MAIN_TABS = [
   { key: "overview", label: "Overview" },
@@ -645,7 +646,7 @@ function RecallSection({ data }: { data: typeof SAMPLE_RECALL_DATA }) {
                 </td>
               </tr>
             ) : (
-              data.map((recall, idx) => (
+              data.map((recall) => (
                 <tr
                   key={recall.recallNumber}
                   className="border-t border-gray-100 text-sm"
@@ -686,12 +687,12 @@ function RecallSection({ data }: { data: typeof SAMPLE_RECALL_DATA }) {
 // --- END RecallSection ---
 
 export default function WorkshopPage() {
-  const [billings, setBillings] = useState<Billing[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [billings, setBillings] = useState<Billing[]>([]);
+  // const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [serviceFilter, setServiceFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("");
-  const [serviceTypes, setServiceTypes] = useState<string[]>([]);
+  // const [serviceFilter, setServiceFilter] = useState("all");
+  // const [dateFilter, setDateFilter] = useState("");
+  // const [serviceTypes, setServiceTypes] = useState<string[]>([]);
   const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 1,
@@ -708,8 +709,10 @@ export default function WorkshopPage() {
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 
   // --- Vehicle search state ---
-  const [vehicleSearchResults, setVehicleSearchResults] = useState<any[]>([]);
-  const [selectedVehicle, setSelectedVehicle] = useState<any | null>(null);
+  const [vehicleSearchResults, setVehicleSearchResults] = useState<unknown[]>(
+    []
+  );
+  const [selectedVehicle, setSelectedVehicle] = useState<unknown | null>(null);
 
   // --- Drawing Modal State ---
   const [drawingModalOpen, setDrawingModalOpen] = useState(false);
@@ -729,9 +732,9 @@ export default function WorkshopPage() {
   >(null);
 
   // --- Track open Section (for Repair Manuals, inline, not modal) ---
-  const [openRepairManualSectionId, setOpenRepairManualSectionId] = useState<
-    string | null
-  >(null);
+  // const [openRepairManualSectionId, setOpenRepairManualSectionId] = useState<
+  //   string | null
+  // >(null);
 
   // Deep state for open/close nested repair manual accordion
   const [openRepairManualPath, setOpenRepairManualPath] = useState<string[]>(
@@ -741,13 +744,13 @@ export default function WorkshopPage() {
   // Fetch billings from API
   const fetchBillings = async () => {
     try {
-      setIsLoading(true);
+      // setIsLoading(true);
       const params = new URLSearchParams({
         page: paginationInfo.currentPage.toString(),
         limit: paginationInfo.itemsPerPage.toString(),
         search: searchTerm,
-        service: serviceFilter,
-        date: dateFilter,
+        // service: serviceFilter,
+        // date: dateFilter,
       });
 
       const response = await fetch(`/api/billings?${params.toString()}`);
@@ -755,26 +758,26 @@ export default function WorkshopPage() {
         throw new Error("Failed to fetch billings");
       }
       const data: ApiResponse = await response.json();
-      setBillings(data.billings);
+      // setBillings(data.billings);
       setPaginationInfo(data.pagination);
-      setServiceTypes(data.filters.serviceTypes);
+      // setServiceTypes(data.filters.serviceTypes);
     } catch (error) {
       console.error("Error fetching billings:", error);
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchBillings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paginationInfo.currentPage, searchTerm, serviceFilter, dateFilter]);
+  }, [paginationInfo.currentPage, searchTerm]);
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= paginationInfo.totalPages) {
-      setPaginationInfo((prev) => ({ ...prev, currentPage: newPage }));
-    }
-  };
+  // const handlePageChange = (newPage: number) => {
+  //   if (newPage >= 1 && newPage <= paginationInfo.totalPages) {
+  //     setPaginationInfo((prev) => ({ ...prev, currentPage: newPage }));
+  //   }
+  // };
 
   // Function to get VRID from HaynesPro API
   async function getVrid({
@@ -832,8 +835,10 @@ export default function WorkshopPage() {
       if (!res.ok) throw new Error("Failed to fetch drawings");
       const data = await res.json();
       setDrawingModalData(Array.isArray(data) ? data : []);
-    } catch (err: any) {
-      setDrawingModalError(err?.message || "Failed to fetch drawings");
+    } catch (err: unknown) {
+      setDrawingModalError(
+        (err as Error)?.message || "Failed to fetch drawings"
+      );
     } finally {
       setDrawingModalLoading(false);
     }
@@ -842,15 +847,15 @@ export default function WorkshopPage() {
   // --- Main Render ---
   // Determine the current vehicle for details/drawings
   const currentVehicle: VehicleInfo = selectedVehicle
-    ? selectedVehicle
+    ? (selectedVehicle as VehicleInfo)
     : vehicleSearchResults && vehicleSearchResults.length > 0
-    ? vehicleSearchResults[0]
+    ? (vehicleSearchResults[0] as VehicleInfo)
     : vehicleInfo;
 
   // Cleanup open section on tab switch away from repair_manuals
   useEffect(() => {
     if (mainTab !== "repair" || repairSubTab !== "repair_manuals") {
-      setOpenRepairManualSectionId(null);
+      // setOpenRepairManualSectionId(null);
       setOpenRepairManualPath([]);
     }
   }, [mainTab, repairSubTab]);
@@ -880,7 +885,7 @@ export default function WorkshopPage() {
               if (searchTerm.trim().length > 0) {
                 try {
                   const backendUrl = process.env.BACKEND_URL;
-                  let res = await fetch(
+                  const res = await fetch(
                     `${backendUrl}/api/auth/vehicle-vrm-info`,
                     {
                       method: "GET",
@@ -926,7 +931,7 @@ export default function WorkshopPage() {
                       distributorPassword: "<REDACTED_DISTRIBUTOR_PASSWORD>",
                       username: "<REDACTED_USERNAME>",
                     });
-                  } catch (e) {
+                  } catch {
                     vrid = null;
                   }
 
@@ -936,7 +941,10 @@ export default function WorkshopPage() {
                     return;
                   }
 
-                  let vehicleData: any = await fetchVehicleWithVrid(vrid, vin);
+                  let vehicleData: unknown = await fetchVehicleWithVrid(
+                    vrid,
+                    vin
+                  );
 
                   // Check for status code 5 and retry with new vrid if needed
                   if (
@@ -955,14 +963,14 @@ export default function WorkshopPage() {
                         vrid = newVrid;
                         vehicleData = await fetchVehicleWithVrid(vrid, vin);
                       }
-                    } catch (e) {
+                    } catch {
                       // If getVrid fails, just fall through and let the empty result be handled
                     }
                   }
                   setVehicleSearchResults(
                     Array.isArray(vehicleData) ? vehicleData : []
                   );
-                } catch (err) {
+                } catch {
                   setVehicleSearchResults([]);
                 }
               } else {
@@ -981,9 +989,13 @@ export default function WorkshopPage() {
           <div className="font-semibold mb-2">Matching Vehicles:</div>
           <div className="max-h-60 overflow-y-auto">
             <ul>
-              {vehicleSearchResults.map((vehicle: any) => (
+              {vehicleSearchResults.map((vehicle: unknown) => (
                 <li
-                  key={vehicle.id ?? vehicle.fullName ?? Math.random()}
+                  key={
+                    (vehicle as { id?: string; fullName?: string })?.id ??
+                    (vehicle as { id?: string; fullName?: string })?.fullName ??
+                    Math.random()
+                  }
                   className="mb-1"
                 >
                   <button
@@ -991,7 +1003,7 @@ export default function WorkshopPage() {
                     className="text-blue-700 underline hover:text-blue-900"
                     onClick={() => setSelectedVehicle(vehicle)}
                   >
-                    {vehicle.fullName}
+                    {(vehicle as { fullName?: string }).fullName}
                   </button>
                 </li>
               ))}
@@ -1031,7 +1043,6 @@ export default function WorkshopPage() {
             <div className="w-full">
               <VehicleTabs
                 mainTab={mainTab}
-                setMainTab={setMainTab}
                 repairSubTab={repairSubTab}
                 setRepairSubTab={setRepairSubTab}
                 selectedSubject={selectedSubject}
@@ -1040,8 +1051,6 @@ export default function WorkshopPage() {
                 onDrawingSubjectClick={() =>
                   handleDrawingSubjectClick(currentVehicle)
                 }
-                openRepairManualSectionId={openRepairManualSectionId}
-                setOpenRepairManualSectionId={setOpenRepairManualSectionId}
                 openRepairManualPath={openRepairManualPath}
                 setOpenRepairManualPath={setOpenRepairManualPath}
               />
@@ -1049,26 +1058,28 @@ export default function WorkshopPage() {
           </div>
           {/* Right: only show image in Overview tab */}
           {mainTab === "overview" && (
-            <div className="bg-white w-full md:w-1/2 flex items-center justify-center p-8 bg-gray-50 relative">
+            <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-gray-50 relative">
               <div
                 className="relative"
                 style={{ width: "480px", height: "360px" }}
               >
-                <img
+                <Image
                   src={
                     (selectedVehicle
-                      ? selectedVehicle.modelPictureMimeDataName
+                      ? (selectedVehicle as VehicleInfo)
+                          .modelPictureMimeDataName
                       : vehicleSearchResults && vehicleSearchResults.length > 0
-                      ? vehicleSearchResults[0].modelPictureMimeDataName
+                      ? (vehicleSearchResults[0] as VehicleInfo)
+                          .modelPictureMimeDataName
                       : vehicleInfo.modelPictureMimeDataName) || ""
                   }
                   alt="Workshop Example"
+                  width={480}
+                  height={360}
                   className="object-contain rounded shadow cursor-pointer"
                   onClick={() => setIsFullscreen(true)}
                   style={{
                     background: "#f9f9f9",
-                    width: "480px",
-                    height: "360px",
                   }}
                 />
                 <button
@@ -1104,9 +1115,10 @@ export default function WorkshopPage() {
         <FullscreenSvgzModal
           imageUrl={
             (selectedVehicle
-              ? selectedVehicle.modelPictureMimeDataName
+              ? (selectedVehicle as VehicleInfo).modelPictureMimeDataName
               : vehicleSearchResults && vehicleSearchResults.length > 0
-              ? vehicleSearchResults[0].modelPictureMimeDataName
+              ? (vehicleSearchResults[0] as VehicleInfo)
+                  .modelPictureMimeDataName
               : vehicleInfo.modelPictureMimeDataName) || ""
           }
           onClose={() => setIsFullscreen(false)}
@@ -1140,36 +1152,36 @@ export default function WorkshopPage() {
 // Tabs and sections UI
 function VehicleTabs({
   mainTab,
-  setMainTab,
+  // setMainTab,
   repairSubTab,
   setRepairSubTab,
   selectedSubject,
   setSelectedSubject,
   vehicle,
   onDrawingSubjectClick,
-  openRepairManualSectionId,
-  setOpenRepairManualSectionId,
+  // openRepairManualSectionId,
+  // setOpenRepairManualSectionId,
   openRepairManualPath,
   setOpenRepairManualPath,
 }: {
   mainTab: string;
-  setMainTab: (tab: string) => void;
+  // setMainTab: (tab: string) => void;
   repairSubTab: string;
   setRepairSubTab: (tab: string) => void;
   selectedSubject: string | null;
   setSelectedSubject: (subject: string | null) => void;
   vehicle: VehicleInfo;
   onDrawingSubjectClick: () => void;
-  openRepairManualSectionId?: string | null;
-  setOpenRepairManualSectionId?: (id: string | null) => void;
+  // openRepairManualSectionId?: string | null;
+  // setOpenRepairManualSectionId?: (id: string | null) => void;
   openRepairManualPath?: string[];
   setOpenRepairManualPath?: (path: string[]) => void;
 }) {
   // Memoize vehicle basic params for Overview
-  const vehicleOverviewParams: { label: string; value: any }[] = [
+  const vehicleOverviewParams: { label: string; value: string | number }[] = [
     { label: "ID", value: vehicle.id },
     { label: "Name", value: vehicle.name },
-    { label: "Remark", value: vehicle.remark },
+    { label: "Remark", value: vehicle.remark || "N/A" },
     { label: "Full Name", value: vehicle.fullName },
     { label: "Level", value: vehicle.level },
     { label: "Made From", value: vehicle.madeFrom },
@@ -1539,8 +1551,8 @@ function WarningLightsSection({
       </h3>
       <div className="text-sm text-gray-600 mb-4 max-w-2xl">
         Below are typical dashboard warning/indicator lights with meanings and
-        recommended actions. Refer to the owner's manual for your vehicle for
-        more details.
+        recommended actions. Refer to the owner&apos;s manual for your vehicle
+        for more details.
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-[640px] w-full table-auto border border-gray-200 bg-gray-50 rounded">
@@ -1600,8 +1612,8 @@ function WarningLightsSection({
         </table>
       </div>
       <div className="mt-2 text-xs text-gray-500">
-        Note: The appearance and color of lights may vary. Check the owner's
-        handbook for your specific vehicle.
+        Note: The appearance and color of lights may vary. Check the
+        owner&apos;s handbook for your specific vehicle.
       </div>
     </div>
   );
@@ -1768,21 +1780,22 @@ function RepairManualsSection({
   }
 
   // Helper: Accepts a list of "subsections" at any depth, and returns a new array flattened such that all descendants are at most 2 levels deep (flattened into the 2nd level array), i.e. any children from 3rd level on up are hoisted up to their grandparent's "subsections" array, immediately after their parent
-  function flattenToTwoLevels(subsections?: any[]): any[] | undefined {
+  function flattenToTwoLevels(subsections?: unknown[]): unknown[] | undefined {
     if (!subsections) return undefined;
-    let flattened: any[] = [];
+    const flattened: unknown[] = [];
     for (const sub of subsections) {
-      if (!sub.subsections) {
+      const subObj = sub as { subsections?: unknown[] };
+      if (!subObj.subsections) {
         flattened.push(sub);
       } else {
         // If the child has "subsections", flatten those (just hoist them all under the current parent alongside their parent, recursively)
         // 1. Push the parent itself, but with undefined subsections
-        flattened.push({ ...sub, subsections: undefined });
+        flattened.push({ ...subObj, subsections: undefined });
         // 2. For each child, if child has own subsections, we also flatten it recursively
-        const subsubs = flattenToTwoLevels(sub.subsections);
+        const subsubs = flattenToTwoLevels(subObj.subsections);
         if (subsubs) {
           for (const s of subsubs) {
-            flattened.push({ ...s, subsections: undefined }); // flatten any further nesting
+            flattened.push({ ...(s as object), subsections: undefined }); // flatten any further nesting
           }
         }
       }
@@ -1791,15 +1804,21 @@ function RepairManualsSection({
   }
 
   // Renders a repair manual section (1st level).
-  function renderSection(section: any, path: string[]) {
+  function renderSection(section: unknown, path: string[]) {
+    const sectionObj = section as {
+      subsections?: unknown[];
+      title?: string;
+      content?: string;
+      images?: string[];
+    };
     const isOpen =
       openSectionPath.length >= path.length &&
       openSectionPath.slice(0, path.length).every((v, idx) => v === path[idx]);
 
     // Prepare subsections for display: flatten any nesting inside each subsection to just one level (no .subsections in a subsection).
-    let flattenedSubsections: any[] | undefined = undefined;
-    if (section.subsections) {
-      flattenedSubsections = flattenToTwoLevels(section.subsections);
+    let flattenedSubsections: unknown[] | undefined = undefined;
+    if (sectionObj.subsections) {
+      flattenedSubsections = flattenToTwoLevels(sectionObj.subsections);
     }
 
     return (
@@ -1818,29 +1837,31 @@ function RepairManualsSection({
           >
             ▶
           </span>
-          <span className="flex-1">{section.title}</span>
-          {section.images && section.images.length > 0 && (
+          <span className="flex-1">{sectionObj.title}</span>
+          {sectionObj.images && sectionObj.images.length > 0 && (
             <span className="ml-3 text-green-600 text-xs font-mono">
-              Images: {section.images.length}
+              Images: {sectionObj.images.length}
             </span>
           )}
         </button>
         {isOpen && (
           <div className="pl-8 pr-4 pb-5 pt-0">
-            {section.content && (
+            {sectionObj.content && (
               <div className="text-gray-800 mb-2 whitespace-pre-line">
-                {section.content}
+                {sectionObj.content}
               </div>
             )}
-            {section.images && section.images.length > 0 ? (
+            {sectionObj.images && sectionObj.images.length > 0 ? (
               <div>
                 <div className="font-semibold text-gray-700 mb-1">Images</div>
                 <div className="flex gap-3 flex-wrap">
-                  {section.images.map((img: string, idx: number) => (
+                  {sectionObj.images.map((img: string, idx: number) => (
                     <div className="relative" key={img}>
-                      <img
+                      <Image
                         src={img}
                         alt={`Repair Manual Section image ${idx + 1}`}
+                        width={200}
+                        height={150}
                         className="rounded shadow border bg-gray-50 max-h-48 max-w-xs"
                         style={{ background: "#f9f9f9" }}
                       />
@@ -1849,8 +1870,8 @@ function RepairManualsSection({
                 </div>
               </div>
             ) : (
-              section.images &&
-              section.images.length === 0 && (
+              sectionObj.images &&
+              sectionObj.images.length === 0 && (
                 <div className="mt-2 text-xs text-gray-500">
                   No images in this section.
                 </div>
@@ -1859,7 +1880,13 @@ function RepairManualsSection({
             {/* Subsections: Only 2nd level. Flat. For each, content/images, but no further nesting shown */}
             {flattenedSubsections && flattenedSubsections.length > 0 && (
               <div className="mt-3 border-l border-blue-100 pl-4">
-                {flattenedSubsections.map((sub: any, subIdx: number) => {
+                {flattenedSubsections.map((sub: unknown, subIdx: number) => {
+                  const subObj = sub as {
+                    subsections?: unknown[];
+                    title?: string;
+                    content?: string;
+                    images?: string[];
+                  };
                   // path: {...path, 2nd level key}
                   const subPath = path.concat(`sub${subIdx}`);
                   const isSubOpen =
@@ -1887,43 +1914,47 @@ function RepairManualsSection({
                         >
                           ▶
                         </span>
-                        <span className="flex-1">{sub.title}</span>
-                        {sub.images && sub.images.length > 0 && (
+                        <span className="flex-1">{subObj.title}</span>
+                        {subObj.images && subObj.images.length > 0 && (
                           <span className="ml-2 text-green-600 text-xs font-mono">
-                            Images: {sub.images.length}
+                            Images: {subObj.images.length}
                           </span>
                         )}
                       </button>
                       {isSubOpen && (
                         <div className="pl-8 pr-4 pb-3 pt-0">
-                          {sub.content && (
+                          {subObj.content && (
                             <div className="text-gray-800 mb-2 whitespace-pre-line">
-                              {sub.content}
+                              {subObj.content}
                             </div>
                           )}
-                          {sub.images && sub.images.length > 0 ? (
+                          {subObj.images && subObj.images.length > 0 ? (
                             <div>
                               <div className="font-semibold text-gray-700 mb-1">
                                 Images
                               </div>
                               <div className="flex gap-3 flex-wrap">
-                                {sub.images.map((img: string, idx: number) => (
-                                  <div className="relative" key={img}>
-                                    <img
-                                      src={img}
-                                      alt={`Repair Manual Subsection image ${
-                                        idx + 1
-                                      }`}
-                                      className="rounded shadow border bg-gray-50 max-h-48 max-w-xs"
-                                      style={{ background: "#f9f9f9" }}
-                                    />
-                                  </div>
-                                ))}
+                                {subObj.images.map(
+                                  (img: string, idx: number) => (
+                                    <div className="relative" key={img}>
+                                      <Image
+                                        src={img}
+                                        alt={`Repair Manual Subsection image ${
+                                          idx + 1
+                                        }`}
+                                        width={200}
+                                        height={150}
+                                        className="rounded shadow border bg-gray-50 max-h-48 max-w-xs"
+                                        style={{ background: "#f9f9f9" }}
+                                      />
+                                    </div>
+                                  )
+                                )}
                               </div>
                             </div>
                           ) : (
-                            sub.images &&
-                            sub.images.length === 0 && (
+                            subObj.images &&
+                            subObj.images.length === 0 && (
                               <div className="mt-2 text-xs text-gray-500">
                                 No images in this subsection.
                               </div>
@@ -1956,8 +1987,10 @@ function RepairManualsSection({
       </div>
       <div className="overflow-x-auto">
         <div className="divide-y border rounded">
-          {SAMPLE_REPAIR_MANUAL_SECTIONS.map((section, idx) =>
-            renderSection(section, [section.id])
+          {SAMPLE_REPAIR_MANUAL_SECTIONS.map((section) =>
+            renderSection(section, [
+              (section as { id?: string }).id || "unknown",
+            ])
           )}
         </div>
       </div>
@@ -2074,9 +2107,11 @@ function DrawingModal({
                 <div className="pl-4 pt-2">
                   {sub.mimeDataName && (
                     <div className="my-2 relative group">
-                      <img
+                      <Image
                         src={sub.mimeDataName}
                         alt={sub.description}
+                        width={400}
+                        height={300}
                         className="rounded border shadow max-w-full max-h-60 cursor-pointer"
                         style={{ background: "#f9f9f9" }}
                         onClick={() => {
@@ -2168,9 +2203,11 @@ function DrawingModal({
                 <div className="pl-4 pt-2">
                   {drawing.mimeDataName && (
                     <div className="my-2 relative group">
-                      <img
+                      <Image
                         src={drawing.mimeDataName}
                         alt={drawing.description}
+                        width={400}
+                        height={300}
                         className="rounded border shadow max-w-full max-h-60 cursor-pointer"
                         style={{ background: "#f9f9f9" }}
                         onClick={() => {
@@ -2299,31 +2336,35 @@ function FullscreenSvgzModal({
   imageUrl: string;
   onClose: () => void;
 }) {
-  // ... unchanged, not related to instructions ...
-  // Kept as is.
-  // (See the rest of the prior code.)
-  // --- omitted for brevity ---
-  const [svgContent, setSvgContent] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  // Zoom state
-  const [zoom, setZoom] = useState(1);
-  const [dragging, setDragging] = useState(false);
-  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(
-    null
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl w-full relative">
+        <button
+          type="button"
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+            <path
+              d="M6 6l8 8M6 14L14 6"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+        <div className="flex items-center justify-center">
+          <Image
+            src={imageUrl}
+            alt="Fullscreen view"
+            width={800}
+            height={600}
+            className="max-w-full max-h-[80vh] object-contain"
+            style={{ background: "#f9f9f9" }}
+          />
+        </div>
+      </div>
+    </div>
   );
-  const [imgOffset, setImgOffset] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
-  const [imgDragStartOffset, setImgDragStartOffset] = useState<{
-    x: number;
-    y: number;
-  }>({ x: 0, y: 0 });
-
-  // Focus trap and Escape key handler
-  const modalRef = useRef<HTMLDivElement>(null);
-  const imgContainerRef = useRef<HTMLDivElement>(null);
-
-  // ... rest unchanged ...
 }

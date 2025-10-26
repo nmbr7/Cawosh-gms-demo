@@ -13,7 +13,7 @@ export default function AuthenticatedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
   const user = useAuthStore((state) => state.user);
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
   const router = useRouter();

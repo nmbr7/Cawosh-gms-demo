@@ -5,13 +5,13 @@ import { Label } from "@/components/ui/label";
 // import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -24,13 +24,13 @@ import {
   Trash2,
   Wrench,
   Clock,
-  DollarSign,
+  // DollarSign,
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useJobSheetStore } from "@/store/jobSheet";
-import { useBookingStore } from "@/store/booking";
+// import { useBookingStore } from "@/store/booking";
 import { toast } from "sonner";
 import type { JobSheet } from "@/store/jobSheet";
 
@@ -65,11 +65,11 @@ export function DiagnosisPanel({
   });
 
   const jobSheetStore = useJobSheetStore();
-  const bookingStore = useBookingStore();
+  // const bookingStore = useBookingStore();
   const booking = jobSheet.booking;
 
   // Get available services from booking store
-  const availableServices = useBookingStore((state) => state.services);
+  // const availableServices = useBookingStore((state) => state.services);
 
   const addService = () => {
     if (!newService.name.trim() || newService.price <= 0) {
