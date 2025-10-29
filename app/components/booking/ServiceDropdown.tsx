@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Command,
   CommandEmpty,
@@ -6,16 +6,16 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { StoreService } from "@/store/booking";
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Check, ChevronsUpDown, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { StoreService } from '@/store/booking';
 
 interface ServiceDropdownProps {
   selectedServices: StoreService[];
@@ -29,7 +29,7 @@ export const ServiceDropdown: React.FC<ServiceDropdownProps> = ({
   selectedServices,
   onServicesChange,
   services,
-  placeholder = "Select services",
+  placeholder = 'Select services',
   disabled = false,
 }) => {
   const [open, setOpen] = useState(false);
@@ -105,9 +105,9 @@ export const ServiceDropdown: React.FC<ServiceDropdownProps> = ({
               <CommandGroup>
                 {services.map((service) => {
                   const isSelected = selectedServices.some(
-                    (s) => s.id === service.id
+                    (s) => s.id === service.id,
                   );
-                  const isUndiagnosed = service.id === "service-undiagnosed";
+                  const isUndiagnosed = service.id === 'service-undiagnosed';
                   return (
                     <CommandItem
                       key={service.id}
@@ -118,15 +118,15 @@ export const ServiceDropdown: React.FC<ServiceDropdownProps> = ({
                       <div className="flex items-center">
                         <Check
                           className={cn(
-                            "mr-2 h-4 w-4",
-                            isSelected ? "opacity-100" : "opacity-0"
+                            'mr-2 h-4 w-4',
+                            isSelected ? 'opacity-100' : 'opacity-0',
                           )}
                         />
                         <div>
                           <div
                             className={cn(
-                              "font-medium",
-                              isUndiagnosed && "text-amber-600"
+                              'font-medium',
+                              isUndiagnosed && 'text-amber-600',
                             )}
                           >
                             {service.name}

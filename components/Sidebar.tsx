@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import {
   Calendar,
   ChevronLeft,
@@ -18,28 +18,26 @@ import {
   Wrench,
   Award,
   Package,
-  File,
   CheckCircle,
-  ChevronLeft as LucideChevronLeft,
-  ChevronRight as LucideChevronRight,
-} from "lucide-react";
-import { useUIStore } from "@/store/ui";
-import { useAuthStore } from "@/store/auth";
-import React from "react";
+} from 'lucide-react';
+import { useUIStore } from '@/store/ui';
+import { useAuthStore } from '@/store/auth';
+import React from 'react';
 
 // Navigation links for sidebar
-const links = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Calendar", href: "/schedule", icon: Calendar },
-  { name: "Bookings", href: "/bookings", icon: Handshake },
-  { name: "Job Sheet", href: "/job-sheet", icon: ClipboardList },
-  { name: "Approvals", href: "/approvals", icon: CheckCircle },
-  { name: "Billings", href: "/billings", icon: Receipt },
-  { name: "Customer Support", href: "/customer-support", icon: HeadphonesIcon },
-  { name: "Workshop", href: "/workshop", icon: Wrench },
-  { name: "MOT", href: "/mot", icon: Award },
-  { name: "Staff Management", href: "/users", icon: UsersIcon },
-  { name: "Settings", href: "/settings", icon: Settings },
+export const links = [
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Calendar', href: '/schedule', icon: Calendar },
+  { name: 'Bookings', href: '/bookings', icon: Handshake },
+  { name: 'Job Sheet', href: '/job-sheet', icon: ClipboardList },
+  { name: 'Stock Management', href: '/inventory', icon: Package },
+  { name: 'Approvals', href: '/approvals', icon: CheckCircle },
+  { name: 'Billings', href: '/billings', icon: Receipt },
+  { name: 'Customer Support', href: '/customer-support', icon: HeadphonesIcon },
+  { name: 'Workshop', href: '/workshop', icon: Wrench },
+  { name: 'MOT', href: '/mot', icon: Award },
+  { name: 'Staff Management', href: '/users', icon: UsersIcon },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 function SidebarLink({
@@ -60,11 +58,13 @@ function SidebarLink({
       key={href}
       href={href}
       className={cn(
-        "flex items-center gap-4 px-4 py-3 rounded-md text-base font-medium transition-colors focus:outline-none focus:ring-2 ring-blue-200",
-        active ? "bg-blue-100 text-blue-700" : "text-gray-700 hover:bg-gray-100"
+        'flex items-center gap-4 px-4 py-3 rounded-md text-base font-medium transition-colors focus:outline-none focus:ring-2 ring-blue-200',
+        active
+          ? 'bg-blue-100 text-blue-700'
+          : 'text-gray-700 hover:bg-gray-100',
       )}
       tabIndex={0}
-      aria-current={active ? "page" : undefined}
+      aria-current={active ? 'page' : undefined}
     >
       <Icon className="w-6 h-6 flex-shrink-0" />
       {expanded && <span>{name}</span>}
@@ -122,8 +122,8 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        "h-screen bg-white shadow-md flex flex-col justify-between transition-all duration-300 ease-in-out",
-        sidebarOpen ? "w-64" : "w-20"
+        'h-screen bg-white shadow-md flex flex-col justify-between transition-all duration-300 ease-in-out',
+        sidebarOpen ? 'w-64' : 'w-20',
       )}
       aria-label="Sidebar navigation"
     >
@@ -131,8 +131,8 @@ export default function Sidebar() {
       <div>
         <div
           className={cn(
-            "p-4 text-xl font-semibold border-b h-16 flex items-center transition-all",
-            sidebarOpen ? "justify-start" : "justify-center"
+            'p-4 text-xl font-semibold border-b h-16 flex items-center transition-all',
+            sidebarOpen ? 'justify-start' : 'justify-center',
           )}
         >
           {expandText ? (
@@ -168,15 +168,11 @@ export default function Sidebar() {
         </button>
         <button
           onClick={toggleSidebar}
-          aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
           className="p-2 rounded hover:bg-gray-100 transition focus:outline-none focus:ring-2 ring-blue-200"
           style={{ minWidth: 36, minHeight: 36 }}
         >
-          {sidebarOpen ? (
-            <ChevronLeft size={20} />
-          ) : (
-            <ChevronRight size={20} />
-          )}
+          {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
         </button>
       </div>
     </aside>

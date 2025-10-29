@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useParams } from "next/navigation";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import VHCSectionGrid from "@/components/vhc/VHCSectionGrid";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import VHCSectionGrid from '@/components/vhc/VHCSectionGrid';
 import {
   VHC_VALUE_MAPPING,
   getVHCTitle,
   convertAnswersForStorage,
-} from "@/lib/vhc/answerMapping";
+} from '@/lib/vhc/answerMapping';
 
 type Template = {
   id: string;
@@ -37,7 +37,7 @@ export default function VehicleHealthCheckEditorPage() {
 
   const load = useCallback(async () => {
     const res = await fetchWithAuth(`/api/vhc/responses/${id}`, {
-      method: "GET",
+      method: 'GET',
     });
     const data = await res.json();
     setResp({
@@ -46,7 +46,7 @@ export default function VehicleHealthCheckEditorPage() {
       answers: data.answers || [],
     });
     const tRes = await fetchWithAuth(`/api/vhc/templates/active`, {
-      method: "GET",
+      method: 'GET',
     });
     const template = await tRes.json();
     setTpl(template);
@@ -59,9 +59,9 @@ export default function VehicleHealthCheckEditorPage() {
   }, [id, load]);
 
   const sections = useMemo(() => {
-    if (!tpl || !resp) return [] as Template["sections"];
+    if (!tpl || !resp) return [] as Template['sections'];
     return tpl.sections.filter(
-      (s) => !s.applicable_to || s.applicable_to.includes(resp.powertrain)
+      (s) => !s.applicable_to || s.applicable_to.includes(resp.powertrain),
     );
   }, [tpl, resp]);
 
@@ -95,8 +95,8 @@ export default function VehicleHealthCheckEditorPage() {
         const convertedPartial = convertAnswersForStorage(partial);
 
         const res = await fetchWithAuth(`/api/vhc/responses/${resp.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ answers: convertedPartial }),
         });
         const updated = await res.json();
@@ -109,7 +109,7 @@ export default function VehicleHealthCheckEditorPage() {
         setSaving(false);
       }
     },
-    [resp]
+    [resp],
   );
 
   if (!tpl || !resp || !current) {
@@ -147,7 +147,7 @@ export default function VehicleHealthCheckEditorPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Vehicle Health Check</h1>
         <div className="text-sm text-gray-500">
-          {saving ? "Saving..." : "Saved"}
+          {saving ? 'Saving...' : 'Saved'}
         </div>
       </div>
 
@@ -155,7 +155,7 @@ export default function VehicleHealthCheckEditorPage() {
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
         {sections.map((section, index) => {
           const isCompleted = section.items.every(
-            (item) => currentValues[item.id] !== undefined
+            (item) => currentValues[item.id] !== undefined,
           );
           const isCurrent = index === currentSectionIndex;
 
@@ -165,10 +165,10 @@ export default function VehicleHealthCheckEditorPage() {
               onClick={() => setCurrentSectionIndex(index)}
               className={`flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isCurrent
-                  ? "bg-blue-100 text-blue-700 border border-blue-200"
+                  ? 'bg-blue-100 text-blue-700 border border-blue-200'
                   : isCompleted
-                  ? "bg-green-100 text-green-700 border border-green-200"
-                  : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+                    ? 'bg-green-100 text-green-700 border border-green-200'
+                    : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -211,7 +211,7 @@ export default function VehicleHealthCheckEditorPage() {
               window.location.href = `/vehicle-health-checks/${params.id}/report`;
             } else {
               setCurrentSectionIndex((i) =>
-                Math.min(sections.length - 1, i + 1)
+                Math.min(sections.length - 1, i + 1),
               );
             }
           }}
@@ -219,8 +219,8 @@ export default function VehicleHealthCheckEditorPage() {
           className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm"
         >
           {currentSectionIndex >= sections.length - 1
-            ? "View Report"
-            : "Next Section"}
+            ? 'View Report'
+            : 'Next Section'}
         </button>
       </div>
     </div>

@@ -1,65 +1,65 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Settings, Building2, Wrench, CreditCard } from "lucide-react";
-import { toast } from "sonner";
-import { ServiceList } from "./components/services";
-import { useGarageStore } from "@/store/garage";
-import { BusinessHours } from "./components/business/BusinessHours";
-import BasicInformation from "./components/business/BasicInformation";
-import TaxSettings from "./components/business/TaxConfiguration";
-import type { BusinessHours as BusinessHoursType } from "@/app/models/garage";
-import type { Service } from "@/app/models/service";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+} from '@/components/ui/card';
+import { Settings, Building2, Wrench, CreditCard } from 'lucide-react';
+import { toast } from 'sonner';
+import { ServiceList } from './components/services';
+import { useGarageStore } from '@/store/garage';
+import { BusinessHours } from './components/business/BusinessHours';
+import BasicInformation from './components/business/BasicInformation';
+import TaxSettings from './components/business/TaxConfiguration';
+import type { BusinessHours as BusinessHoursType } from '@/app/models/garage';
+import type { Service } from '@/app/models/service';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 const tabs = [
   {
-    id: "business",
-    label: "Business",
+    id: 'business',
+    label: 'Business',
     icon: Building2,
     submenus: [
-      { id: "info", label: "Basic Information" },
-      { id: "hours", label: "Business Hours" },
+      { id: 'info', label: 'Basic Information' },
+      { id: 'hours', label: 'Business Hours' },
     ],
   },
   {
-    id: "services",
-    label: "Services",
+    id: 'services',
+    label: 'Services',
     icon: Wrench,
     submenus: [],
   },
   {
-    id: "billing",
-    label: "Billing",
+    id: 'billing',
+    label: 'Billing',
     icon: CreditCard,
     submenus: [
-      { id: "tax", label: "Tax Configuration" },
-      { id: "payment", label: "Payment Settings" },
+      { id: 'tax', label: 'Tax Configuration' },
+      { id: 'payment', label: 'Payment Settings' },
     ],
   },
   {
-    id: "system",
-    label: "System",
+    id: 'system',
+    label: 'System',
     icon: Settings,
     submenus: [
-      { id: "security", label: "Security" },
-      { id: "notifications", label: "Notifications" },
-      { id: "backup", label: "Backup" },
-      { id: "integrations", label: "Integrations" },
+      { id: 'security', label: 'Security' },
+      { id: 'notifications', label: 'Notifications' },
+      { id: 'backup', label: 'Backup' },
+      { id: 'integrations', label: 'Integrations' },
     ],
   },
 ];
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("business");
-  const [activeSubmenu, setActiveSubmenu] = useState("info");
+  const [activeTab, setActiveTab] = useState('business');
+  const [activeSubmenu, setActiveSubmenu] = useState('info');
   const [services, setServices] = useState<Service[]>([]);
   const [servicesLoading, setServicesLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -75,11 +75,11 @@ export default function SettingsPage() {
   const fetchGarageSettings = async () => {
     setLoading(true);
     try {
-      const response = await fetchWithAuth("/api/garage-settings");
+      const response = await fetchWithAuth('/api/garage-settings');
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch garage settings");
+        throw new Error(data.error || 'Failed to fetch garage settings');
       }
 
       useGarageStore.getState().setGarage(data.data);
@@ -87,8 +87,8 @@ export default function SettingsPage() {
     } catch (error) {
       toast.error(
         `Failed to fetch garage settings: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       );
     } finally {
       setLoading(false);
@@ -97,28 +97,28 @@ export default function SettingsPage() {
 
   const handleTimeChange = (
     day: string,
-    type: "open" | "close" | "isClosed",
-    value: string
+    type: 'open' | 'close' | 'isClosed',
+    value: string,
   ) => {
     setBusinessHours((prev) =>
       prev.map((hour) =>
         hour.day === day
           ? {
               ...hour,
-              [type]: type === "isClosed" ? value === "true" : value,
+              [type]: type === 'isClosed' ? value === 'true' : value,
             }
-          : hour
-      )
+          : hour,
+      ),
     );
   };
 
   const handleSaveBusinessHours = async () => {
     setSaving(true);
     try {
-      const response = await fetchWithAuth("/api/garage-settings", {
-        method: "PATCH",
+      const response = await fetchWithAuth('/api/garage-settings', {
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           businessHours,
@@ -126,17 +126,17 @@ export default function SettingsPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save business hours");
+        throw new Error('Failed to save business hours');
       }
 
       const data = await response.json();
       useGarageStore.getState().setGarage(data.data);
-      toast.success("Business hours updated successfully");
+      toast.success('Business hours updated successfully');
     } catch (error) {
       toast.error(
         `Failed to save business hours: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       );
     } finally {
       setSaving(false);
@@ -144,7 +144,7 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    if (activeTab === "services") {
+    if (activeTab === 'services') {
       fetchServices();
     }
   }, [activeTab]);
@@ -154,19 +154,19 @@ export default function SettingsPage() {
     try {
       const garage = useGarageStore.getState().garage;
       if (!garage) {
-        throw new Error("No garage selected");
+        throw new Error('No garage selected');
       }
 
       const response = await fetchWithAuth(
-        `/api/garages/${garage.id}/services`
+        `/api/garages/${garage.id}/services`,
       );
       const data = await response.json();
       setServices(data.services || []);
     } catch (error) {
       toast.error(
         `Failed to load services: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       );
     } finally {
       setServicesLoading(false);
@@ -174,7 +174,7 @@ export default function SettingsPage() {
   };
 
   const handleServiceUpdate = async (
-    updatedFields: Omit<Service, "serviceId"> & { serviceId: string }
+    updatedFields: Omit<Service, 'serviceId'> & { serviceId: string },
   ) => {
     const garage = useGarageStore.getState().garage;
     if (!garage) return;
@@ -183,32 +183,32 @@ export default function SettingsPage() {
       const response = await fetchWithAuth(
         `/api/garages/${garage.id}/services/${serviceId}`,
         {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             customPrice,
             customDuration: duration,
             isActive,
           }),
-        }
+        },
       );
       if (!response.ok) {
-        throw new Error("Failed to update service");
+        throw new Error('Failed to update service');
       }
       // Optimistically update the local state
       setServices((prev) =>
         prev.map((service) =>
           service.serviceId === serviceId
             ? { ...service, customPrice, duration, isActive }
-            : service
-        )
+            : service,
+        ),
       );
-      toast.success("Service updated successfully!");
+      toast.success('Service updated successfully!');
     } catch (error) {
       toast.error(
         `Failed to update service: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       );
     }
   };
@@ -243,8 +243,8 @@ export default function SettingsPage() {
                   }}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === tab.id
-                      ? "bg-blue-50 text-blue-700 font-semibold"
-                      : "text-gray-700 hover:bg-gray-50"
+                      ? 'bg-blue-50 text-blue-700 font-semibold'
+                      : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -258,8 +258,8 @@ export default function SettingsPage() {
                         onClick={() => setActiveSubmenu(submenu.id)}
                         className={`w-full flex items-center px-3 py-2 rounded-lg text-sm transition-colors ${
                           activeSubmenu === submenu.id
-                            ? "bg-blue-50 text-blue-700 font-semibold"
-                            : "text-gray-600 hover:bg-gray-50"
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-gray-600 hover:bg-gray-50'
                         }`}
                       >
                         {submenu.label}
@@ -274,14 +274,14 @@ export default function SettingsPage() {
 
         {/* Content Area */}
         <div className="flex-1">
-          {activeTab === "business" && (
+          {activeTab === 'business' && (
             <>
-              {activeSubmenu === "info" && (
+              {activeSubmenu === 'info' && (
                 <div className="max-w-[75%]">
                   <BasicInformation garage={garage} />
                 </div>
               )}
-              {activeSubmenu === "hours" && (
+              {activeSubmenu === 'hours' && (
                 <div className="max-w-[75%]">
                   <BusinessHours
                     onTimeChange={handleTimeChange}
@@ -291,7 +291,7 @@ export default function SettingsPage() {
                   />
                 </div>
               )}
-              {activeSubmenu === "tax" && (
+              {activeSubmenu === 'tax' && (
                 <div className="max-w-[75%]">
                   <TaxSettings garage={garage || undefined} />
                 </div>
@@ -299,10 +299,10 @@ export default function SettingsPage() {
             </>
           )}
 
-          {activeTab === "services" && (
+          {activeTab === 'services' && (
             <ServiceList
               services={services}
-              garageId={garage?.id || ""}
+              garageId={garage?.id || ''}
               onServiceAdd={() => {}}
               onServiceUpdate={handleServiceUpdate}
               onServiceDelete={() => {}}
@@ -310,14 +310,14 @@ export default function SettingsPage() {
             />
           )}
 
-          {activeTab === "billing" && (
+          {activeTab === 'billing' && (
             <>
-              {activeSubmenu === "tax" && (
+              {activeSubmenu === 'tax' && (
                 <div className="max-w-[75%]">
                   <TaxSettings garage={garage || undefined} />
                 </div>
               )}
-              {activeSubmenu === "payment" && (
+              {activeSubmenu === 'payment' && (
                 <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
@@ -333,9 +333,9 @@ export default function SettingsPage() {
             </>
           )}
 
-          {activeTab === "system" && (
+          {activeTab === 'system' && (
             <>
-              {activeSubmenu === "security" && (
+              {activeSubmenu === 'security' && (
                 <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
@@ -348,7 +348,7 @@ export default function SettingsPage() {
                   </Card>
                 </div>
               )}
-              {activeSubmenu === "notifications" && (
+              {activeSubmenu === 'notifications' && (
                 <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
@@ -363,7 +363,7 @@ export default function SettingsPage() {
                   </Card>
                 </div>
               )}
-              {activeSubmenu === "backup" && (
+              {activeSubmenu === 'backup' && (
                 <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>
@@ -376,7 +376,7 @@ export default function SettingsPage() {
                   </Card>
                 </div>
               )}
-              {activeSubmenu === "integrations" && (
+              {activeSubmenu === 'integrations' && (
                 <div className="max-w-[75%]">
                   <Card>
                     <CardHeader>

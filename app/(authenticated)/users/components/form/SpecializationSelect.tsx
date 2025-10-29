@@ -1,20 +1,20 @@
-import { useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from "@/components/ui/command";
+} from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+} from '@/components/ui/popover';
+import { Badge } from '@/components/ui/badge';
+import { X } from 'lucide-react';
 
 interface ISkillRef {
   _id?: string;
@@ -33,27 +33,27 @@ export function SpecializationSelect({
   onSpecializationsChange,
   disabled = false,
 }: SpecializationSelectProps) {
-  const [specializationInput, setSpecializationInput] = useState("");
+  const [specializationInput, setSpecializationInput] = useState('');
   const [isOpenSpecialization, setIsOpenSpecialization] = useState(false);
 
   const SPECIALIZATIONS: ISkillRef[] = [
-    { code: "engine_diagnostics", displayName: "Engine Diagnostics" },
-    { code: "transmission_repair", displayName: "Transmission Repair" },
-    { code: "brake_systems", displayName: "Brake Systems" },
-    { code: "suspension_steering", displayName: "Suspension & Steering" },
-    { code: "electrical_systems", displayName: "Electrical Systems" },
-    { code: "air_conditioning", displayName: "Air Conditioning" },
-    { code: "exhaust_systems", displayName: "Exhaust Systems" },
-    { code: "body_paint", displayName: "Body & Paint" },
-    { code: "wheel_alignment", displayName: "Wheel Alignment" },
-    { code: "oil_fluid_services", displayName: "Oil & Fluid Services" },
-    { code: "battery_services", displayName: "Battery Services" },
-    { code: "tire_services", displayName: "Tire Services" },
-    { code: "general_maintenance", displayName: "General Maintenance" },
-    { code: "performance_tuning", displayName: "Performance Tuning" },
+    { code: 'engine_diagnostics', displayName: 'Engine Diagnostics' },
+    { code: 'transmission_repair', displayName: 'Transmission Repair' },
+    { code: 'brake_systems', displayName: 'Brake Systems' },
+    { code: 'suspension_steering', displayName: 'Suspension & Steering' },
+    { code: 'electrical_systems', displayName: 'Electrical Systems' },
+    { code: 'air_conditioning', displayName: 'Air Conditioning' },
+    { code: 'exhaust_systems', displayName: 'Exhaust Systems' },
+    { code: 'body_paint', displayName: 'Body & Paint' },
+    { code: 'wheel_alignment', displayName: 'Wheel Alignment' },
+    { code: 'oil_fluid_services', displayName: 'Oil & Fluid Services' },
+    { code: 'battery_services', displayName: 'Battery Services' },
+    { code: 'tire_services', displayName: 'Tire Services' },
+    { code: 'general_maintenance', displayName: 'General Maintenance' },
+    { code: 'performance_tuning', displayName: 'Performance Tuning' },
     {
-      code: "hybrid_electric_vehicles",
-      displayName: "Hybrid/Electric Vehicles",
+      code: 'hybrid_electric_vehicles',
+      displayName: 'Hybrid/Electric Vehicles',
     },
   ];
 
@@ -61,13 +61,13 @@ export function SpecializationSelect({
     if (!selectedSpecializations.some((s) => s.code === value.code)) {
       onSpecializationsChange([...selectedSpecializations, value]);
     }
-    setSpecializationInput("");
+    setSpecializationInput('');
     setIsOpenSpecialization(false);
   };
 
   const handleSpecializationRemove = (code: string) => {
     onSpecializationsChange(
-      selectedSpecializations.filter((s) => s.code !== code)
+      selectedSpecializations.filter((s) => s.code !== code),
     );
   };
 
@@ -76,7 +76,7 @@ export function SpecializationSelect({
       spec.displayName
         .toLowerCase()
         .includes(specializationInput.toLowerCase()) &&
-      !selectedSpecializations.some((s) => s.code === spec.code)
+      !selectedSpecializations.some((s) => s.code === spec.code),
   );
 
   return (

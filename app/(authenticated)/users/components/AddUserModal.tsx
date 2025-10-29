@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { UserRole, UserStatus, EmploymentType } from "@/app/models/user";
-import { NameInputs } from "./form/NameInputs";
-import { ContactInputs } from "./form/ContactInputs";
-import { RoleSelect } from "./form/RoleSelect";
-import { StatusSelect } from "./form/StatusSelect";
-import { SpecializationSelect } from "./form/SpecializationSelect";
-import { ImagePicker } from "./form/ImagePicker";
-import { EmploymentDetails } from "./form/EmploymentDetails";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { UserRole, UserStatus, EmploymentType } from '@/app/models/user';
+import { NameInputs } from './form/NameInputs';
+import { ContactInputs } from './form/ContactInputs';
+import { RoleSelect } from './form/RoleSelect';
+import { StatusSelect } from './form/StatusSelect';
+import { SpecializationSelect } from './form/SpecializationSelect';
+import { ImagePicker } from './form/ImagePicker';
+import { EmploymentDetails } from './form/EmploymentDetails';
 import {
   validateEmail,
   validatePhone,
   getValidationErrors,
-} from "@/app/utils/validation";
-import { toast } from "sonner";
+} from '@/app/utils/validation';
+import { toast } from 'sonner';
 
 interface ValidationErrors {
   [key: string]: string;
@@ -72,7 +72,7 @@ interface AddUserModalProps {
   onClose: () => void;
   onSave: (userData: FormData) => void;
   initialData?: Partial<FormData>;
-  mode?: "view" | "edit" | "add";
+  mode?: 'view' | 'edit' | 'add';
 }
 
 export function AddUserModal({
@@ -80,33 +80,33 @@ export function AddUserModal({
   onClose,
   onSave,
   initialData,
-  mode = "add",
+  mode = 'add',
 }: AddUserModalProps) {
   const [formData, setFormData] = useState<FormData>({
-    firstName: initialData?.firstName || "",
-    lastName: initialData?.lastName || "",
-    email: initialData?.email || "",
-    password: initialData?.password || "",
-    phone: initialData?.phone || "",
-    address: initialData?.address || "",
-    role: initialData?.role || "staff",
-    status: initialData?.status || "active",
-    position: initialData?.position || "",
-    department: initialData?.department || "",
-    employmentType: initialData?.employmentType || "full-time",
+    firstName: initialData?.firstName || '',
+    lastName: initialData?.lastName || '',
+    email: initialData?.email || '',
+    password: initialData?.password || '',
+    phone: initialData?.phone || '',
+    address: initialData?.address || '',
+    role: initialData?.role || 'staff',
+    status: initialData?.status || 'active',
+    position: initialData?.position || '',
+    department: initialData?.department || '',
+    employmentType: initialData?.employmentType || 'full-time',
     joiningDate:
-      initialData?.joiningDate || new Date().toISOString().split("T")[0],
+      initialData?.joiningDate || new Date().toISOString().split('T')[0],
     skills: initialData?.skills || [],
     certifications: initialData?.certifications || [],
     workingHours: initialData?.workingHours
       ? {
-          start: initialData.workingHours.start || "10:00",
-          end: initialData.workingHours.end || "18:00",
+          start: initialData.workingHours.start || '10:00',
+          end: initialData.workingHours.end || '18:00',
           days: initialData.workingHours.days || [],
         }
       : {
-          start: "10:00",
-          end: "18:00",
+          start: '10:00',
+          end: '18:00',
           days: [],
         },
     systemAccess: initialData?.systemAccess || {
@@ -119,38 +119,38 @@ export function AddUserModal({
     imageUrl: initialData?.imageUrl || null,
   });
 
-  const isViewMode = mode === "view";
-  const isEditMode = mode === "edit";
+  const isViewMode = mode === 'view';
+  const isEditMode = mode === 'edit';
 
   // Reset form data when initialData changes or mode changes
   useEffect(() => {
     if (initialData) {
       // Edit or view mode - populate with user data
       setFormData({
-        firstName: initialData.firstName || "",
-        lastName: initialData.lastName || "",
-        email: initialData.email || "",
-        password: initialData.password || "",
-        phone: initialData.phone || "",
-        address: initialData.address || "",
-        role: initialData.role || "staff",
-        status: initialData.status || "active",
-        position: initialData.position || "",
-        department: initialData.department || "",
-        employmentType: initialData.employmentType || "full-time",
+        firstName: initialData.firstName || '',
+        lastName: initialData.lastName || '',
+        email: initialData.email || '',
+        password: initialData.password || '',
+        phone: initialData.phone || '',
+        address: initialData.address || '',
+        role: initialData.role || 'staff',
+        status: initialData.status || 'active',
+        position: initialData.position || '',
+        department: initialData.department || '',
+        employmentType: initialData.employmentType || 'full-time',
         joiningDate:
-          initialData.joiningDate || new Date().toISOString().split("T")[0],
+          initialData.joiningDate || new Date().toISOString().split('T')[0],
         skills: initialData.skills || [],
         certifications: initialData.certifications || [],
         workingHours: initialData.workingHours
           ? {
-              start: initialData.workingHours.start || "10:00",
-              end: initialData.workingHours.end || "18:00",
+              start: initialData.workingHours.start || '10:00',
+              end: initialData.workingHours.end || '18:00',
               days: initialData.workingHours.days || [],
             }
           : {
-              start: "10:00",
-              end: "18:00",
+              start: '10:00',
+              end: '18:00',
               days: [],
             },
         systemAccess: initialData.systemAccess || {
@@ -162,26 +162,26 @@ export function AddUserModal({
         image: null,
         imageUrl: initialData.imageUrl || null,
       });
-    } else if (mode === "add") {
+    } else if (mode === 'add') {
       // Add mode - reset to empty form
       setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        phone: "",
-        address: "",
-        role: "staff",
-        status: "active",
-        position: "",
-        department: "",
-        employmentType: "full-time",
-        joiningDate: new Date().toISOString().split("T")[0],
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        phone: '',
+        address: '',
+        role: 'staff',
+        status: 'active',
+        position: '',
+        department: '',
+        employmentType: 'full-time',
+        joiningDate: new Date().toISOString().split('T')[0],
         skills: [],
         certifications: [],
         workingHours: {
-          start: "10:00",
-          end: "18:00",
+          start: '10:00',
+          end: '18:00',
           days: [],
         },
         systemAccess: {
@@ -248,43 +248,43 @@ export function AddUserModal({
 
   const validateForm = () => {
     const validationErrors: ValidationErrors = {
-      firstName: !formData.firstName ? "First name is required" : "",
-      lastName: !formData.lastName ? "Last name is required" : "",
-      email: !formData.email ? "Email is required" : "",
-      phone: !formData.phone ? "Phone is required" : "",
-      role: !formData.role ? "Role is required" : "",
-      position: !formData.position ? "Position is required" : "",
-      department: !formData.department ? "Department is required" : "",
+      firstName: !formData.firstName ? 'First name is required' : '',
+      lastName: !formData.lastName ? 'Last name is required' : '',
+      email: !formData.email ? 'Email is required' : '',
+      phone: !formData.phone ? 'Phone is required' : '',
+      role: !formData.role ? 'Role is required' : '',
+      position: !formData.position ? 'Position is required' : '',
+      department: !formData.department ? 'Department is required' : '',
     };
 
     // Password is only required in add mode
-    if (mode === "add" && !formData.password) {
-      validationErrors.password = "Password is required";
+    if (mode === 'add' && !formData.password) {
+      validationErrors.password = 'Password is required';
     }
 
     const errors = getValidationErrors(validationErrors);
     const formatErrors: string[] = [];
 
     if (formData.email && !validateEmail(formData.email)) {
-      formatErrors.push("Please enter a valid email address");
+      formatErrors.push('Please enter a valid email address');
     }
 
     if (formData.phone && !validatePhone(formData.phone)) {
       formatErrors.push(
-        "Please enter a valid UK phone number (e.g., 7123456789)"
+        'Please enter a valid UK phone number (e.g., 7123456789)',
       );
     }
 
     // Password validation only applies if password is provided
     if (formData.password && formData.password.length < 8) {
-      formatErrors.push("Password must be at least 8 characters long");
+      formatErrors.push('Password must be at least 8 characters long');
     }
 
     // Combine all validation errors for Sonner display
     const allErrors = [...errors, ...formatErrors];
 
     if (allErrors.length > 0) {
-      toast.error("Please fix below errors", {
+      toast.error('Please fix below errors', {
         description: (
           <ul className="list-disc list-inside">
             {allErrors.map((error, index) => (
@@ -312,7 +312,7 @@ export function AddUserModal({
       joiningDate: new Date(formData.joiningDate).toISOString(),
       workingHours: {
         ...formData.workingHours,
-        days: ["monday", "tuesday", "wednesday", "thursday", "friday"], // Default working days
+        days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'], // Default working days
       },
     };
 
@@ -325,10 +325,10 @@ export function AddUserModal({
         <DialogHeader className="p-6 pb-4">
           <DialogTitle className="text-2xl font-semibold">
             {isViewMode
-              ? "User Details"
+              ? 'User Details'
               : isEditMode
-              ? "Edit User"
-              : "Add New User"}
+                ? 'Edit User'
+                : 'Add New User'}
           </DialogTitle>
         </DialogHeader>
         <form
@@ -365,7 +365,7 @@ export function AddUserModal({
               {!isViewMode && (
                 <div className="space-y-2">
                   <Label htmlFor="password">
-                    Password {isEditMode && "(leave blank to keep current)"}
+                    Password {isEditMode && '(leave blank to keep current)'}
                   </Label>
                   <Input
                     id="password"
@@ -379,8 +379,8 @@ export function AddUserModal({
                     }
                     placeholder={
                       isEditMode
-                        ? "Leave blank to keep current password"
-                        : "Enter password"
+                        ? 'Leave blank to keep current password'
+                        : 'Enter password'
                     }
                     disabled={isViewMode}
                   />
@@ -570,12 +570,12 @@ export function AddUserModal({
               <Label htmlFor="certifications">Certifications</Label>
               <Input
                 id="certifications"
-                value={formData.certifications.join(", ")}
+                value={formData.certifications.join(', ')}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
                     certifications: e.target.value
-                      .split(",")
+                      .split(',')
                       .map((cert) => cert.trim())
                       .filter((cert) => cert),
                   }))
@@ -588,11 +588,11 @@ export function AddUserModal({
         </form>
         <DialogFooter className="p-6 pt-4 border-t">
           <Button type="button" variant="outline" onClick={onClose}>
-            {isViewMode ? "Close" : "Cancel"}
+            {isViewMode ? 'Close' : 'Cancel'}
           </Button>
           {!isViewMode && (
             <Button type="submit" form="user-form">
-              {isEditMode ? "Update User" : "Add User"}
+              {isEditMode ? 'Update User' : 'Add User'}
             </Button>
           )}
         </DialogFooter>

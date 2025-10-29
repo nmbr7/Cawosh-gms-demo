@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 // import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 // import {
 //   Select,
 //   SelectContent,
@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Plus,
   Trash2,
@@ -27,12 +27,12 @@ import {
   // DollarSign,
   AlertCircle,
   CheckCircle,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useJobSheetStore } from "@/store/jobSheet";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useJobSheetStore } from '@/store/jobSheet';
 // import { useBookingStore } from "@/store/booking";
-import { toast } from "sonner";
-import type { JobSheet } from "@/store/jobSheet";
+import { toast } from 'sonner';
+import type { JobSheet } from '@/store/jobSheet';
 
 interface DiagnosedService {
   id: string;
@@ -54,12 +54,12 @@ export function DiagnosisPanel({
   const [diagnosedServices, setDiagnosedServices] = useState<
     DiagnosedService[]
   >([]);
-  const [diagnosisNotes, setDiagnosisNotes] = useState("");
+  const [diagnosisNotes, setDiagnosisNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAddService, setShowAddService] = useState(false);
   const [newService, setNewService] = useState({
-    name: "",
-    description: "",
+    name: '',
+    description: '',
     duration: 30,
     price: 0,
   });
@@ -73,7 +73,7 @@ export function DiagnosisPanel({
 
   const addService = () => {
     if (!newService.name.trim() || newService.price <= 0) {
-      toast.error("Please provide service name and valid price");
+      toast.error('Please provide service name and valid price');
       return;
     }
 
@@ -86,9 +86,9 @@ export function DiagnosisPanel({
     };
 
     setDiagnosedServices([...diagnosedServices, service]);
-    setNewService({ name: "", description: "", duration: 30, price: 0 });
+    setNewService({ name: '', description: '', duration: 30, price: 0 });
     setShowAddService(false);
-    toast.success("Service added to diagnosis");
+    toast.success('Service added to diagnosis');
   };
 
   const removeService = (serviceId: string) => {
@@ -97,12 +97,12 @@ export function DiagnosisPanel({
 
   const submitDiagnosis = async () => {
     if (diagnosedServices.length === 0) {
-      toast.error("Please add at least one service");
+      toast.error('Please add at least one service');
       return;
     }
 
     if (!diagnosisNotes.trim()) {
-      toast.error("Please provide diagnosis notes");
+      toast.error('Please provide diagnosis notes');
       return;
     }
 
@@ -114,15 +114,15 @@ export function DiagnosisPanel({
         jobSheet.id,
         diagnosedServices.map((service) => ({
           ...service,
-          addedBy: "current-technician", // This would come from auth context
-        }))
+          addedBy: 'current-technician', // This would come from auth context
+        })),
       );
 
-      toast.success("Diagnosis submitted for approval");
+      toast.success('Diagnosis submitted for approval');
       onDiagnosisComplete();
     } catch (error) {
-      console.error("Error submitting diagnosis:", error);
-      toast.error("Failed to submit diagnosis");
+      console.error('Error submitting diagnosis:', error);
+      toast.error('Failed to submit diagnosis');
     } finally {
       setIsSubmitting(false);
     }
@@ -130,39 +130,39 @@ export function DiagnosisPanel({
 
   const totalPrice = diagnosedServices.reduce(
     (acc, service) => acc + service.price,
-    0
+    0,
   );
   const totalDuration = diagnosedServices.reduce(
     (acc, service) => acc + service.duration,
-    0
+    0,
   );
 
   const getStatusInfo = () => {
-    if (jobSheet.approvalStatus === "approved") {
+    if (jobSheet.approvalStatus === 'approved') {
       return {
         icon: CheckCircle,
-        text: "Work Order Approved",
-        className: "text-green-600 bg-green-50 border-green-200",
+        text: 'Work Order Approved',
+        className: 'text-green-600 bg-green-50 border-green-200',
       };
     }
-    if (jobSheet.approvalStatus === "rejected") {
+    if (jobSheet.approvalStatus === 'rejected') {
       return {
         icon: AlertCircle,
-        text: "Work Order Rejected",
-        className: "text-red-600 bg-red-50 border-red-200",
+        text: 'Work Order Rejected',
+        className: 'text-red-600 bg-red-50 border-red-200',
       };
     }
     if (diagnosedServices.length > 0) {
       return {
         icon: Clock,
-        text: "Pending Approval",
-        className: "text-amber-600 bg-amber-50 border-amber-200",
+        text: 'Pending Approval',
+        className: 'text-amber-600 bg-amber-50 border-amber-200',
       };
     }
     return {
       icon: Wrench,
-      text: "Diagnosis Required",
-      className: "text-blue-600 bg-blue-50 border-blue-200",
+      text: 'Diagnosis Required',
+      className: 'text-blue-600 bg-blue-50 border-blue-200',
     };
   };
 
@@ -178,8 +178,8 @@ export function DiagnosisPanel({
         </CardTitle>
         <div
           className={cn(
-            "inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border",
-            statusInfo.className
+            'inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border',
+            statusInfo.className,
           )}
         >
           <StatusIcon className="h-4 w-4" />
@@ -225,8 +225,8 @@ export function DiagnosisPanel({
         <div>
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-medium text-gray-900">Diagnosed Services</h4>
-            {jobSheet.approvalStatus !== "approved" &&
-              jobSheet.approvalStatus !== "rejected" && (
+            {jobSheet.approvalStatus !== 'approved' &&
+              jobSheet.approvalStatus !== 'rejected' && (
                 <Dialog open={showAddService} onOpenChange={setShowAddService}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline">
@@ -259,7 +259,7 @@ export function DiagnosisPanel({
                           id="service-description"
                           value={newService.description}
                           onChange={(
-                            e: React.ChangeEvent<HTMLTextAreaElement>
+                            e: React.ChangeEvent<HTMLTextAreaElement>,
                           ) =>
                             setNewService({
                               ...newService,
@@ -350,8 +350,8 @@ export function DiagnosisPanel({
                       >
                         £{service.price.toFixed(2)}
                       </Badge>
-                      {jobSheet.approvalStatus !== "approved" &&
-                        jobSheet.approvalStatus !== "rejected" && (
+                      {jobSheet.approvalStatus !== 'approved' &&
+                        jobSheet.approvalStatus !== 'rejected' && (
                           <Button
                             size="sm"
                             variant="ghost"
@@ -374,8 +374,8 @@ export function DiagnosisPanel({
         </div>
 
         {/* Diagnosis Notes */}
-        {jobSheet.approvalStatus !== "approved" &&
-          jobSheet.approvalStatus !== "rejected" && (
+        {jobSheet.approvalStatus !== 'approved' &&
+          jobSheet.approvalStatus !== 'rejected' && (
             <div>
               <Label htmlFor="diagnosis-notes">Diagnosis Notes</Label>
               <textarea
@@ -415,8 +415,8 @@ export function DiagnosisPanel({
         )}
 
         {/* Submit Button */}
-        {jobSheet.approvalStatus !== "approved" &&
-          jobSheet.approvalStatus !== "rejected" && (
+        {jobSheet.approvalStatus !== 'approved' &&
+          jobSheet.approvalStatus !== 'rejected' && (
             <div className="flex justify-end">
               <Button
                 onClick={submitDiagnosis}
@@ -428,14 +428,14 @@ export function DiagnosisPanel({
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 {isSubmitting
-                  ? "Submitting..."
-                  : "Submit Diagnosis for Approval"}
+                  ? 'Submitting...'
+                  : 'Submit Diagnosis for Approval'}
               </Button>
             </div>
           )}
 
         {/* Approval Status Messages */}
-        {jobSheet.approvalStatus === "approved" && (
+        {jobSheet.approvalStatus === 'approved' && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <div className="flex items-center gap-2 text-green-800">
               <CheckCircle className="h-5 w-5" />
@@ -447,7 +447,7 @@ export function DiagnosisPanel({
           </div>
         )}
 
-        {jobSheet.approvalStatus === "rejected" && (
+        {jobSheet.approvalStatus === 'rejected' && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
             <div className="flex items-center gap-2 text-red-800">
               <AlertCircle className="h-5 w-5" />

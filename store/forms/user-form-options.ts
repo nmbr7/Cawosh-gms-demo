@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { create } from 'zustand';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 interface UserFormOptions {
   positions: string[];
@@ -20,10 +20,10 @@ interface UserFormOptionsState {
 }
 
 const FALLBACK_OPTIONS: UserFormOptions = {
-  positions: ["Service Technician", "Manager", "Admin"],
-  departments: ["Service", "Operations", "IT"],
-  roles: ["User", "Admin", "Super Admin"],
-  permissions: ["Read", "Write", "Delete"],
+  positions: ['Service Technician', 'Manager', 'Admin'],
+  departments: ['Service', 'Operations', 'IT'],
+  roles: ['User', 'Admin', 'Super Admin'],
+  permissions: ['Read', 'Write', 'Delete'],
 };
 
 export const useUserFormOptionsStore = create<UserFormOptionsState>(
@@ -40,21 +40,21 @@ export const useUserFormOptionsStore = create<UserFormOptionsState>(
       set({ isLoading: true, error: null });
 
       try {
-        const response = await fetchWithAuth("/api/form-options");
-        console.log("response", response);
+        const response = await fetchWithAuth('/api/form-options');
+        console.log('response', response);
         if (response.ok) {
           const data = await response.json();
-          console.log("data", data);
+          console.log('data', data);
           set({ formOptions: data.data, isLoading: false, hasLoaded: true });
         } else {
-          throw new Error("Failed to fetch user form options");
+          throw new Error('Failed to fetch user form options');
         }
       } catch (err) {
         set({
           error:
             err instanceof Error
               ? err.message
-              : "Failed to fetch user form options",
+              : 'Failed to fetch user form options',
           isLoading: false,
           hasLoaded: true,
         });
@@ -74,5 +74,5 @@ export const useUserFormOptionsStore = create<UserFormOptionsState>(
         hasLoaded: false,
       });
     },
-  })
+  }),
 );

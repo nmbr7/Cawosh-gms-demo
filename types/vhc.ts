@@ -1,13 +1,13 @@
-export type Powertrain = "ice" | "ev" | "hybrid";
+export type Powertrain = 'ice' | 'ev' | 'hybrid';
 
 export type VHCOptionValue = number | string | boolean;
 
 export type VHCItemType =
-  | "radio"
-  | "checkbox"
-  | "range"
-  | "tread-depth"
-  | "note";
+  | 'radio'
+  | 'checkbox'
+  | 'range'
+  | 'tread-depth'
+  | 'note';
 
 export interface VHCScoreMap {
   [optionValue: string]: number;
@@ -51,11 +51,11 @@ export interface VHCTemplate {
 }
 
 export type VHCStatus =
-  | "draft"
-  | "in_progress"
-  | "submitted"
-  | "approved"
-  | "void";
+  | 'draft'
+  | 'in_progress'
+  | 'submitted'
+  | 'approved'
+  | 'void';
 
 export interface VHCAnswer {
   itemId: string;

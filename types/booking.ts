@@ -44,11 +44,11 @@ export interface Service {
   currency: string;
   currencySymbol: string;
   status:
-    | "pending"
-    | "in_progress"
-    | "completed"
-    | "cancelled"
-    | "awaiting_diagnosis";
+    | 'pending'
+    | 'in_progress'
+    | 'completed'
+    | 'cancelled'
+    | 'awaiting_diagnosis';
   technicianId: TechnicianId;
   bayId: string;
   startTime: string;
@@ -91,18 +91,18 @@ export interface HistoryEntry {
   notes: string;
   _id: string;
   type?:
-    | "diagnosis_submitted"
-    | "diagnosis_approved"
-    | "diagnosis_rejected"
-    | "booking_created"
-    | "status_changed"
-    | "job_sheet_created"
-    | "job_started"
-    | "job_paused"
-    | "job_resumed"
-    | "job_halted"
-    | "job_completed"
-    | "inventory_used";
+    | 'diagnosis_submitted'
+    | 'diagnosis_approved'
+    | 'diagnosis_rejected'
+    | 'booking_created'
+    | 'status_changed'
+    | 'job_sheet_created'
+    | 'job_started'
+    | 'job_paused'
+    | 'job_resumed'
+    | 'job_halted'
+    | 'job_completed'
+    | 'inventory_used';
 }
 
 export interface InventoryUsageEntry {
@@ -123,7 +123,7 @@ export interface Booking {
   bookingDate: string;
   totalDuration: number;
   totalPrice: number;
-  status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
+  status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
   notes: string;
   history: HistoryEntry[];
   createdAt: string;

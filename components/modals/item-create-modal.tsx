@@ -3,11 +3,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useState } from 'react';
 
 interface ItemCreateModalProps {
   isOpen: boolean;
@@ -16,17 +16,17 @@ interface ItemCreateModalProps {
 
 export function ItemCreateModal({ isOpen, onClose }: ItemCreateModalProps) {
   const [formData, setFormData] = useState({
-    name: "",
-    sku: "",
-    category: "",
-    description: "",
-    quantity: "",
-    unit: "",
-    reorderLevel: "",
-    costPrice: "",
-    sellingPrice: "",
-    supplier: "",
-    location: "",
+    name: '',
+    sku: '',
+    category: '',
+    description: '',
+    quantity: '',
+    unit: '',
+    reorderLevel: '',
+    costPrice: '',
+    sellingPrice: '',
+    supplier: '',
+    location: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {

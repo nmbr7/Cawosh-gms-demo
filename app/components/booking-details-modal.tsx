@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Booking } from "@/types/booking";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { BookingDetailsShimmer } from "./BookingDetailsShimmer";
-import { useBookingStore } from "@/store/booking";
+} from '@/components/ui/dialog';
+import { Booking } from '@/types/booking';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { BookingDetailsShimmer } from './BookingDetailsShimmer';
+import { useBookingStore } from '@/store/booking';
 
 interface BookingDetailsModalProps {
   bookingId: string | null;
@@ -21,28 +21,28 @@ interface BookingDetailsModalProps {
 // Helper function to safely format dates
 const safeFormatDate = (
   dateString: string | undefined,
-  formatString: string
+  formatString: string,
 ): string => {
-  if (!dateString) return "N/A";
+  if (!dateString) return 'N/A';
 
   try {
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "Invalid date";
+    if (isNaN(date.getTime())) return 'Invalid date';
     return format(date, formatString);
   } catch {
-    return "Invalid date";
+    return 'Invalid date';
   }
 };
 
 // Helper function to safely get technician name
 const getTechnicianName = (technicianId: unknown): string => {
-  if (!technicianId) return "Not assigned";
+  if (!technicianId) return 'Not assigned';
 
-  if (typeof technicianId === "string") {
+  if (typeof technicianId === 'string') {
     return technicianId;
   }
 
-  if (typeof technicianId === "object" && technicianId !== null) {
+  if (typeof technicianId === 'object' && technicianId !== null) {
     const tech = technicianId as Record<string, unknown>;
 
     if (tech.firstName && tech.lastName) {
@@ -56,7 +56,7 @@ const getTechnicianName = (technicianId: unknown): string => {
     }
   }
 
-  return "Not assigned";
+  return 'Not assigned';
 };
 
 export function BookingDetailsModal({
@@ -96,11 +96,11 @@ export function BookingDetailsModal({
       if (foundBooking) {
         setBooking(foundBooking);
       } else {
-        throw new Error("Booking not found");
+        throw new Error('Booking not found');
       }
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to fetch booking details";
+        err instanceof Error ? err.message : 'Failed to fetch booking details';
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -115,7 +115,7 @@ export function BookingDetailsModal({
         <DialogHeader>
           <DialogTitle>
             {loading
-              ? "Loading..."
+              ? 'Loading...'
               : `Booking Details - ${
                   booking?.bookingId || booking?._id || bookingId
                 }`}
@@ -177,7 +177,7 @@ export function BookingDetailsModal({
                       Notes
                     </label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {booking.notes || "No notes"}
+                      {booking.notes || 'No notes'}
                     </p>
                   </div>
                 </div>
@@ -212,7 +212,7 @@ export function BookingDetailsModal({
                       License Plate
                     </label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {booking.vehicle.license || "N/A"}
+                      {booking.vehicle.license || 'N/A'}
                     </p>
                   </div>
                   <div>
@@ -220,7 +220,7 @@ export function BookingDetailsModal({
                       VIN
                     </label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {booking.vehicle.vin || "N/A"}
+                      {booking.vehicle.vin || 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -245,15 +245,15 @@ export function BookingDetailsModal({
                         </h4>
                         <span
                           className={cn(
-                            "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                            service.status === "completed" &&
-                              "bg-green-100 text-green-800",
-                            service.status === "in_progress" &&
-                              "bg-amber-100 text-amber-800",
-                            service.status === "pending" &&
-                              "bg-yellow-100 text-yellow-800",
-                            service.status === "cancelled" &&
-                              "bg-red-100 text-red-800"
+                            'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                            service.status === 'completed' &&
+                              'bg-green-100 text-green-800',
+                            service.status === 'in_progress' &&
+                              'bg-amber-100 text-amber-800',
+                            service.status === 'pending' &&
+                              'bg-yellow-100 text-yellow-800',
+                            service.status === 'cancelled' &&
+                              'bg-red-100 text-red-800',
                           )}
                         >
                           {service.status}
@@ -283,7 +283,7 @@ export function BookingDetailsModal({
                           <p className="mt-1 text-gray-900">
                             {service.description ||
                               service.serviceId?.description ||
-                              "No description"}
+                              'No description'}
                           </p>
                         </div>
                         <div>
@@ -310,12 +310,12 @@ export function BookingDetailsModal({
                           <p className="mt-1 text-gray-900">
                             {safeFormatDate(
                               service.startTime,
-                              "MMM dd, yyyy HH:mm"
-                            )}{" "}
-                            -{" "}
+                              'MMM dd, yyyy HH:mm',
+                            )}{' '}
+                            -{' '}
                             {safeFormatDate(
                               service.endTime,
-                              "MMM dd, yyyy HH:mm"
+                              'MMM dd, yyyy HH:mm',
                             )}
                           </p>
                         </div>
@@ -328,14 +328,14 @@ export function BookingDetailsModal({
                               // Try to find bay name from garage bays
                               if (
                                 booking.garage_id &&
-                                typeof booking.garage_id === "object" &&
-                                "bays" in booking.garage_id
+                                typeof booking.garage_id === 'object' &&
+                                'bays' in booking.garage_id
                               ) {
                                 const garage = booking.garage_id as {
                                   bays?: Array<{ _id: string; name: string }>;
                                 };
                                 const bay = garage.bays?.find(
-                                  (b) => b._id === service.bayId
+                                  (b) => b._id === service.bayId,
                                 );
                                 return bay ? bay.name : service.bayId;
                               }
@@ -370,7 +370,7 @@ export function BookingDetailsModal({
                       Booking Date
                     </label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {safeFormatDate(booking.bookingDate, "MMM dd, yyyy")}
+                      {safeFormatDate(booking.bookingDate, 'MMM dd, yyyy')}
                     </p>
                   </div>
                   <div>
@@ -397,17 +397,17 @@ export function BookingDetailsModal({
                     <p className="mt-1">
                       <span
                         className={cn(
-                          "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                          booking.status === "completed" &&
-                            "bg-green-100 text-green-800",
-                          booking.status === "in_progress" &&
-                            "bg-amber-100 text-amber-800",
-                          booking.status === "confirmed" &&
-                            "bg-blue-100 text-blue-800",
-                          booking.status === "pending" &&
-                            "bg-yellow-100 text-yellow-800",
-                          booking.status === "cancelled" &&
-                            "bg-red-100 text-red-800"
+                          'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                          booking.status === 'completed' &&
+                            'bg-green-100 text-green-800',
+                          booking.status === 'in_progress' &&
+                            'bg-amber-100 text-amber-800',
+                          booking.status === 'confirmed' &&
+                            'bg-blue-100 text-blue-800',
+                          booking.status === 'pending' &&
+                            'bg-yellow-100 text-yellow-800',
+                          booking.status === 'cancelled' &&
+                            'bg-red-100 text-red-800',
                         )}
                       >
                         {booking.status}
@@ -436,12 +436,12 @@ export function BookingDetailsModal({
                               {u.itemName}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {new Date(u.createdAt).toLocaleString()}{" "}
+                              {new Date(u.createdAt).toLocaleString()}{' '}
                               {u.jobSheetId && `• Job ${u.jobSheetId}`}
                             </div>
                           </div>
                           <div className="text-right text-gray-900 font-medium min-w-[120px]">
-                            {u.quantity} {u.unit || ""}
+                            {u.quantity} {u.unit || ''}
                           </div>
                         </div>
                       ))}
@@ -468,17 +468,17 @@ export function BookingDetailsModal({
                             <div className="flex items-center justify-between">
                               <span
                                 className={cn(
-                                  "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                                  entry.status === "completed" &&
-                                    "bg-green-100 text-green-800",
-                                  entry.status === "in-progress" &&
-                                    "bg-amber-100 text-amber-800",
-                                  entry.status === "confirmed" &&
-                                    "bg-blue-100 text-blue-800",
-                                  entry.status === "pending" &&
-                                    "bg-yellow-100 text-yellow-800",
-                                  entry.status === "cancelled" &&
-                                    "bg-red-100 text-red-800"
+                                  'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                                  entry.status === 'completed' &&
+                                    'bg-green-100 text-green-800',
+                                  entry.status === 'in-progress' &&
+                                    'bg-amber-100 text-amber-800',
+                                  entry.status === 'confirmed' &&
+                                    'bg-blue-100 text-blue-800',
+                                  entry.status === 'pending' &&
+                                    'bg-yellow-100 text-yellow-800',
+                                  entry.status === 'cancelled' &&
+                                    'bg-red-100 text-red-800',
                                 )}
                               >
                                 {entry.status}
@@ -486,30 +486,30 @@ export function BookingDetailsModal({
                               <span className="text-xs text-gray-500">
                                 {safeFormatDate(
                                   entry.changedAt,
-                                  "MMM dd, yyyy HH:mm"
+                                  'MMM dd, yyyy HH:mm',
                                 )}
                               </span>
                             </div>
                             <div className="mt-2 flex items-center space-x-2">
                               <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
                                 <span className="text-xs font-medium text-blue-600">
-                                  {entry.changedBy?.firstName?.charAt(0) || "U"}
-                                  {entry.changedBy?.lastName?.charAt(0) || "N"}
+                                  {entry.changedBy?.firstName?.charAt(0) || 'U'}
+                                  {entry.changedBy?.lastName?.charAt(0) || 'N'}
                                 </span>
                               </div>
                               <div>
                                 <p className="text-sm font-medium text-gray-900">
-                                  {entry.changedBy?.firstName || "Unknown"}{" "}
-                                  {entry.changedBy?.lastName || "User"}
+                                  {entry.changedBy?.firstName || 'Unknown'}{' '}
+                                  {entry.changedBy?.lastName || 'User'}
                                 </p>
                                 <p className="text-xs text-gray-500">
-                                  {entry.changedBy?.email || "No email"}
+                                  {entry.changedBy?.email || 'No email'}
                                 </p>
                               </div>
                             </div>
                             {entry.notes && (
                               <p className="text-xs text-gray-600 mt-2 pl-8">
-                                <span className="font-medium">Notes:</span>{" "}
+                                <span className="font-medium">Notes:</span>{' '}
                                 {entry.notes}
                               </p>
                             )}

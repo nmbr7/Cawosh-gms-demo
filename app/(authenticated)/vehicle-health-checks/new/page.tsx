@@ -1,54 +1,54 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { notify } from "@/lib/notify";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { notify } from '@/lib/notify';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 const powertrains = [
-  { value: "ice", label: "ICE (Petrol/Diesel)" },
-  { value: "ev", label: "EV" },
-  { value: "hybrid", label: "Hybrid" },
+  { value: 'ice', label: 'ICE (Petrol/Diesel)' },
+  { value: 'ev', label: 'EV' },
+  { value: 'hybrid', label: 'Hybrid' },
 ];
 
 export default function NewVehicleHealthCheckPage() {
   const router = useRouter();
-  const [reg, setReg] = useState("");
-  const [clientName, setClientName] = useState("");
-  const [powertrain, setPowertrain] = useState("ice");
+  const [reg, setReg] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [powertrain, setPowertrain] = useState('ice');
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reg.trim()) {
-      notify("Registration number is required", "error");
+      notify('Registration number is required', 'error');
       return;
     }
     setSubmitting(true);
     try {
-      const tplRes = await fetchWithAuth("/api/vhc/templates/active", {
-        method: "GET",
+      const tplRes = await fetchWithAuth('/api/vhc/templates/active', {
+        method: 'GET',
       });
       const template = await tplRes.json();
-      const createRes = await fetchWithAuth("/api/vhc/responses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const createRes = await fetchWithAuth('/api/vhc/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           templateId: template.id,
           powertrain,
           vehicleId: reg.trim(),
-          createdBy: clientName || "technician",
+          createdBy: clientName || 'technician',
         }),
       });
       if (!createRes.ok) {
         const err = await createRes.json();
-        throw new Error(err?.error || "Failed to create health check");
+        throw new Error(err?.error || 'Failed to create health check');
       }
       const created = await createRes.json();
-      notify("Health check started", "success");
+      notify('Health check started', 'success');
       router.push(`/vehicle-health-checks/${created.id}`);
     } catch (error) {
-      notify(error instanceof Error ? error.message : "Failed", "error");
+      notify(error instanceof Error ? error.message : 'Failed', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -105,7 +105,7 @@ export default function NewVehicleHealthCheckPage() {
             disabled={submitting}
             className="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
           >
-            {submitting ? "Starting..." : "Start Check"}
+            {submitting ? 'Starting...' : 'Start Check'}
           </button>
         </div>
       </form>

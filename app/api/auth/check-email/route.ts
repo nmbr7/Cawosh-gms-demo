@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
@@ -6,24 +6,24 @@ export async function POST(request: Request) {
 
     // Mock database check
     const mockUsers = [
-      { email: "admin@cawosh.com" },
-      { email: "user@example.com" },
+      { email: 'admin@cawosh.com' },
+      { email: 'user@example.com' },
     ];
 
     const userExists = mockUsers.some((user) => user.email === email);
 
     if (!userExists) {
       return NextResponse.json(
-        { error: "No account found with this email address" },
-        { status: 404 }
+        { error: 'No account found with this email address' },
+        { status: 404 },
       );
     }
 
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
-      { error: "Failed to check email" },
-      { status: 500 }
+      { error: 'Failed to check email' },
+      { status: 500 },
     );
   }
 }

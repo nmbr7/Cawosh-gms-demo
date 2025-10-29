@@ -1,33 +1,33 @@
 // app/login/page.tsx
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/auth";
-import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { CustomButton } from "@/components/ui/custom-button";
-import { PasswordInput } from "@/components/ui/password-input";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { useGarageStore } from "@/store/garage";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+// import { useAuthStore } from "@/store/auth";
+import { Input } from '@/components/ui/input';
+import Link from 'next/link';
+import { CustomButton } from '@/components/ui/custom-button';
+import { PasswordInput } from '@/components/ui/password-input';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+// import { useGarageStore } from "@/store/garage";
 
 export default function LoginPage() {
   const router = useRouter();
-  const setUser = useAuthStore((state) => state.setUser);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  // const setUser = useAuthStore((state) => state.setUser);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
@@ -35,7 +35,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Login failed");
+        setError(data.error || 'Login failed');
         setIsLoading(false);
         return;
       }
@@ -68,14 +68,14 @@ export default function LoginPage() {
       // });
 
       // Wait for the cookie to be set and auth store to be updated
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Navigate to dashboard
-      router.push("/dashboard");
+      router.push('/dashboard');
       setIsLoading(false);
     } catch (error) {
-      console.error("Login error:", error);
-      setError("An error occurred. Please try again.");
+      console.error('Login error:', error);
+      setError('An error occurred. Please try again.');
       setIsLoading(false);
     }
   };
@@ -120,7 +120,7 @@ export default function LoginPage() {
         </div>
 
         <CustomButton type="submit" disabled={isLoading}>
-          {isLoading ? <LoadingSpinner /> : "Login"}
+          {isLoading ? <LoadingSpinner /> : 'Login'}
         </CustomButton>
       </form>
     </div>

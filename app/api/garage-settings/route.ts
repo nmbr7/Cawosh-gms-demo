@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import type { BusinessHours, Billing } from "@/app/models/garage";
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import type { BusinessHours, Billing } from '@/app/models/garage';
 
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
+    const accessToken = cookieStore.get('access_token')?.value;
 
     if (!accessToken) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const response = await fetch(
@@ -17,22 +17,22 @@ export async function GET() {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      }
+      },
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Backend response:", errorText);
-      throw new Error("Failed to fetch garage settings");
+      console.error('Backend response:', errorText);
+      throw new Error('Failed to fetch garage settings');
     }
 
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error fetching garage settings:", error);
+    console.error('Error fetching garage settings:', error);
     return NextResponse.json(
-      { error: "Failed to fetch garage settings" },
-      { status: 500 }
+      { error: 'Failed to fetch garage settings' },
+      { status: 500 },
     );
   }
 }
@@ -40,9 +40,9 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
+    const accessToken = cookieStore.get('access_token')?.value;
     if (!accessToken) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -54,29 +54,29 @@ export async function PATCH(request: Request) {
     const response = await fetch(
       `${process.env.BACKEND_URL}/api/garages/settings`,
       {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           businessHours,
           billing,
         }),
-      }
+      },
     );
 
     if (!response.ok) {
-      throw new Error("Failed to update garage settings");
+      throw new Error('Failed to update garage settings');
     }
 
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error updating garage settings:", error);
+    console.error('Error updating garage settings:', error);
     return NextResponse.json(
-      { error: "Failed to update garage settings" },
-      { status: 500 }
+      { error: 'Failed to update garage settings' },
+      { status: 500 },
     );
   }
 }

@@ -1,13 +1,13 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { useGarageStore } from "./garage";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { useGarageStore } from './garage';
 import type {
   Booking,
   Customer,
   Vehicle,
   HistoryEntry,
   InventoryUsageEntry,
-} from "@/types/booking";
+} from '@/types/booking';
 
 export interface Bay {
   id: string;
@@ -46,7 +46,7 @@ interface BookingState {
   getBookingsForBayAndDate: (
     bayId: string,
     date: string,
-    technicianId?: string
+    technicianId?: string,
   ) => Booking[];
   seedBookings: (args?: {
     days?: number;
@@ -78,190 +78,190 @@ interface BookingState {
       description: string;
       duration: number;
       price: number;
-    }>
+    }>,
   ) => void;
   updateBooking: (bookingId: string, updates: Partial<Booking>) => void;
   addBookingHistory: (
     bookingId: string,
-    entry: Omit<HistoryEntry, "_id">
+    entry: Omit<HistoryEntry, '_id'>,
   ) => void;
   addInventoryUsage: (bookingId: string, usage: InventoryUsageEntry) => void;
 }
 
 // Static data
 const staticBays: Bay[] = [
-  { id: "bay-1", name: "Bay 1" },
-  { id: "bay-2", name: "Bay 2" },
-  { id: "bay-3", name: "Bay 3" },
-  { id: "bay-4", name: "Bay 4" },
-  { id: "bay-5", name: "Bay 5" },
+  { id: 'bay-1', name: 'Bay 1' },
+  { id: 'bay-2', name: 'Bay 2' },
+  { id: 'bay-3', name: 'Bay 3' },
+  { id: 'bay-4', name: 'Bay 4' },
+  { id: 'bay-5', name: 'Bay 5' },
 ];
 
 const staticTechnicians: Technician[] = [
   {
-    id: "tech-1",
-    firstName: "John",
-    lastName: "Smith",
-    role: "Senior Mechanic",
+    id: 'tech-1',
+    firstName: 'John',
+    lastName: 'Smith',
+    role: 'Senior Mechanic',
   },
-  { id: "tech-2", firstName: "Sarah", lastName: "Johnson", role: "Mechanic" },
+  { id: 'tech-2', firstName: 'Sarah', lastName: 'Johnson', role: 'Mechanic' },
   {
-    id: "tech-3",
-    firstName: "Mike",
-    lastName: "Davis",
-    role: "Junior Mechanic",
+    id: 'tech-3',
+    firstName: 'Mike',
+    lastName: 'Davis',
+    role: 'Junior Mechanic',
   },
-  { id: "tech-4", firstName: "Lisa", lastName: "Wilson", role: "Specialist" },
+  { id: 'tech-4', firstName: 'Lisa', lastName: 'Wilson', role: 'Specialist' },
 ];
 
 const staticServices = [
   {
-    id: "service-undiagnosed",
-    name: "Undiagnosed - Requires Diagnosis",
+    id: 'service-undiagnosed',
+    name: 'Undiagnosed - Requires Diagnosis',
     duration: 60,
     price: 0.0,
   },
   // Original services
-  { id: "service-1", name: "Oil Change", duration: 30, price: 20.0 },
-  { id: "service-2", name: "Tire Rotation", duration: 30, price: 12.0 },
-  { id: "service-3", name: "Brake Inspection", duration: 30, price: 28.0 },
-  { id: "service-4", name: "Engine Diagnostic", duration: 30, price: 40.0 },
-  { id: "service-5", name: "Transmission Service", duration: 30, price: 60.0 },
-  { id: "service-6", name: "AC Service", duration: 30, price: 32.0 },
-  { id: "service-7", name: "Battery Check", duration: 30, price: 16.0 },
-  { id: "service-8", name: "Wheel Alignment", duration: 30, price: 48.0 },
+  { id: 'service-1', name: 'Oil Change', duration: 30, price: 20.0 },
+  { id: 'service-2', name: 'Tire Rotation', duration: 30, price: 12.0 },
+  { id: 'service-3', name: 'Brake Inspection', duration: 30, price: 28.0 },
+  { id: 'service-4', name: 'Engine Diagnostic', duration: 30, price: 40.0 },
+  { id: 'service-5', name: 'Transmission Service', duration: 30, price: 60.0 },
+  { id: 'service-6', name: 'AC Service', duration: 30, price: 32.0 },
+  { id: 'service-7', name: 'Battery Check', duration: 30, price: 16.0 },
+  { id: 'service-8', name: 'Wheel Alignment', duration: 30, price: 48.0 },
   {
-    id: "service-9",
-    name: "Spark Plug Replacement",
+    id: 'service-9',
+    name: 'Spark Plug Replacement',
     duration: 30,
     price: 36.0,
   },
   {
-    id: "service-10",
-    name: "Air Filter Replacement",
+    id: 'service-10',
+    name: 'Air Filter Replacement',
     duration: 30,
     price: 24.0,
   },
   // Fluids & Filters
   {
-    id: "service-11",
-    name: "Oil Change (Full Synthetic 5W-30)",
+    id: 'service-11',
+    name: 'Oil Change (Full Synthetic 5W-30)',
     duration: 30,
     price: 45.0,
   },
   {
-    id: "service-12",
-    name: "Oil Change (Conventional 10W-30)",
+    id: 'service-12',
+    name: 'Oil Change (Conventional 10W-30)',
     duration: 30,
     price: 35.0,
   },
   {
-    id: "service-13",
-    name: "Oil Filter Replacement",
+    id: 'service-13',
+    name: 'Oil Filter Replacement',
     duration: 15,
     price: 12.0,
   },
   {
-    id: "service-14",
-    name: "Cabin Air Filter Replacement",
+    id: 'service-14',
+    name: 'Cabin Air Filter Replacement',
     duration: 15,
     price: 20.0,
   },
-  { id: "service-15", name: "Coolant Flush", duration: 45, price: 55.0 },
+  { id: 'service-15', name: 'Coolant Flush', duration: 45, price: 55.0 },
   {
-    id: "service-16",
-    name: "Transmission Fluid Change",
+    id: 'service-16',
+    name: 'Transmission Fluid Change',
     duration: 60,
     price: 85.0,
   },
-  { id: "service-17", name: "Brake Fluid Flush", duration: 30, price: 45.0 },
+  { id: 'service-17', name: 'Brake Fluid Flush', duration: 30, price: 45.0 },
   // Parts Replacement
   {
-    id: "service-18",
-    name: "Front Brake Pads Replacement",
+    id: 'service-18',
+    name: 'Front Brake Pads Replacement',
     duration: 60,
     price: 120.0,
   },
   {
-    id: "service-19",
-    name: "Rear Brake Pads Replacement",
+    id: 'service-19',
+    name: 'Rear Brake Pads Replacement',
     duration: 60,
     price: 110.0,
   },
   {
-    id: "service-20",
-    name: "Front Brake Rotors Replacement",
+    id: 'service-20',
+    name: 'Front Brake Rotors Replacement',
     duration: 90,
     price: 180.0,
   },
-  { id: "service-21", name: "Battery Replacement", duration: 20, price: 95.0 },
+  { id: 'service-21', name: 'Battery Replacement', duration: 20, price: 95.0 },
   {
-    id: "service-22",
-    name: "Spark Plugs Replacement (4-cylinder)",
+    id: 'service-22',
+    name: 'Spark Plugs Replacement (4-cylinder)',
     duration: 45,
     price: 80.0,
   },
   {
-    id: "service-23",
-    name: "Spark Plugs Replacement (6-cylinder)",
+    id: 'service-23',
+    name: 'Spark Plugs Replacement (6-cylinder)',
     duration: 60,
     price: 110.0,
   },
   {
-    id: "service-24",
-    name: "Wiper Blades Replacement",
+    id: 'service-24',
+    name: 'Wiper Blades Replacement',
     duration: 10,
     price: 25.0,
   },
   {
-    id: "service-25",
-    name: "Headlight Bulb Replacement",
+    id: 'service-25',
+    name: 'Headlight Bulb Replacement',
     duration: 15,
     price: 30.0,
   },
   {
-    id: "service-26",
-    name: "Serpentine Belt Replacement",
+    id: 'service-26',
+    name: 'Serpentine Belt Replacement',
     duration: 45,
     price: 75.0,
   },
   // Cleaning & Maintenance
-  { id: "service-27", name: "Engine Bay Cleaning", duration: 30, price: 40.0 },
+  { id: 'service-27', name: 'Engine Bay Cleaning', duration: 30, price: 40.0 },
   {
-    id: "service-28",
-    name: "Throttle Body Cleaning",
+    id: 'service-28',
+    name: 'Throttle Body Cleaning',
     duration: 45,
     price: 60.0,
   },
   {
-    id: "service-29",
-    name: "Fuel Injection System Cleaning",
+    id: 'service-29',
+    name: 'Fuel Injection System Cleaning',
     duration: 60,
     price: 85.0,
   },
-  { id: "service-30", name: "AC System Cleaning", duration: 45, price: 65.0 },
+  { id: 'service-30', name: 'AC System Cleaning', duration: 45, price: 65.0 },
   // Inspection & Diagnostic
   {
-    id: "service-31",
-    name: "Engine Diagnostic Scan",
+    id: 'service-31',
+    name: 'Engine Diagnostic Scan',
     duration: 30,
     price: 40.0,
   },
   {
-    id: "service-32",
-    name: "Brake System Inspection",
+    id: 'service-32',
+    name: 'Brake System Inspection',
     duration: 30,
     price: 28.0,
   },
   {
-    id: "service-33",
-    name: "Suspension Inspection",
+    id: 'service-33',
+    name: 'Suspension Inspection',
     duration: 30,
     price: 35.0,
   },
   {
-    id: "service-34",
-    name: "Electrical System Diagnostic",
+    id: 'service-34',
+    name: 'Electrical System Diagnostic',
     duration: 45,
     price: 55.0,
   },
@@ -289,7 +289,7 @@ export const useBookingStore = create<BookingState>()(
       removeBooking: (bookingId) =>
         set((state) => ({
           bookings: state.bookings.filter(
-            (booking) => booking._id !== bookingId
+            (booking) => booking._id !== bookingId,
           ),
         })),
 
@@ -302,7 +302,7 @@ export const useBookingStore = create<BookingState>()(
           }
 
           const matchesBay = booking.services.some(
-            (service) => service.bayId === bayId
+            (service) => service.bayId === bayId,
           );
           // Check bookingDate for date matching
           const matchesDate =
@@ -327,23 +327,23 @@ export const useBookingStore = create<BookingState>()(
 
         const garage = useGarageStore.getState().garage;
         const getHoursForDate = (d: Date) => {
-          const dayName = d.toLocaleDateString("en-US", { weekday: "long" });
+          const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
           const bh = garage?.businessHours?.find(
-            (h) => h.day.toLowerCase() === dayName.toLowerCase()
+            (h) => h.day.toLowerCase() === dayName.toLowerCase(),
           );
           if (bh && !bh.isClosed) {
             return { open: bh.open, close: bh.close };
           }
-          return { open: "10:00", close: "17:00" };
+          return { open: '10:00', close: '17:00' };
         };
 
         const makeSlots = (open: string, close: string) => {
-          const [openH] = open.split(":").map((n) => parseInt(n));
-          const [closeH, closeM] = close.split(":").map((n) => parseInt(n));
+          const [openH] = open.split(':').map((n) => parseInt(n));
+          const [closeH, closeM] = close.split(':').map((n) => parseInt(n));
           const slots: string[] = [];
           for (let h = openH; h < closeH || (h === closeH && 0 < closeM); h++) {
-            slots.push(`${h.toString().padStart(2, "0")}:00`);
-            slots.push(`${h.toString().padStart(2, "0")}:30`);
+            slots.push(`${h.toString().padStart(2, '0')}:00`);
+            slots.push(`${h.toString().padStart(2, '0')}:30`);
           }
           return slots;
         };
@@ -352,7 +352,7 @@ export const useBookingStore = create<BookingState>()(
         for (let d = 0; d < days; d++) {
           const day = new Date(today);
           day.setDate(today.getDate() + d);
-          const dateStr = day.toISOString().split("T")[0];
+          const dateStr = day.toISOString().split('T')[0];
           const { open, close } = getHoursForDate(day);
           const slots = makeSlots(open, close);
 
@@ -361,12 +361,12 @@ export const useBookingStore = create<BookingState>()(
             Math.min(
               maxPerDay,
               Math.floor(Math.random() * (maxPerDay - minPerDay + 1)) +
-                minPerDay
-            )
+                minPerDay,
+            ),
           );
 
           const usedByBay: Record<string, Set<string>> = Object.fromEntries(
-            bays.map((b) => [b.id, new Set<string>()])
+            bays.map((b) => [b.id, new Set<string>()]),
           );
 
           for (let i = 0; i < countForDay; i++) {
@@ -396,39 +396,39 @@ export const useBookingStore = create<BookingState>()(
             newBookings.push({
               _id: crypto.randomUUID(),
               customer: {
-                name: "Walk-in Customer",
-                phone: "+971501234567",
-                email: "walkin@example.com",
+                name: 'Walk-in Customer',
+                phone: '+971501234567',
+                email: 'walkin@example.com',
               },
               vehicle: {
-                make: "Toyota",
-                model: "Camry",
+                make: 'Toyota',
+                model: 'Camry',
                 year: 2022,
-                license: "UAE12345",
-                vin: "1HGCM82633A004352",
+                license: 'UAE12345',
+                vin: '1HGCM82633A004352',
               },
               services: [
                 {
                   serviceId: {
-                    _id: svc?.id || "service-1",
-                    name: svc?.name || "Service",
-                    description: "Service description",
-                    category: "Maintenance",
+                    _id: svc?.id || 'service-1',
+                    name: svc?.name || 'Service',
+                    description: 'Service description',
+                    category: 'Maintenance',
                   },
-                  name: svc?.name || "Service",
-                  description: "Service description",
+                  name: svc?.name || 'Service',
+                  description: 'Service description',
                   duration: svc?.duration || 30,
                   price: svc?.price || 20.0,
-                  currency: "GBP",
-                  currencySymbol: "£",
-                  status: "pending",
+                  currency: 'GBP',
+                  currencySymbol: '£',
+                  status: 'pending',
                   technicianId: {
-                    _id: tech?.id || "tech-1",
-                    firstName: tech?.firstName || "John",
-                    lastName: tech?.lastName || "Smith",
-                    email: "tech@garage.com",
-                    phone: "1234567890",
-                    role: "technician",
+                    _id: tech?.id || 'tech-1',
+                    firstName: tech?.firstName || 'John',
+                    lastName: tech?.lastName || 'Smith',
+                    email: 'tech@garage.com',
+                    phone: '1234567890',
+                    role: 'technician',
                   },
                   bayId: bay.id,
                   startTime,
@@ -440,19 +440,19 @@ export const useBookingStore = create<BookingState>()(
               bookingDate: `${dateStr}T00:00:00.000Z`,
               totalDuration: svc?.duration || 30,
               totalPrice: svc?.price || 20.0,
-              status: "pending",
-              notes: "Walk-in booking",
+              status: 'pending',
+              notes: 'Walk-in booking',
               history: [
                 {
-                  status: "pending",
+                  status: 'pending',
                   changedBy: {
-                    _id: "admin",
-                    firstName: "Admin",
-                    lastName: "User",
-                    email: "admin@local.garage.com",
+                    _id: 'admin',
+                    firstName: 'Admin',
+                    lastName: 'User',
+                    email: 'admin@local.garage.com',
                   },
                   changedAt: new Date().toISOString(),
-                  notes: "Booking created",
+                  notes: 'Booking created',
                   _id: crypto.randomUUID(),
                 },
               ],
@@ -460,23 +460,23 @@ export const useBookingStore = create<BookingState>()(
               updatedAt: new Date().toISOString(),
               bookingId: `LOC-${Math.floor(Math.random() * 10000)
                 .toString()
-                .padStart(4, "0")}`,
+                .padStart(4, '0')}`,
               garage_id: {
-                _id: "garage-1",
-                name: "Cawosh Garage",
+                _id: 'garage-1',
+                name: 'Cawosh Garage',
                 address: {
-                  street: "123 Main Street",
-                  city: "Dubai",
-                  state: "Dubai",
-                  zipCode: "00000",
-                  country: "UAE",
+                  street: '123 Main Street',
+                  city: 'Dubai',
+                  state: 'Dubai',
+                  zipCode: '00000',
+                  country: 'UAE',
                 },
                 bays: [
-                  { _id: "bay-1", name: "Bay 1" },
-                  { _id: "bay-2", name: "Bay 2" },
-                  { _id: "bay-3", name: "Bay 3" },
-                  { _id: "bay-4", name: "Bay 4" },
-                  { _id: "bay-5", name: "Bay 5" },
+                  { _id: 'bay-1', name: 'Bay 1' },
+                  { _id: 'bay-2', name: 'Bay 2' },
+                  { _id: 'bay-3', name: 'Bay 3' },
+                  { _id: 'bay-4', name: 'Bay 4' },
+                  { _id: 'bay-5', name: 'Bay 5' },
                 ],
               },
               __v: 0,
@@ -496,12 +496,12 @@ export const useBookingStore = create<BookingState>()(
         technicianId,
         startTimeHHMM,
         date,
-        notes = "",
+        notes = '',
       }) => {
         const currentState = get();
         const totalDuration = services.reduce(
           (acc, s) => acc + (s.duration || 30),
-          0
+          0,
         );
         const totalPrice = services.reduce((acc, s) => acc + (s.price || 0), 0);
         const startTime = `${date}T${startTimeHHMM}:00.000Z`;
@@ -510,12 +510,12 @@ export const useBookingStore = create<BookingState>()(
 
         // Check if this is an undiagnosed booking
         const isUndiagnosed = services.some(
-          (s) => s.serviceId === "service-undiagnosed"
+          (s) => s.serviceId === 'service-undiagnosed',
         );
 
         // Extract technician assignments
         const technician = currentState.technicians.find(
-          (t) => t.id === technicianId
+          (t) => t.id === technicianId,
         );
         const assignedTechnicians = technician
           ? [
@@ -523,7 +523,7 @@ export const useBookingStore = create<BookingState>()(
                 technicianId: technicianId,
                 technicianName: `${technician.firstName} ${technician.lastName}`,
                 assignedAt: new Date().toISOString(),
-                role: "primary" as const,
+                role: 'primary' as const,
               },
             ]
           : [];
@@ -535,11 +535,11 @@ export const useBookingStore = create<BookingState>()(
           services: services.map((s, index) => {
             const serviceStartTime = new Date(startTime);
             serviceStartTime.setMinutes(
-              serviceStartTime.getMinutes() + index * 30
+              serviceStartTime.getMinutes() + index * 30,
             );
             const serviceEndTime = new Date(serviceStartTime);
             serviceEndTime.setMinutes(
-              serviceEndTime.getMinutes() + (s.duration || 30)
+              serviceEndTime.getMinutes() + (s.duration || 30),
             );
 
             return {
@@ -547,28 +547,28 @@ export const useBookingStore = create<BookingState>()(
                 _id: s.serviceId,
                 name: s.name,
                 description: s.description,
-                category: "Maintenance",
+                category: 'Maintenance',
               },
               name: s.name,
               description: s.description,
               duration: s.duration,
               price: s.price,
-              currency: "GBP",
-              currencySymbol: "£",
+              currency: 'GBP',
+              currencySymbol: '£',
               status: isUndiagnosed
-                ? ("awaiting_diagnosis" as const)
-                : ("pending" as const),
+                ? ('awaiting_diagnosis' as const)
+                : ('pending' as const),
               technicianId: {
                 _id: technicianId,
                 firstName:
                   currentState.technicians.find((t) => t.id === technicianId)
-                    ?.firstName || "Unknown",
+                    ?.firstName || 'Unknown',
                 lastName:
                   currentState.technicians.find((t) => t.id === technicianId)
-                    ?.lastName || "Technician",
-                email: "tech@garage.com",
-                phone: "1234567890",
-                role: "technician",
+                    ?.lastName || 'Technician',
+                email: 'tech@garage.com',
+                phone: '1234567890',
+                role: 'technician',
               },
               bayId,
               startTime: serviceStartTime.toISOString(),
@@ -580,19 +580,19 @@ export const useBookingStore = create<BookingState>()(
           bookingDate: new Date(`${date}T00:00:00.000Z`).toISOString(),
           totalDuration,
           totalPrice,
-          status: "pending",
+          status: 'pending',
           notes,
           history: [
             {
-              status: "pending",
+              status: 'pending',
               changedBy: {
-                _id: "admin",
-                firstName: "Admin",
-                lastName: "User",
-                email: "admin@local.garage.com",
+                _id: 'admin',
+                firstName: 'Admin',
+                lastName: 'User',
+                email: 'admin@local.garage.com',
               },
               changedAt: new Date().toISOString(),
-              notes: "Booking created",
+              notes: 'Booking created',
               _id: crypto.randomUUID(),
             },
           ],
@@ -600,23 +600,23 @@ export const useBookingStore = create<BookingState>()(
           updatedAt: new Date().toISOString(),
           bookingId: `LOC-${Math.floor(Math.random() * 10000)
             .toString()
-            .padStart(4, "0")}`,
+            .padStart(4, '0')}`,
           garage_id: {
-            _id: "garage-1",
-            name: "Cawosh Garage",
+            _id: 'garage-1',
+            name: 'Cawosh Garage',
             address: {
-              street: "123 Main Street",
-              city: "Dubai",
-              state: "Dubai",
-              zipCode: "00000",
-              country: "UAE",
+              street: '123 Main Street',
+              city: 'Dubai',
+              state: 'Dubai',
+              zipCode: '00000',
+              country: 'UAE',
             },
             bays: [
-              { _id: "bay-1", name: "Bay 1" },
-              { _id: "bay-2", name: "Bay 2" },
-              { _id: "bay-3", name: "Bay 3" },
-              { _id: "bay-4", name: "Bay 4" },
-              { _id: "bay-5", name: "Bay 5" },
+              { _id: 'bay-1', name: 'Bay 1' },
+              { _id: 'bay-2', name: 'Bay 2' },
+              { _id: 'bay-3', name: 'Bay 3' },
+              { _id: 'bay-4', name: 'Bay 4' },
+              { _id: 'bay-5', name: 'Bay 5' },
             ],
           },
           __v: 0,
@@ -633,7 +633,7 @@ export const useBookingStore = create<BookingState>()(
             if (booking._id === bookingId) {
               const totalDuration = services.reduce(
                 (acc, s) => acc + s.duration,
-                0
+                0,
               );
               const totalPrice = services.reduce((acc, s) => acc + s.price, 0);
 
@@ -642,11 +642,11 @@ export const useBookingStore = create<BookingState>()(
                 services: services.map((s, index) => {
                   const serviceStartTime = new Date(booking.bookingDate);
                   serviceStartTime.setMinutes(
-                    serviceStartTime.getMinutes() + index * 30
+                    serviceStartTime.getMinutes() + index * 30,
                   );
                   const serviceEndTime = new Date(serviceStartTime);
                   serviceEndTime.setMinutes(
-                    serviceEndTime.getMinutes() + s.duration
+                    serviceEndTime.getMinutes() + s.duration,
                   );
 
                   return {
@@ -654,24 +654,24 @@ export const useBookingStore = create<BookingState>()(
                       _id: s.serviceId,
                       name: s.name,
                       description: s.description,
-                      category: "Maintenance",
+                      category: 'Maintenance',
                     },
                     name: s.name,
                     description: s.description,
                     duration: s.duration,
                     price: s.price,
-                    currency: "GBP",
-                    currencySymbol: "£",
-                    status: "pending" as const,
+                    currency: 'GBP',
+                    currencySymbol: '£',
+                    status: 'pending' as const,
                     technicianId: booking.services[0]?.technicianId || {
-                      _id: "tech-1",
-                      firstName: "Tech",
-                      lastName: "Name",
-                      email: "tech@garage.com",
-                      phone: "1234567890",
-                      role: "technician",
+                      _id: 'tech-1',
+                      firstName: 'Tech',
+                      lastName: 'Name',
+                      email: 'tech@garage.com',
+                      phone: '1234567890',
+                      role: 'technician',
                     },
-                    bayId: booking.services[0]?.bayId || "bay-1",
+                    bayId: booking.services[0]?.bayId || 'bay-1',
                     startTime: serviceStartTime.toISOString(),
                     endTime: serviceEndTime.toISOString(),
                     _id: crypto.randomUUID(),
@@ -693,7 +693,7 @@ export const useBookingStore = create<BookingState>()(
           bookings: state.bookings.map((booking) =>
             booking._id === bookingId
               ? { ...booking, ...updates, updatedAt: new Date().toISOString() }
-              : booking
+              : booking,
           ),
         }));
       },
@@ -709,7 +709,7 @@ export const useBookingStore = create<BookingState>()(
                   ],
                   updatedAt: new Date().toISOString(),
                 }
-              : b
+              : b,
           ),
         }));
       },
@@ -725,15 +725,15 @@ export const useBookingStore = create<BookingState>()(
                   ],
                   updatedAt: new Date().toISOString(),
                 }
-              : b
+              : b,
           ),
         }));
       },
     }),
     {
-      name: "booking-storage",
+      name: 'booking-storage',
       // Only persist bookings, not static data
       partialize: (state) => ({ bookings: state.bookings }),
-    }
-  )
+    },
+  ),
 );

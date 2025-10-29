@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import {
   ChevronLeft,
   ChevronRight,
@@ -17,21 +17,21 @@ import {
   SortAsc,
   SortDesc,
   AlertTriangle,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import React from "react";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import React from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useJobSheetStore, JobSheet as StoreJobSheet } from "@/store/jobSheet";
-import { useBookingStore } from "@/store/booking";
-import { format } from "date-fns";
-import { DiagnosisSubmissionModal } from "@/app/components/job-sheet/DiagnosisSubmissionModal";
-import { WorkTrackingModal } from "@/app/components/job-sheet/WorkTrackingModal";
-import { Stethoscope, AlertCircle, CheckCircle, Play } from "lucide-react";
+} from '@/components/ui/dialog';
+import { useJobSheetStore, JobSheet as StoreJobSheet } from '@/store/jobSheet';
+import { useBookingStore } from '@/store/booking';
+import { format } from 'date-fns';
+import { DiagnosisSubmissionModal } from '@/app/components/job-sheet/DiagnosisSubmissionModal';
+import { WorkTrackingModal } from '@/app/components/job-sheet/WorkTrackingModal';
+import { Stethoscope, AlertCircle, CheckCircle, Play } from 'lucide-react';
 
 // Removed old JobSheet interface - using StoreJobSheet from store
 
@@ -44,12 +44,12 @@ interface PaginationInfo {
 
 // Filter and sort state interface
 interface FilterState {
-  status: string | "all";
+  status: string | 'all';
   bookingId: string | null;
   technicianId: string | null;
   diagnosisStatus: string | null;
   sortBy: string;
-  sortOrder: "asc" | "desc";
+  sortOrder: 'asc' | 'desc';
 }
 
 // interface FilterOptions {
@@ -84,7 +84,7 @@ export default function JobSheetPage() {
   const [showDiagnosisModal, setShowDiagnosisModal] = useState(false);
   const [showWorkTrackingModal, setShowWorkTrackingModal] = useState(false);
   const [workTrackingJobSheetId, setWorkTrackingJobSheetId] =
-    useState<string>("");
+    useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -114,12 +114,12 @@ export default function JobSheetPage() {
 
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
-    status: "all",
+    status: 'all',
     bookingId: null,
     technicianId: null,
     diagnosisStatus: null,
-    sortBy: "id",
-    sortOrder: "desc",
+    sortBy: 'id',
+    sortOrder: 'desc',
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -138,7 +138,7 @@ export default function JobSheetPage() {
 
     // Apply filters
     const filtered = all.filter((js) => {
-      const statusOk = filters.status === "all" || js.status === filters.status;
+      const statusOk = filters.status === 'all' || js.status === filters.status;
 
       const bookingIdOk =
         !filters.bookingId ||
@@ -150,30 +150,30 @@ export default function JobSheetPage() {
       const technicianOk =
         !filters.technicianId ||
         (js.booking?.services?.some(
-          (s) => s.technicianId?._id === filters.technicianId
+          (s) => s.technicianId?._id === filters.technicianId,
         ) ??
           false);
 
       const diagnosisOk =
         !filters.diagnosisStatus ||
         (() => {
-          if (filters.diagnosisStatus === "standard") {
+          if (filters.diagnosisStatus === 'standard') {
             return !js.requiresDiagnosis;
           }
-          if (filters.diagnosisStatus === "awaiting-diagnosis") {
+          if (filters.diagnosisStatus === 'awaiting-diagnosis') {
             return (
               js.requiresDiagnosis &&
               (!js.diagnosedServices || js.diagnosedServices.length === 0)
             );
           }
-          if (filters.diagnosisStatus === "pending-approval") {
-            return js.requiresDiagnosis && js.approvalStatus === "pending";
+          if (filters.diagnosisStatus === 'pending-approval') {
+            return js.requiresDiagnosis && js.approvalStatus === 'pending';
           }
-          if (filters.diagnosisStatus === "approved") {
-            return js.requiresDiagnosis && js.approvalStatus === "approved";
+          if (filters.diagnosisStatus === 'approved') {
+            return js.requiresDiagnosis && js.approvalStatus === 'approved';
           }
-          if (filters.diagnosisStatus === "rejected") {
-            return js.requiresDiagnosis && js.approvalStatus === "rejected";
+          if (filters.diagnosisStatus === 'rejected') {
+            return js.requiresDiagnosis && js.approvalStatus === 'rejected';
           }
           return true;
         })();
@@ -183,11 +183,11 @@ export default function JobSheetPage() {
 
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
-      const dir = filters.sortOrder === "asc" ? 1 : -1;
-      if (filters.sortBy === "id") {
+      const dir = filters.sortOrder === 'asc' ? 1 : -1;
+      if (filters.sortBy === 'id') {
         return a.id.localeCompare(b.id) * dir;
       }
-      if (filters.sortBy === "status") {
+      if (filters.sortBy === 'status') {
         return a.status.localeCompare(b.status) * dir;
       }
       // Default: sort by creation date (latest first)
@@ -222,14 +222,14 @@ export default function JobSheetPage() {
       setCurrentPage(1); // Reset to first page
       await fetchJobSheets();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsRefreshing(false);
     }
   };
 
   const handleFilterChange = (key: keyof FilterState, value: string | null) => {
-    console.log("handleFilterChange", key, value);
+    console.log('handleFilterChange', key, value);
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1); // Reset to first page when filters change
   };
@@ -239,7 +239,7 @@ export default function JobSheetPage() {
       ...prev,
       sortBy: field,
       sortOrder:
-        prev.sortBy === field && prev.sortOrder === "asc" ? "desc" : "asc",
+        prev.sortBy === field && prev.sortOrder === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -258,8 +258,8 @@ export default function JobSheetPage() {
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
               className={cn(
-                "flex items-center gap-2",
-                showFilters && "bg-blue-100"
+                'flex items-center gap-2',
+                showFilters && 'bg-blue-100',
               )}
             >
               <Filter className="w-4 h-4" />
@@ -282,15 +282,15 @@ export default function JobSheetPage() {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => handleSortChange("id")}
+                onClick={() => handleSortChange('id')}
                 className={cn(
-                  "flex items-center gap-2",
-                  filters.sortBy === "id" && "bg-blue-100"
+                  'flex items-center gap-2',
+                  filters.sortBy === 'id' && 'bg-blue-100',
                 )}
               >
                 ID
-                {filters.sortBy === "id" &&
-                  (filters.sortOrder === "asc" ? (
+                {filters.sortBy === 'id' &&
+                  (filters.sortOrder === 'asc' ? (
                     <SortAsc className="w-4 h-4" />
                   ) : (
                     <SortDesc className="w-4 h-4" />
@@ -298,15 +298,15 @@ export default function JobSheetPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleSortChange("status")}
+                onClick={() => handleSortChange('status')}
                 className={cn(
-                  "flex items-center gap-2",
-                  filters.sortBy === "status" && "bg-blue-100"
+                  'flex items-center gap-2',
+                  filters.sortBy === 'status' && 'bg-blue-100',
                 )}
               >
                 Status
-                {filters.sortBy === "status" &&
-                  (filters.sortOrder === "asc" ? (
+                {filters.sortBy === 'status' &&
+                  (filters.sortOrder === 'asc' ? (
                     <SortAsc className="w-4 h-4" />
                   ) : (
                     <SortDesc className="w-4 h-4" />
@@ -327,9 +327,9 @@ export default function JobSheetPage() {
                 </label>
                 <Input
                   type="text"
-                  value={filters.bookingId || ""}
+                  value={filters.bookingId || ''}
                   onChange={(e) =>
-                    handleFilterChange("bookingId", e.target.value || null)
+                    handleFilterChange('bookingId', e.target.value || null)
                   }
                   placeholder="Search booking ID..."
                 />
@@ -341,11 +341,11 @@ export default function JobSheetPage() {
                   Technician
                 </label>
                 <Select
-                  value={filters.technicianId || "all"}
+                  value={filters.technicianId || 'all'}
                   onValueChange={(value) =>
                     handleFilterChange(
-                      "technicianId",
-                      value === "all" ? null : value
+                      'technicianId',
+                      value === 'all' ? null : value,
                     )
                   }
                 >
@@ -370,7 +370,7 @@ export default function JobSheetPage() {
                 </label>
                 <Select
                   value={filters.status}
-                  onValueChange={(value) => handleFilterChange("status", value)}
+                  onValueChange={(value) => handleFilterChange('status', value)}
                 >
                   <SelectTrigger className="bg-white">
                     <SelectValue placeholder="Select status" />
@@ -505,8 +505,8 @@ export default function JobSheetPage() {
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "flex items-center gap-2",
-              showFilters && "bg-blue-100"
+              'flex items-center gap-2',
+              showFilters && 'bg-blue-100',
             )}
           >
             <Filter className="w-4 h-4" />
@@ -529,15 +529,15 @@ export default function JobSheetPage() {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => handleSortChange("id")}
+              onClick={() => handleSortChange('id')}
               className={cn(
-                "flex items-center gap-2",
-                filters.sortBy === "id" && "bg-blue-100"
+                'flex items-center gap-2',
+                filters.sortBy === 'id' && 'bg-blue-100',
               )}
             >
               ID
-              {filters.sortBy === "id" &&
-                (filters.sortOrder === "asc" ? (
+              {filters.sortBy === 'id' &&
+                (filters.sortOrder === 'asc' ? (
                   <SortAsc className="w-4 h-4" />
                 ) : (
                   <SortDesc className="w-4 h-4" />
@@ -545,15 +545,15 @@ export default function JobSheetPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleSortChange("status")}
+              onClick={() => handleSortChange('status')}
               className={cn(
-                "flex items-center gap-2",
-                filters.sortBy === "status" && "bg-blue-100"
+                'flex items-center gap-2',
+                filters.sortBy === 'status' && 'bg-blue-100',
               )}
             >
               Status
-              {filters.sortBy === "status" &&
-                (filters.sortOrder === "asc" ? (
+              {filters.sortBy === 'status' &&
+                (filters.sortOrder === 'asc' ? (
                   <SortAsc className="w-4 h-4" />
                 ) : (
                   <SortDesc className="w-4 h-4" />
@@ -574,9 +574,9 @@ export default function JobSheetPage() {
               </label>
               <Input
                 type="text"
-                value={filters.bookingId || ""}
+                value={filters.bookingId || ''}
                 onChange={(e) =>
-                  handleFilterChange("bookingId", e.target.value || null)
+                  handleFilterChange('bookingId', e.target.value || null)
                 }
                 placeholder="Search booking ID..."
               />
@@ -588,11 +588,11 @@ export default function JobSheetPage() {
                 Technician
               </label>
               <Select
-                value={filters.technicianId || "all"}
+                value={filters.technicianId || 'all'}
                 onValueChange={(value) =>
                   handleFilterChange(
-                    "technicianId",
-                    value === "all" ? null : value
+                    'technicianId',
+                    value === 'all' ? null : value,
                   )
                 }
               >
@@ -617,7 +617,7 @@ export default function JobSheetPage() {
               </label>
               <Select
                 value={filters.status}
-                onValueChange={(value) => handleFilterChange("status", value)}
+                onValueChange={(value) => handleFilterChange('status', value)}
               >
                 <SelectTrigger className="bg-white">
                   <SelectValue placeholder="Select status" />
@@ -642,11 +642,11 @@ export default function JobSheetPage() {
                 Diagnosis Status
               </label>
               <Select
-                value={filters.diagnosisStatus || "all"}
+                value={filters.diagnosisStatus || 'all'}
                 onValueChange={(value) =>
                   handleFilterChange(
-                    "diagnosisStatus",
-                    value === "all" ? null : value
+                    'diagnosisStatus',
+                    value === 'all' ? null : value,
                   )
                 }
               >
@@ -728,33 +728,33 @@ export default function JobSheetPage() {
                     </div>
                     <div className="text-center">
                       <h3 className="text-lg font-medium text-gray-900">
-                        {filters.status !== "all" ||
+                        {filters.status !== 'all' ||
                         filters.bookingId ||
                         filters.technicianId
-                          ? "No job sheets match your filters"
-                          : "No job sheets found"}
+                          ? 'No job sheets match your filters'
+                          : 'No job sheets found'}
                       </h3>
                       <p className="mt-1 text-sm text-gray-500">
-                        {filters.status !== "all" ||
+                        {filters.status !== 'all' ||
                         filters.bookingId ||
                         filters.technicianId
-                          ? "Try adjusting your filters or search criteria"
-                          : "Job sheets will appear here when created"}
+                          ? 'Try adjusting your filters or search criteria'
+                          : 'Job sheets will appear here when created'}
                       </p>
                     </div>
-                    {filters.status !== "all" ||
+                    {filters.status !== 'all' ||
                     filters.bookingId ||
                     filters.technicianId ? (
                       <Button
                         variant="outline"
                         onClick={() => {
                           setFilters({
-                            status: "all",
+                            status: 'all',
                             bookingId: null,
                             technicianId: null,
                             diagnosisStatus: null,
-                            sortBy: "id",
-                            sortOrder: "desc",
+                            sortBy: 'id',
+                            sortOrder: 'desc',
                           });
                         }}
                         className="mt-2"
@@ -776,15 +776,15 @@ export default function JobSheetPage() {
                     {jobSheet.id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {jobSheet.booking?.bookingId || "N/A"}
+                    {jobSheet.booking?.bookingId || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {jobSheet.booking?.bookingDate
                       ? format(
                           new Date(jobSheet.booking.bookingDate),
-                          "MMM dd, yyyy"
+                          'MMM dd, yyyy',
                         )
-                      : "N/A"}
+                      : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {jobSheet.booking?.services &&
@@ -793,36 +793,36 @@ export default function JobSheetPage() {
                           const sorted = [...jobSheet.booking.services].sort(
                             (a, b) =>
                               new Date(a.startTime).getTime() -
-                              new Date(b.startTime).getTime()
+                              new Date(b.startTime).getTime(),
                           );
                           const first = sorted[0];
                           const last = sorted[sorted.length - 1];
                           const start = new Date(
-                            first.startTime
+                            first.startTime,
                           ).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
+                            hour: '2-digit',
+                            minute: '2-digit',
                           });
                           const end = new Date(last.endTime).toLocaleTimeString(
                             [],
                             {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            },
                           );
                           return `${start} - ${end}`;
                         })()
-                      : "N/A"}
+                      : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {jobSheet.booking?.services &&
                     jobSheet.booking.services.length > 0
                       ? [
                           ...new Set(
-                            jobSheet.booking.services.map((s) => s.bayId)
+                            jobSheet.booking.services.map((s) => s.bayId),
                           ),
-                        ].join(", ")
-                      : "N/A"}
+                        ].join(', ')
+                      : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {jobSheet.booking?.services &&
@@ -831,19 +831,19 @@ export default function JobSheetPage() {
                           const technicians = jobSheet.booking.services
                             .map((s) => {
                               if (
-                                typeof s.technicianId === "object" &&
+                                typeof s.technicianId === 'object' &&
                                 s.technicianId
                               ) {
                                 return `${s.technicianId.firstName} ${s.technicianId.lastName}`;
                               }
-                              return s.technicianId || "Not assigned";
+                              return s.technicianId || 'Not assigned';
                             })
                             .filter(
-                              (tech, index, arr) => arr.indexOf(tech) === index
+                              (tech, index, arr) => arr.indexOf(tech) === index,
                             );
-                          return technicians.join(", ");
+                          return technicians.join(', ');
                         })()
-                      : "N/A"}
+                      : 'N/A'}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     <div className="space-y-1">
@@ -857,59 +857,59 @@ export default function JobSheetPage() {
                             ? `${service.name.substring(0, 15)}...`
                             : service.name}
                         </div>
-                      )) || "No services"}
+                      )) || 'No services'}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={cn(
-                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                        jobSheet.status === "COMPLETED" &&
-                          "bg-green-100 text-green-800",
-                        jobSheet.status === "IN_PROGRESS" &&
-                          "bg-amber-100 text-amber-800",
-                        jobSheet.status === "PENDING" &&
-                          "bg-blue-100 text-blue-800",
-                        jobSheet.status === "CANCELLED" &&
-                          "bg-red-100 text-red-800"
+                        'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        jobSheet.status === 'COMPLETED' &&
+                          'bg-green-100 text-green-800',
+                        jobSheet.status === 'IN_PROGRESS' &&
+                          'bg-amber-100 text-amber-800',
+                        jobSheet.status === 'PENDING' &&
+                          'bg-blue-100 text-blue-800',
+                        jobSheet.status === 'CANCELLED' &&
+                          'bg-red-100 text-red-800',
                       )}
                     >
                       {filterOptions.statuses.find(
-                        (s) => s.value === jobSheet.status
+                        (s) => s.value === jobSheet.status,
                       )?.label || jobSheet.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={cn(
-                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                        jobSheet.status === "PENDING" &&
-                          "bg-blue-100 text-blue-800",
-                        jobSheet.status === "IN_PROGRESS" &&
-                          "bg-green-100 text-green-800",
-                        jobSheet.status === "PAUSED" &&
-                          "bg-yellow-100 text-yellow-800",
-                        jobSheet.status === "HALTED" &&
-                          "bg-red-100 text-red-800",
-                        jobSheet.status === "COMPLETED" &&
-                          "bg-green-100 text-green-800"
+                        'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        jobSheet.status === 'PENDING' &&
+                          'bg-blue-100 text-blue-800',
+                        jobSheet.status === 'IN_PROGRESS' &&
+                          'bg-green-100 text-green-800',
+                        jobSheet.status === 'PAUSED' &&
+                          'bg-yellow-100 text-yellow-800',
+                        jobSheet.status === 'HALTED' &&
+                          'bg-red-100 text-red-800',
+                        jobSheet.status === 'COMPLETED' &&
+                          'bg-green-100 text-green-800',
                       )}
                     >
-                      {jobSheet.status === "PENDING" && "Not Started"}
-                      {jobSheet.status === "IN_PROGRESS" && "In Progress"}
-                      {jobSheet.status === "PAUSED" && "Paused"}
-                      {jobSheet.status === "HALTED" && "Halted"}
-                      {jobSheet.status === "COMPLETED" && "Completed"}
+                      {jobSheet.status === 'PENDING' && 'Not Started'}
+                      {jobSheet.status === 'IN_PROGRESS' && 'In Progress'}
+                      {jobSheet.status === 'PAUSED' && 'Paused'}
+                      {jobSheet.status === 'HALTED' && 'Halted'}
+                      {jobSheet.status === 'COMPLETED' && 'Completed'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {jobSheet.requiresDiagnosis ? (
                       <div className="flex flex-col gap-1">
-                        {jobSheet.approvalStatus === "approved" ? (
+                        {jobSheet.approvalStatus === 'approved' ? (
                           <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
                             Approved
                           </span>
-                        ) : jobSheet.approvalStatus === "rejected" ? (
+                        ) : jobSheet.approvalStatus === 'rejected' ? (
                           <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
                             Rejected
                           </span>
@@ -957,7 +957,7 @@ export default function JobSheetPage() {
             <div className="space-y-6">
               {/* Diagnosis Required Banner */}
               {selectedJobSheet.requiresDiagnosis &&
-                selectedJobSheet.approvalStatus !== "approved" && (
+                selectedJobSheet.approvalStatus !== 'approved' && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                     <div className="flex items-center gap-2">
                       <AlertCircle className="w-5 h-5 text-amber-600" />
@@ -975,7 +975,7 @@ export default function JobSheetPage() {
 
               {/* Diagnosis Approved Banner */}
               {selectedJobSheet.requiresDiagnosis &&
-                selectedJobSheet.approvalStatus === "approved" && (
+                selectedJobSheet.approvalStatus === 'approved' && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <div className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5 text-green-600" />
@@ -999,7 +999,7 @@ export default function JobSheetPage() {
                     Booking ID
                   </h3>
                   <p className="mt-1">
-                    {selectedJobSheet.booking?.bookingId || "N/A"}
+                    {selectedJobSheet.booking?.bookingId || 'N/A'}
                   </p>
                 </div>
                 <div>
@@ -1013,19 +1013,19 @@ export default function JobSheetPage() {
                           const technicians = selectedJobSheet.booking.services
                             .map((s) => {
                               if (
-                                typeof s.technicianId === "object" &&
+                                typeof s.technicianId === 'object' &&
                                 s.technicianId
                               ) {
                                 return `${s.technicianId.firstName} ${s.technicianId.lastName}`;
                               }
-                              return s.technicianId || "Not assigned";
+                              return s.technicianId || 'Not assigned';
                             })
                             .filter(
-                              (tech, index, arr) => arr.indexOf(tech) === index
+                              (tech, index, arr) => arr.indexOf(tech) === index,
                             );
-                          return technicians.join(", ");
+                          return technicians.join(', ');
                         })()
-                      : "N/A"}
+                      : 'N/A'}
                   </p>
                 </div>
                 <div>
@@ -1036,9 +1036,9 @@ export default function JobSheetPage() {
                     {selectedJobSheet.booking?.bookingDate
                       ? format(
                           new Date(selectedJobSheet.booking.bookingDate),
-                          "MMM dd, yyyy"
+                          'MMM dd, yyyy',
                         )
-                      : "N/A"}
+                      : 'N/A'}
                   </p>
                 </div>
                 <div>
@@ -1049,11 +1049,11 @@ export default function JobSheetPage() {
                       ? [
                           ...new Set(
                             selectedJobSheet.booking.services.map(
-                              (s) => s.bayId
-                            )
+                              (s) => s.bayId,
+                            ),
                           ),
-                        ].join(", ")
-                      : "N/A"}
+                        ].join(', ')
+                      : 'N/A'}
                   </p>
                 </div>
               </div>
@@ -1096,16 +1096,16 @@ export default function JobSheetPage() {
                 <div className="bg-gray-50 px-3 py-2 rounded-md">
                   <div className="text-sm">
                     <strong>
-                      {selectedJobSheet.booking?.customer?.name || "N/A"}
+                      {selectedJobSheet.booking?.customer?.name || 'N/A'}
                     </strong>
                   </div>
                   <div className="text-xs text-gray-500">
-                    {selectedJobSheet.booking?.customer?.email || "No email"}
+                    {selectedJobSheet.booking?.customer?.email || 'No email'}
                   </div>
                   <div className="text-xs text-gray-500">
-                    {selectedJobSheet.booking?.vehicle?.make || "Unknown"}{" "}
-                    {selectedJobSheet.booking?.vehicle?.model || "Vehicle"} (
-                    {selectedJobSheet.booking?.vehicle?.year || "N/A"})
+                    {selectedJobSheet.booking?.vehicle?.make || 'Unknown'}{' '}
+                    {selectedJobSheet.booking?.vehicle?.model || 'Vehicle'} (
+                    {selectedJobSheet.booking?.vehicle?.year || 'N/A'})
                   </div>
                 </div>
               </div>
@@ -1117,28 +1117,28 @@ export default function JobSheetPage() {
                 </h3>
                 <span
                   className={cn(
-                    "px-3 py-1 text-sm font-medium rounded-full",
-                    selectedJobSheet.status === "COMPLETED" &&
-                      "bg-green-100 text-green-800",
-                    selectedJobSheet.status === "IN_PROGRESS" &&
-                      "bg-amber-100 text-amber-800",
-                    selectedJobSheet.status === "PENDING" &&
-                      "bg-blue-100 text-blue-800",
-                    selectedJobSheet.status === "CANCELLED" &&
-                      "bg-red-100 text-red-800"
+                    'px-3 py-1 text-sm font-medium rounded-full',
+                    selectedJobSheet.status === 'COMPLETED' &&
+                      'bg-green-100 text-green-800',
+                    selectedJobSheet.status === 'IN_PROGRESS' &&
+                      'bg-amber-100 text-amber-800',
+                    selectedJobSheet.status === 'PENDING' &&
+                      'bg-blue-100 text-blue-800',
+                    selectedJobSheet.status === 'CANCELLED' &&
+                      'bg-red-100 text-red-800',
                   )}
                 >
                   {filterOptions.statuses.find(
-                    (s) => s.value === selectedJobSheet.status
+                    (s) => s.value === selectedJobSheet.status,
                   )?.label || selectedJobSheet.status}
                 </span>
               </div>
 
               {/* Submit Diagnosis Button */}
               {selectedJobSheet.requiresDiagnosis &&
-                selectedJobSheet.approvalStatus !== "pending" &&
-                selectedJobSheet.approvalStatus !== "approved" &&
-                selectedJobSheet.approvalStatus !== "rejected" && (
+                selectedJobSheet.approvalStatus !== 'pending' &&
+                selectedJobSheet.approvalStatus !== 'approved' &&
+                selectedJobSheet.approvalStatus !== 'rejected' && (
                   <div className="flex justify-center pt-4">
                     <Button
                       onClick={() => {
@@ -1154,24 +1154,24 @@ export default function JobSheetPage() {
                 )}
 
               {/* Work Action Buttons */}
-              {selectedJobSheet.status === "PENDING" &&
+              {selectedJobSheet.status === 'PENDING' &&
                 (!selectedJobSheet.requiresDiagnosis ||
-                  selectedJobSheet.approvalStatus === "approved") && (
+                  selectedJobSheet.approvalStatus === 'approved') && (
                   <div className="flex justify-center pt-4">
                     <Button
                       onClick={() => {
                         console.log(
-                          "Start Work clicked - selectedJobSheet:",
-                          selectedJobSheet
+                          'Start Work clicked - selectedJobSheet:',
+                          selectedJobSheet,
                         );
                         console.log(
-                          "Setting workTrackingJobSheetId to:",
-                          selectedJobSheet.id
+                          'Setting workTrackingJobSheetId to:',
+                          selectedJobSheet.id,
                         );
                         setWorkTrackingJobSheetId(selectedJobSheet.id);
-                        console.log("Setting showWorkTrackingModal to true");
+                        console.log('Setting showWorkTrackingModal to true');
                         setShowWorkTrackingModal(true);
-                        console.log("Setting selectedJobSheet to null");
+                        console.log('Setting selectedJobSheet to null');
                         setSelectedJobSheet(null); // Close the job sheet details modal
                       }}
                       className="bg-green-600 hover:bg-green-700 text-white"
@@ -1183,7 +1183,7 @@ export default function JobSheetPage() {
                 )}
 
               {/* Manage Work for in-progress jobs */}
-              {selectedJobSheet.status === "IN_PROGRESS" && (
+              {selectedJobSheet.status === 'IN_PROGRESS' && (
                 <div className="flex justify-center pt-4">
                   <Button
                     onClick={() => {
@@ -1199,9 +1199,9 @@ export default function JobSheetPage() {
               )}
 
               {/* Diagnosis Required Message */}
-              {selectedJobSheet.status === "PENDING" &&
+              {selectedJobSheet.status === 'PENDING' &&
                 selectedJobSheet.requiresDiagnosis &&
-                selectedJobSheet.approvalStatus !== "approved" && (
+                selectedJobSheet.approvalStatus !== 'approved' && (
                   <div className="flex justify-center pt-4">
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
                       <div className="flex items-center justify-center gap-2 text-amber-800">
@@ -1216,13 +1216,13 @@ export default function JobSheetPage() {
                   </div>
                 )}
 
-              {selectedJobSheet.status === "HALTED" && (
+              {selectedJobSheet.status === 'HALTED' && (
                 <div className="flex justify-center pt-4">
                   <Button
                     onClick={() => {
                       console.log(
-                        "Resume Work clicked - selectedJobSheet:",
-                        selectedJobSheet
+                        'Resume Work clicked - selectedJobSheet:',
+                        selectedJobSheet,
                       );
                       setWorkTrackingJobSheetId(selectedJobSheet.id);
                       setShowWorkTrackingModal(true);
@@ -1236,13 +1236,13 @@ export default function JobSheetPage() {
                 </div>
               )}
 
-              {selectedJobSheet.status === "PAUSED" && (
+              {selectedJobSheet.status === 'PAUSED' && (
                 <div className="flex justify-center pt-4">
                   <Button
                     onClick={() => {
                       console.log(
-                        "Resume Work clicked - selectedJobSheet:",
-                        selectedJobSheet
+                        'Resume Work clicked - selectedJobSheet:',
+                        selectedJobSheet,
                       );
                       setWorkTrackingJobSheetId(selectedJobSheet.id);
                       setShowWorkTrackingModal(true);
@@ -1263,11 +1263,11 @@ export default function JobSheetPage() {
       {/* Pagination */}
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          Showing {(currentPage - 1) * paginationInfo.itemsPerPage + 1} to{" "}
+          Showing {(currentPage - 1) * paginationInfo.itemsPerPage + 1} to{' '}
           {Math.min(
             currentPage * paginationInfo.itemsPerPage,
-            paginationInfo.totalItems
-          )}{" "}
+            paginationInfo.totalItems,
+          )}{' '}
           of {paginationInfo.totalItems} job sheets
         </div>
         <div className="flex items-center gap-2">
@@ -1283,16 +1283,16 @@ export default function JobSheetPage() {
           <div className="flex gap-1">
             {Array.from(
               { length: paginationInfo.totalPages },
-              (_, i) => i + 1
+              (_, i) => i + 1,
             ).map((page) => (
               <Button
                 key={page}
-                variant={currentPage === page ? "default" : "outline"}
+                variant={currentPage === page ? 'default' : 'outline'}
                 onClick={() => handlePageChange(page)}
                 className={cn(
-                  "w-8 h-8 p-0",
+                  'w-8 h-8 p-0',
                   currentPage === page &&
-                    "bg-blue-500 text-white hover:bg-blue-600"
+                    'bg-blue-500 text-white hover:bg-blue-600',
                 )}
               >
                 {page}

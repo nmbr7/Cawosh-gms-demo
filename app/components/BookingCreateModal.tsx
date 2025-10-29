@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,26 +6,26 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
-} from "@/components/ui/popover";
-import { startOfDay, format, isBefore } from "date-fns";
-import { toast } from "sonner";
-import { useGarageStore } from "@/store/garage";
-import { useBookingDemo } from "@/hooks/useBookingDemo";
-import { useBookingStore } from "@/store/booking";
-import { useJobSheetStore } from "@/store/jobSheet";
-import { ServiceDropdown } from "./booking/ServiceDropdown";
-import { BayDropdown } from "./booking/BayDropdown";
-import { TechnicianDropdown } from "./booking/TechnicianDropdown";
-import { BookingTimeline } from "./booking/BookingTimeline";
-import type { StoreService } from "@/store/booking";
+} from '@/components/ui/popover';
+import { startOfDay, format, isBefore } from 'date-fns';
+import { toast } from 'sonner';
+import { useGarageStore } from '@/store/garage';
+import { useBookingDemo } from '@/hooks/useBookingDemo';
+import { useBookingStore } from '@/store/booking';
+import { useJobSheetStore } from '@/store/jobSheet';
+import { ServiceDropdown } from './booking/ServiceDropdown';
+import { BayDropdown } from './booking/BayDropdown';
+import { TechnicianDropdown } from './booking/TechnicianDropdown';
+import { BookingTimeline } from './booking/BookingTimeline';
+import type { StoreService } from '@/store/booking';
 
 interface BookingCreateModalProps {
   isOpen: boolean;
@@ -46,15 +46,15 @@ export const BookingCreateModal = ({
     useBookingDemo();
 
   // Form state
-  const [customerName, setCustomerName] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
-  const [customerPhone, setCustomerPhone] = useState("");
-  const [carMake, setCarMake] = useState("");
-  const [carModel, setCarModel] = useState("");
-  const [carYear, setCarYear] = useState("");
-  const [carRegistration, setCarRegistration] = useState("");
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [carMake, setCarMake] = useState('');
+  const [carModel, setCarModel] = useState('');
+  const [carYear, setCarYear] = useState('');
+  const [carRegistration, setCarRegistration] = useState('');
   const [date, setDate] = useState<Date | undefined>(undefined);
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState('');
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,62 +63,62 @@ export const BookingCreateModal = ({
   const [selectedServices, setSelectedServices] = useState<StoreService[]>([]);
 
   // New state for bay and technician
-  const [selectedBay, setSelectedBay] = useState<string>("");
-  const [selectedTechnician, setSelectedTechnician] = useState<string>("");
-  const [selectedTime, setSelectedTime] = useState<string>("");
+  const [selectedBay, setSelectedBay] = useState<string>('');
+  const [selectedTechnician, setSelectedTechnician] = useState<string>('');
+  const [selectedTime, setSelectedTime] = useState<string>('');
 
   // Set default date to today when modal opens
   useEffect(() => {
     if (isOpen) {
       setDate(startOfDay(new Date()));
-      setSelectedBay("");
-      setSelectedTechnician("");
+      setSelectedBay('');
+      setSelectedTechnician('');
     }
   }, [isOpen]);
 
   // Get existing bookings for the selected bay/date
   const existingBookings =
     selectedBay && date
-      ? getBookingsForBayAndDate(selectedBay, format(date, "yyyy-MM-dd"))
+      ? getBookingsForBayAndDate(selectedBay, format(date, 'yyyy-MM-dd'))
       : [];
 
   // Add validation function
   const isFormValid = () => {
     return (
-      customerName.trim() !== "" &&
-      customerEmail.trim() !== "" &&
-      customerPhone.trim() !== "" &&
-      carMake.trim() !== "" &&
-      carModel.trim() !== "" &&
-      carYear.trim() !== "" &&
-      carRegistration.trim() !== "" &&
+      customerName.trim() !== '' &&
+      customerEmail.trim() !== '' &&
+      customerPhone.trim() !== '' &&
+      carMake.trim() !== '' &&
+      carModel.trim() !== '' &&
+      carYear.trim() !== '' &&
+      carRegistration.trim() !== '' &&
       selectedServices.length > 0 &&
-      selectedBay !== "" &&
-      selectedTechnician !== "" &&
+      selectedBay !== '' &&
+      selectedTechnician !== '' &&
       date !== undefined &&
-      selectedTime !== ""
+      selectedTime !== ''
     );
   };
 
   const isUndiagnosed = selectedServices.some(
-    (service) => service.id === "service-undiagnosed"
+    (service) => service.id === 'service-undiagnosed',
   );
 
   // Reset all form fields
   const resetForm = () => {
-    setCustomerName("");
-    setCustomerEmail("");
-    setCustomerPhone("");
-    setCarMake("");
-    setCarModel("");
-    setCarYear("");
-    setCarRegistration("");
+    setCustomerName('');
+    setCustomerEmail('');
+    setCustomerPhone('');
+    setCarMake('');
+    setCarModel('');
+    setCarYear('');
+    setCarRegistration('');
     setDate(undefined);
-    setSelectedTime("");
-    setNotes("");
+    setSelectedTime('');
+    setNotes('');
     setSelectedServices([]);
-    setSelectedBay("");
-    setSelectedTechnician("");
+    setSelectedBay('');
+    setSelectedTechnician('');
     setIsDatePopoverOpen(false);
   };
 
@@ -131,7 +131,7 @@ export const BookingCreateModal = ({
       const bookingStore = useBookingStore.getState();
       const jobSheetStore = useJobSheetStore.getState();
 
-      const dateStr = date ? format(date, "yyyy-MM-dd") : "";
+      const dateStr = date ? format(date, 'yyyy-MM-dd') : '';
 
       // Create booking in store (computes endTime)
       const booking = bookingStore.createBooking({
@@ -145,7 +145,7 @@ export const BookingCreateModal = ({
           model: carModel,
           year: parseInt(carYear),
           license: carRegistration,
-          vin: "", // Optional field
+          vin: '', // Optional field
         },
         services: selectedServices.map((service) => ({
           serviceId: service.id,
@@ -164,15 +164,15 @@ export const BookingCreateModal = ({
       // Create linked jobsheet
       jobSheetStore.createFromBooking(booking._id);
 
-      toast.success("Booking created successfully!");
+      toast.success('Booking created successfully!');
       resetForm();
       onBookingCreated?.();
       onClose();
 
       setIsSubmitting(false);
     } catch (error) {
-      console.error("Error creating booking:", error);
-      toast.error("An error occurred. Please try again later.");
+      console.error('Error creating booking:', error);
+      toast.error('An error occurred. Please try again later.');
       setIsSubmitting(false);
     }
   };
@@ -361,12 +361,12 @@ export const BookingCreateModal = ({
                           <button
                             type="button"
                             className={
-                              "w-full text-left bg-white border rounded-md px-3 py-2 shadow-xs transition outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] min-h-[48px] text-sm" +
-                              (!date ? " text-gray-400" : "")
+                              'w-full text-left bg-white border rounded-md px-3 py-2 shadow-xs transition outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] min-h-[48px] text-sm' +
+                              (!date ? ' text-gray-400' : '')
                             }
                             onClick={() => setIsDatePopoverOpen(true)}
                           >
-                            {date ? format(date, "d MMM yyyy") : "Select date"}
+                            {date ? format(date, 'd MMM yyyy') : 'Select date'}
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -418,7 +418,7 @@ export const BookingCreateModal = ({
                 {/* Notes */}
                 <div>
                   <h3 className="text-sm font-semibold mb-2">
-                    Notes {isUndiagnosed && "(Required for undiagnosed issues)"}
+                    Notes {isUndiagnosed && '(Required for undiagnosed issues)'}
                   </h3>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Notes
@@ -427,8 +427,8 @@ export const BookingCreateModal = ({
                     className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] min-h-[48px]"
                     placeholder={
                       isUndiagnosed
-                        ? "Describe the issue (e.g., engine light, strange noise, etc.)..."
-                        : "Additional notes..."
+                        ? 'Describe the issue (e.g., engine light, strange noise, etc.)...'
+                        : 'Additional notes...'
                     }
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
@@ -467,7 +467,7 @@ export const BookingCreateModal = ({
                 className="bg-blue-500 text-white hover:bg-blue-600"
                 disabled={!isFormValid() || isSubmitting}
               >
-                {isSubmitting ? "Creating..." : "Create Booking"}
+                {isSubmitting ? 'Creating...' : 'Create Booking'}
               </Button>
             </DialogFooter>
           </form>

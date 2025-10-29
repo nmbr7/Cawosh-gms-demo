@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Eye, EyeOff } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Eye, EyeOff } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface PasswordInputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   className?: string;
 }
 
@@ -13,8 +14,8 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
   return (
     <div className="relative">
       <Input
-        type={showPassword ? "text" : "password"}
-        className={cn("h-12 pr-10", className)}
+        type={showPassword ? 'text' : 'password'}
+        className={cn('h-12 pr-10', className)}
         {...props}
       />
       <button
@@ -30,4 +31,4 @@ export function PasswordInput({ className, ...props }: PasswordInputProps) {
       </button>
     </div>
   );
-} 
+}

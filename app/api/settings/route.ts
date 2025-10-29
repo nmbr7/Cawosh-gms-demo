@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -10,8 +10,8 @@ export async function GET() {
     });
   } catch {
     return NextResponse.json(
-      { error: "Failed to fetch settings" },
-      { status: 500 }
+      { error: 'Failed to fetch settings' },
+      { status: 500 },
     );
   }
 }
@@ -24,12 +24,12 @@ export async function PUT() {
     // In a real application, you would save these settings to a database
     return NextResponse.json({
       success: true,
-      message: "Settings updated successfully",
+      message: 'Settings updated successfully',
     });
   } catch {
     return NextResponse.json(
-      { success: false, message: "Failed to update settings" },
-      { status: 400 }
+      { success: false, message: 'Failed to update settings' },
+      { status: 400 },
     );
   }
 }

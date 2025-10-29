@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import { useState } from 'react';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface ImagePickerProps {
   imageUrl?: string | null;
@@ -55,10 +55,10 @@ export function ImagePicker({
           <Button
             type="button"
             variant="outline"
-            onClick={() => document.getElementById("image")?.click()}
+            onClick={() => document.getElementById('image')?.click()}
             disabled={disabled}
           >
-            {previewUrl ? "Change Image" : "Upload Image"}
+            {previewUrl ? 'Change Image' : 'Upload Image'}
           </Button>
         </div>
       </div>

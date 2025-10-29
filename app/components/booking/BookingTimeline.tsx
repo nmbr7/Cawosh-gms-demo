@@ -1,6 +1,6 @@
-import React from "react";
-import { BookedSlotCard } from "./BookedSlotCard";
-import type { Booking, Service } from "@/types/booking";
+import React from 'react';
+import { BookedSlotCard } from './BookedSlotCard';
+import type { Booking, Service } from '@/types/booking';
 
 interface BookingTimelineProps {
   bayId: string;
@@ -23,25 +23,25 @@ const generateTimeSlots = (
     close: string;
     isClosed: boolean;
   }>,
-  date: Date
+  date: Date,
 ): string[] => {
-  const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+  const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
   const dayHours = businessHours.find(
-    (h) => h.day.toLowerCase() === dayName.toLowerCase()
+    (h) => h.day.toLowerCase() === dayName.toLowerCase(),
   );
 
   // Fallback to 10 AM - 5 PM if no business hours found
   const startHour =
-    dayHours && !dayHours.isClosed ? parseInt(dayHours.open.split(":")[0]) : 10; // Default to 10 AM
+    dayHours && !dayHours.isClosed ? parseInt(dayHours.open.split(':')[0]) : 10; // Default to 10 AM
   const endHour =
     dayHours && !dayHours.isClosed
-      ? parseInt(dayHours.close.split(":")[0])
+      ? parseInt(dayHours.close.split(':')[0])
       : 17; // Default to 5 PM
 
   const slots: string[] = [];
   for (let hour = startHour; hour < endHour; hour++) {
-    slots.push(`${hour.toString().padStart(2, "0")}:00`);
-    slots.push(`${hour.toString().padStart(2, "0")}:30`);
+    slots.push(`${hour.toString().padStart(2, '0')}:00`);
+    slots.push(`${hour.toString().padStart(2, '0')}:30`);
   }
 
   return slots;
@@ -50,9 +50,9 @@ const generateTimeSlots = (
 // Find booking at a specific time
 const findBookingAtTime = (
   bookings: Booking[],
-  time: string
+  time: string,
 ): Booking | null => {
-  const timeStr = time.padStart(5, "0"); // Ensure format like "09:00"
+  const timeStr = time.padStart(5, '0'); // Ensure format like "09:00"
 
   return (
     bookings.find((booking) => {
@@ -85,11 +85,11 @@ export const BookingTimeline: React.FC<BookingTimelineProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div className="text-xs text-gray-600 mb-2">
-        {bayId} -{" "}
-        {date.toLocaleDateString("en-US", {
-          weekday: "short",
-          month: "short",
-          day: "numeric",
+        {bayId} -{' '}
+        {date.toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
         })}
       </div>
       <div className="flex-1 overflow-y-auto min-h-0">

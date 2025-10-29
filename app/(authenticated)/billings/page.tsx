@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { FileDoc, CaretLeft, CaretRight } from "phosphor-react";
-import { formatDate } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { FileDoc, CaretLeft, CaretRight } from 'phosphor-react';
+import { formatDate } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import React from "react";
-import { useBillingStore } from "@/store/billing";
-import type { Invoice } from "@/types/invoice";
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import React from 'react';
+import { useBillingStore } from '@/store/billing';
+import type { Invoice } from '@/types/invoice';
 
 interface PaginationInfo {
   currentPage: number;
@@ -28,9 +28,9 @@ export default function BillingsPage() {
   const { invoices } = useBillingStore();
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [serviceFilter, setServiceFilter] = useState("all");
-  const [dateFilter, setDateFilter] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [serviceFilter, setServiceFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('');
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
   const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
     currentPage: 1,
@@ -57,11 +57,11 @@ export default function BillingsPage() {
             .includes(searchTerm.toLowerCase());
 
         const matchesService =
-          serviceFilter === "all" ||
+          serviceFilter === 'all' ||
           invoice.services.some((service) => service.name === serviceFilter);
 
         const matchesDate =
-          dateFilter === "" || invoice.issuedDate.includes(dateFilter);
+          dateFilter === '' || invoice.issuedDate.includes(dateFilter);
 
         return matchesSearch && matchesService && matchesDate;
       });
@@ -71,7 +71,7 @@ export default function BillingsPage() {
         (paginationInfo.currentPage - 1) * paginationInfo.itemsPerPage;
       const paginatedInvoices = filtered.slice(
         startIndex,
-        startIndex + paginationInfo.itemsPerPage
+        startIndex + paginationInfo.itemsPerPage,
       );
 
       // Store filtered invoices for display
@@ -83,7 +83,7 @@ export default function BillingsPage() {
         totalItems: filtered.length,
         totalPages: Math.max(
           1,
-          Math.ceil(filtered.length / paginationInfo.itemsPerPage)
+          Math.ceil(filtered.length / paginationInfo.itemsPerPage),
         ),
       }));
 
@@ -91,13 +91,13 @@ export default function BillingsPage() {
       const uniqueServiceTypes = Array.from(
         new Set(
           allInvoices.flatMap((invoice) =>
-            invoice.services.map((service) => service.name)
-          )
-        )
+            invoice.services.map((service) => service.name),
+          ),
+        ),
       );
       setServiceTypes(uniqueServiceTypes);
     } catch (error) {
-      console.error("Error fetching billings:", error);
+      console.error('Error fetching billings:', error);
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +123,7 @@ export default function BillingsPage() {
   const handleDownloadInvoice = (invoice: Invoice) => {
     // TODO: Implement actual PDF generation
     console.log(`Downloading invoice ${invoice.invoiceNumber}`);
-    alert("PDF download functionality will be implemented soon!");
+    alert('PDF download functionality will be implemented soon!');
   };
 
   if (isLoading) {
@@ -275,13 +275,13 @@ export default function BillingsPage() {
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="text-2xl font-bold text-amber-600">
-            {invoices.filter((inv) => inv.status === "DRAFT").length}
+            {invoices.filter((inv) => inv.status === 'DRAFT').length}
           </div>
           <div className="text-sm text-gray-600">Draft</div>
         </div>
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="text-2xl font-bold text-green-600">
-            {invoices.filter((inv) => inv.status === "PAID").length}
+            {invoices.filter((inv) => inv.status === 'PAID').length}
           </div>
           <div className="text-sm text-gray-600">Paid</div>
         </div>
@@ -376,23 +376,23 @@ export default function BillingsPage() {
                       </div>
                       <div className="text-center">
                         <h3 className="text-lg font-medium text-gray-900">
-                          {searchTerm || serviceFilter !== "all" || dateFilter
-                            ? "No billings match your filters"
-                            : "No billings found"}
+                          {searchTerm || serviceFilter !== 'all' || dateFilter
+                            ? 'No billings match your filters'
+                            : 'No billings found'}
                         </h3>
                         <p className="mt-1 text-sm text-gray-500">
-                          {searchTerm || serviceFilter !== "all" || dateFilter
-                            ? "Try adjusting your filters or search criteria"
-                            : "Get started by creating a new billing"}
+                          {searchTerm || serviceFilter !== 'all' || dateFilter
+                            ? 'Try adjusting your filters or search criteria'
+                            : 'Get started by creating a new billing'}
                         </p>
                       </div>
-                      {searchTerm || serviceFilter !== "all" || dateFilter ? (
+                      {searchTerm || serviceFilter !== 'all' || dateFilter ? (
                         <Button
                           variant="outline"
                           onClick={() => {
-                            setSearchTerm("");
-                            setServiceFilter("all");
-                            setDateFilter("");
+                            setSearchTerm('');
+                            setServiceFilter('all');
+                            setDateFilter('');
                           }}
                           className="mt-2"
                         >
@@ -423,14 +423,14 @@ export default function BillingsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex flex-col">
                         <span>
-                          {invoice.services[0]?.name || "Multiple Services"}
+                          {invoice.services[0]?.name || 'Multiple Services'}
                         </span>
                         <span className="text-xs text-gray-500">
-                          Duration:{" "}
+                          Duration:{' '}
                           {invoice.services.reduce(
                             (sum, s) => sum + s.duration,
-                            0
-                          )}{" "}
+                            0,
+                          )}{' '}
                           min
                         </span>
                       </div>
@@ -454,15 +454,15 @@ export default function BillingsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          invoice.status === "DRAFT"
-                            ? "bg-gray-100 text-gray-800"
-                            : invoice.status === "SENT"
-                            ? "bg-blue-100 text-blue-800"
-                            : invoice.status === "PAID"
-                            ? "bg-green-100 text-green-800"
-                            : invoice.status === "OVERDUE"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
+                          invoice.status === 'DRAFT'
+                            ? 'bg-gray-100 text-gray-800'
+                            : invoice.status === 'SENT'
+                              ? 'bg-blue-100 text-blue-800'
+                              : invoice.status === 'PAID'
+                                ? 'bg-green-100 text-green-800'
+                                : invoice.status === 'OVERDUE'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-gray-100 text-gray-800'
                         }`}
                       >
                         {invoice.status}
@@ -490,18 +490,18 @@ export default function BillingsPage() {
       {/* Pagination */}
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          Showing{" "}
+          Showing{' '}
           <span className="font-medium">
             {(paginationInfo.currentPage - 1) * paginationInfo.itemsPerPage + 1}
-          </span>{" "}
-          -{" "}
+          </span>{' '}
+          -{' '}
           <span className="font-medium">
             {Math.min(
               paginationInfo.currentPage * paginationInfo.itemsPerPage,
-              paginationInfo.totalItems
+              paginationInfo.totalItems,
             )}
-          </span>{" "}
-          of <span className="font-medium">{paginationInfo.totalItems}</span>{" "}
+          </span>{' '}
+          of <span className="font-medium">{paginationInfo.totalItems}</span>{' '}
           results
         </div>
         <div className="flex items-center gap-2">
@@ -518,19 +518,19 @@ export default function BillingsPage() {
           <div className="flex gap-1">
             {Array.from(
               { length: paginationInfo.totalPages },
-              (_, i) => i + 1
+              (_, i) => i + 1,
             ).map((page) => (
               <Button
                 key={page}
                 variant={
-                  page === paginationInfo.currentPage ? "default" : "outline"
+                  page === paginationInfo.currentPage ? 'default' : 'outline'
                 }
                 size="sm"
                 onClick={() => handlePageChange(page)}
                 className={cn(
-                  "w-8 h-8 p-0",
+                  'w-8 h-8 p-0',
                   page === paginationInfo.currentPage &&
-                    "bg-blue-500 text-white hover:bg-blue-600"
+                    'bg-blue-500 text-white hover:bg-blue-600',
                 )}
               >
                 {page}

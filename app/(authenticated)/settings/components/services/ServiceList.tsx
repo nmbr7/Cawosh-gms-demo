@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -14,23 +14,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/app/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Pencil, ChevronLeft, ChevronRight, Eye, Wrench } from "lucide-react";
-import { toast } from "sonner";
-import { ServiceModal } from "./ServiceModal";
-import ServiceListSkeleton from "./ServiceListSkeleton";
-import type { Service } from "@/app/models/service";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+} from '@/app/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Pencil, ChevronLeft, ChevronRight, Eye, Wrench } from 'lucide-react';
+import { toast } from 'sonner';
+import { ServiceModal } from './ServiceModal';
+import ServiceListSkeleton from './ServiceListSkeleton';
+import type { Service } from '@/app/models/service';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 interface ServiceListProps {
   services: Service[];
   onServiceUpdate: (
-    service: Omit<Service, "serviceId"> & { serviceId: string }
+    service: Omit<Service, 'serviceId'> & { serviceId: string },
   ) => void;
   onServiceDelete: (serviceId: string) => void;
-  onServiceAdd: (service: Omit<Service, "serviceId">) => void;
+  onServiceAdd: (service: Omit<Service, 'serviceId'>) => void;
   loading?: boolean;
   garageId: string;
 }
@@ -45,19 +45,19 @@ export function ServiceList({
   const [isAdding, setIsAdding] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [newService, setNewService] = useState<Omit<Service, "serviceId">>({
-    name: "",
-    description: "",
-    currency: "GBP",
-    currencySymbol: "£",
+  const [newService, setNewService] = useState<Omit<Service, 'serviceId'>>({
+    name: '',
+    description: '',
+    currency: 'GBP',
+    currencySymbol: '£',
     duration: 60,
     defaultPrice: 0,
     customPrice: 0,
-    category: "maintenance",
+    category: 'maintenance',
     isActive: true,
   });
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<"view" | "edit" | "add">("view");
+  const [modalMode, setModalMode] = useState<'view' | 'edit' | 'add'>('view');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   // Calculate pagination
@@ -68,13 +68,13 @@ export function ServiceList({
 
   const handleAddService = async () => {
     if (!newService.name || !newService.description) {
-      toast.error("Please fill in all required fields");
+      toast.error('Please fill in all required fields');
       return;
     }
     const response = await fetchWithAuth(`/api/garages/${garageId}/services`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(newService),
     });
@@ -83,20 +83,20 @@ export function ServiceList({
       const data = await response.json();
       onServiceAdd(data);
       setNewService({
-        name: "",
-        description: "",
+        name: '',
+        description: '',
         duration: 60,
-        currency: "GBP",
-        currencySymbol: "£",
+        currency: 'GBP',
+        currencySymbol: '£',
         defaultPrice: 0,
         customPrice: 0,
-        category: "maintenance",
+        category: 'maintenance',
         isActive: true,
       });
       setIsAdding(false);
-      toast.success("Service added successfully");
+      toast.success('Service added successfully');
     } else {
-      toast.error("Failed to add service");
+      toast.error('Failed to add service');
     }
   };
 
@@ -227,14 +227,14 @@ export function ServiceList({
                         <TableCell>{service.name}</TableCell>
                         <TableCell>
                           <span className="px-3 py-1 rounded-lg text-xs  bg-gray-100 text-gray-800">
-                            {service.category || "Uncategorized"}
+                            {service.category || 'Uncategorized'}
                           </span>
                         </TableCell>
                         <TableCell>{service.duration || 60} min</TableCell>
                         <TableCell>
                           <div className="flex items-baseline gap-1">
                             <span className="text-xs font-medium">
-                              {service.currencySymbol || "£"}
+                              {service.currencySymbol || '£'}
                             </span>
                             <span className="text-md ">
                               {service.customPrice || service.defaultPrice || 0}
@@ -246,12 +246,12 @@ export function ServiceList({
                             className={`px-2 py-1 rounded text-xs font-semibold
                               ${
                                 service.isActive
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-gray-200 text-gray-500"
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-gray-200 text-gray-500'
                               }
                             `}
                           >
-                            {service.isActive ? "Active" : "Disabled"}
+                            {service.isActive ? 'Active' : 'Disabled'}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
@@ -260,7 +260,7 @@ export function ServiceList({
                               variant="ghost"
                               size="icon"
                               onClick={() => {
-                                setModalMode("view");
+                                setModalMode('view');
                                 setSelectedService(service);
                                 setModalOpen(true);
                               }}
@@ -272,7 +272,7 @@ export function ServiceList({
                               variant="ghost"
                               size="icon"
                               onClick={() => {
-                                setModalMode("edit");
+                                setModalMode('edit');
                                 setSelectedService(service);
                                 setModalOpen(true);
                               }}
@@ -294,7 +294,7 @@ export function ServiceList({
       {/* Pagination Widget Below Card */}
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm text-gray-500">
-          Showing {startIndex + 1} to {Math.min(endIndex, services.length)} of{" "}
+          Showing {startIndex + 1} to {Math.min(endIndex, services.length)} of{' '}
           {services.length} services
         </div>
         <div className="flex items-center space-x-1">
@@ -313,8 +313,8 @@ export function ServiceList({
               className={`w-8 h-8 flex items-center justify-center rounded-lg border text-sm font-medium transition-colors
                 ${
                   currentPage === page
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-black hover:bg-blue-50"
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-black hover:bg-blue-50'
                 }
               `}
               onClick={() => setCurrentPage(page)}
@@ -343,8 +343,8 @@ export function ServiceList({
         service={selectedService}
         onClose={() => setModalOpen(false)}
         onSave={(data, id) => {
-          if (modalMode === "add") onServiceAdd(data);
-          else if (modalMode === "edit" && id)
+          if (modalMode === 'add') onServiceAdd(data);
+          else if (modalMode === 'edit' && id)
             onServiceUpdate({ ...data, serviceId: id });
         }}
       />

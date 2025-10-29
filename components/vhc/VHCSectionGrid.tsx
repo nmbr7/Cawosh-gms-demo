@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
 export type VHCRadioOption = {
   value: number | string;
@@ -82,8 +82,8 @@ export function VHCSectionGrid({
                           key={String(opt.value)}
                           className={`flex items-center gap-3 rounded-lg px-3 py-3 cursor-pointer border transition-all duration-200 ${
                             currentValue === opt.value
-                              ? "border-blue-500 bg-blue-50 shadow-sm"
-                              : "border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                              ? 'border-blue-500 bg-blue-50 shadow-sm'
+                              : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                           }`}
                         >
                           <input
@@ -127,10 +127,10 @@ export function VHCSectionGrid({
             {
               Object.keys(currentValues).filter((key) =>
                 section.items.some(
-                  (item) => item.id === key && currentValues[key] !== undefined
-                )
+                  (item) => item.id === key && currentValues[key] !== undefined,
+                ),
               ).length
-            }{" "}
+            }{' '}
             / {section.items.length} answered
           </span>
         </div>
@@ -142,8 +142,8 @@ export function VHCSectionGrid({
                 (Object.keys(currentValues).filter((key) =>
                   section.items.some(
                     (item) =>
-                      item.id === key && currentValues[key] !== undefined
-                  )
+                      item.id === key && currentValues[key] !== undefined,
+                  ),
                 ).length /
                   section.items.length) *
                 100

@@ -1,13 +1,13 @@
 // store/inventory.ts
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { InventoryItem, StockMovement, StockStatus } from "../types/inventory";
-import mockInventory from "../app/data/mock-inventory.json";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { InventoryItem, StockMovement, StockStatus } from '../types/inventory';
+import mockInventory from '../app/data/mock-inventory.json';
 
 function computeStatus(qty: number, rl: number): StockStatus {
-  if (qty <= 0) return "OUT";
-  if (qty <= rl) return "LOW";
-  return "IN_STOCK";
+  if (qty <= 0) return 'OUT';
+  if (qty <= rl) return 'LOW';
+  return 'IN_STOCK';
 }
 
 interface PaginationInfo {
@@ -26,12 +26,12 @@ interface FilterOptions {
 
 interface InventoryFilters {
   q: string;
-  status?: StockStatus | "ALL";
+  status?: StockStatus | 'ALL';
   category?: string;
   supplier?: string;
   location?: string;
   sortBy: string;
-  sortOrder: "asc" | "desc";
+  sortOrder: 'asc' | 'desc';
   page: number;
   limit: number;
 }
@@ -59,12 +59,12 @@ type InventoryState = {
   // Actions
   setFilters: (f: Partial<InventoryFilters>) => void;
   addItem: (
-    i: Omit<InventoryItem, "status" | "createdAt" | "updatedAt">
+    i: Omit<InventoryItem, 'status' | 'createdAt' | 'updatedAt'>,
   ) => void;
   updateItem: (i: InventoryItem) => void;
   adjustStock: (args: {
     itemId: string;
-    mode: "INCREASE" | "DECREASE" | "SET";
+    mode: 'INCREASE' | 'DECREASE' | 'SET';
     quantity: number;
     reason: string;
     reference?: string;
@@ -87,14 +87,14 @@ type InventoryState = {
   getMovementsByItem: (
     itemId: string,
     filters?: {
-      type?: "INCREASE" | "DECREASE" | "SET" | "ALL";
+      type?: 'INCREASE' | 'DECREASE' | 'SET' | 'ALL';
       q?: string;
       from?: string;
       to?: string;
-      referenceType?: "JOB_SHEET" | "BOOKING" | "MANUAL" | "SYSTEM" | "ALL";
+      referenceType?: 'JOB_SHEET' | 'BOOKING' | 'MANUAL' | 'SYSTEM' | 'ALL';
       page?: number;
       limit?: number;
-    }
+    },
   ) => {
     data: StockMovement[];
     total: number;
@@ -110,7 +110,7 @@ export const useInventory = create<InventoryState>()(
       // Initialize raw data
       allItems: mockInventory.map((item) => ({
         ...item,
-        unit: item.unit as "pair" | "bottle" | "pc" | "box" | "litre" | "kg",
+        unit: item.unit as 'pair' | 'bottle' | 'pc' | 'box' | 'litre' | 'kg',
         status: computeStatus(item.quantity, item.reorderLevel),
       })),
 
@@ -135,18 +135,18 @@ export const useInventory = create<InventoryState>()(
         categories: [],
         suppliers: [],
         locations: [],
-        statuses: ["IN_STOCK", "LOW", "OUT"],
+        statuses: ['IN_STOCK', 'LOW', 'OUT'],
       },
 
       // Initialize filters
       filters: {
-        q: "",
-        status: "ALL",
+        q: '',
+        status: 'ALL',
         category: undefined,
         supplier: undefined,
         location: undefined,
-        sortBy: "name",
-        sortOrder: "asc",
+        sortBy: 'name',
+        sortOrder: 'asc',
         page: 1,
         limit: 10,
       },
@@ -175,7 +175,7 @@ export const useInventory = create<InventoryState>()(
           // Status filter
           if (
             filters.status &&
-            filters.status !== "ALL" &&
+            filters.status !== 'ALL' &&
             item.status !== filters.status
           ) {
             return false;
@@ -199,14 +199,14 @@ export const useInventory = create<InventoryState>()(
           const aValue = a[filters.sortBy as keyof InventoryItem];
           const bValue = b[filters.sortBy as keyof InventoryItem];
 
-          if (typeof aValue === "string" && typeof bValue === "string") {
-            return filters.sortOrder === "asc"
+          if (typeof aValue === 'string' && typeof bValue === 'string') {
+            return filters.sortOrder === 'asc'
               ? aValue.localeCompare(bValue)
               : bValue.localeCompare(aValue);
           }
 
-          if (typeof aValue === "number" && typeof bValue === "number") {
-            return filters.sortOrder === "asc"
+          if (typeof aValue === 'number' && typeof bValue === 'number') {
+            return filters.sortOrder === 'asc'
               ? aValue - bValue
               : bValue - aValue;
           }
@@ -230,17 +230,17 @@ export const useInventory = create<InventoryState>()(
             ...new Set(
               allItems
                 .map((item) => item.supplier)
-                .filter((s): s is string => Boolean(s))
+                .filter((s): s is string => Boolean(s)),
             ),
           ].sort(),
           locations: [
             ...new Set(
               allItems
                 .map((item) => item.location)
-                .filter((l): l is string => Boolean(l))
+                .filter((l): l is string => Boolean(l)),
             ),
           ].sort(),
-          statuses: ["IN_STOCK", "LOW", "OUT"],
+          statuses: ['IN_STOCK', 'LOW', 'OUT'],
         };
 
         const pagination: PaginationInfo = {
@@ -263,7 +263,7 @@ export const useInventory = create<InventoryState>()(
           const updatedFilters = { ...state.filters, ...newFilters };
 
           // Reset to page 1 when filters change (except page changes)
-          if (Object.keys(newFilters).some((key) => key !== "page")) {
+          if (Object.keys(newFilters).some((key) => key !== 'page')) {
             updatedFilters.page = 1;
           }
 
@@ -282,7 +282,7 @@ export const useInventory = create<InventoryState>()(
               return false;
             if (
               filters.status &&
-              filters.status !== "ALL" &&
+              filters.status !== 'ALL' &&
               item.status !== filters.status
             )
               return false;
@@ -296,13 +296,13 @@ export const useInventory = create<InventoryState>()(
           filtered.sort((a, b) => {
             const aValue = a[filters.sortBy as keyof InventoryItem];
             const bValue = b[filters.sortBy as keyof InventoryItem];
-            if (typeof aValue === "string" && typeof bValue === "string") {
-              return filters.sortOrder === "asc"
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+              return filters.sortOrder === 'asc'
                 ? aValue.localeCompare(bValue)
                 : bValue.localeCompare(aValue);
             }
-            if (typeof aValue === "number" && typeof bValue === "number") {
-              return filters.sortOrder === "asc"
+            if (typeof aValue === 'number' && typeof bValue === 'number') {
+              return filters.sortOrder === 'asc'
                 ? aValue - bValue
                 : bValue - aValue;
             }
@@ -330,17 +330,17 @@ export const useInventory = create<InventoryState>()(
                 ...new Set(
                   allItems
                     .map((i) => i.supplier)
-                    .filter((s): s is string => Boolean(s))
+                    .filter((s): s is string => Boolean(s)),
                 ),
               ].sort(),
               locations: [
                 ...new Set(
                   allItems
                     .map((i) => i.location)
-                    .filter((l): l is string => Boolean(l))
+                    .filter((l): l is string => Boolean(l)),
                 ),
               ].sort(),
-              statuses: ["IN_STOCK", "LOW", "OUT"],
+              statuses: ['IN_STOCK', 'LOW', 'OUT'],
             },
           };
         });
@@ -379,11 +379,11 @@ export const useInventory = create<InventoryState>()(
                   ...updatedItem,
                   status: computeStatus(
                     updatedItem.quantity,
-                    updatedItem.reorderLevel
+                    updatedItem.reorderLevel,
                   ),
                   updatedAt: new Date().toISOString(),
                 }
-              : item
+              : item,
           );
 
           const alerts = computeAlerts(updatedAllItems);
@@ -417,8 +417,8 @@ export const useInventory = create<InventoryState>()(
             if (item.id !== itemId) return item;
 
             let newQty = item.quantity;
-            if (mode === "INCREASE") newQty += quantity;
-            else if (mode === "DECREASE") newQty -= quantity;
+            if (mode === 'INCREASE') newQty += quantity;
+            else if (mode === 'DECREASE') newQty -= quantity;
             else newQty = quantity;
 
             if (newQty < 0) newQty = 0;
@@ -443,10 +443,10 @@ export const useInventory = create<InventoryState>()(
             resultingQuantity:
               updatedAllItems.find((it) => it.id === itemId)?.quantity || 0,
             referenceType: jobSheetId
-              ? "JOB_SHEET"
+              ? 'JOB_SHEET'
               : bookingId
-              ? "BOOKING"
-              : "MANUAL",
+                ? 'BOOKING'
+                : 'MANUAL',
             jobSheetId,
             bookingId,
             serviceId,
@@ -479,25 +479,25 @@ export const useInventory = create<InventoryState>()(
       getMovementsByItem: (itemId, filters = {}) => {
         const state = get();
         const {
-          type = "ALL",
+          type = 'ALL',
           q,
           from,
           to,
-          referenceType = "ALL",
+          referenceType = 'ALL',
           page = 1,
           limit = 20,
         } = filters;
 
         let list = [...(state.movements[itemId] ?? [])];
-        if (type !== "ALL") list = list.filter((m) => m.type === type);
-        if (referenceType !== "ALL")
+        if (type !== 'ALL') list = list.filter((m) => m.type === type);
+        if (referenceType !== 'ALL')
           list = list.filter((m) => m.referenceType === referenceType);
         if (q) {
           const s = q.toLowerCase();
           list = list.filter(
             (m) =>
               (m.reason && m.reason.toLowerCase().includes(s)) ||
-              (m.notes && m.notes.toLowerCase().includes(s))
+              (m.notes && m.notes.toLowerCase().includes(s)),
           );
         }
         if (from)
@@ -519,20 +519,20 @@ export const useInventory = create<InventoryState>()(
       },
     }),
     {
-      name: "inventory-storage",
+      name: 'inventory-storage',
       partialize: (state) => ({
         allItems: state.allItems,
         movements: state.movements,
       }),
-    }
-  )
+    },
+  ),
 );
 
 function computeAlerts(items: InventoryItem[]) {
-  const lowCount = items.filter((item) => item.status === "LOW").length;
-  const outCount = items.filter((item) => item.status === "OUT").length;
-  const lowItems = items.filter((item) => item.status === "LOW");
-  const outItems = items.filter((item) => item.status === "OUT");
+  const lowCount = items.filter((item) => item.status === 'LOW').length;
+  const outCount = items.filter((item) => item.status === 'OUT').length;
+  const lowItems = items.filter((item) => item.status === 'LOW');
+  const outItems = items.filter((item) => item.status === 'OUT');
   return { lowCount, outCount, lowItems, outItems };
 }
 // Initialize the store with computed data after persistence loads

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface TableLoaderProps {
   rows?: number;
@@ -8,7 +8,7 @@ interface TableLoaderProps {
 export function TableLoader({ rows = 3, className }: TableLoaderProps) {
   return (
     <div
-      className={cn("bg-white rounded-lg shadow overflow-hidden", className)}
+      className={cn('bg-white rounded-lg shadow overflow-hidden', className)}
     >
       <div className="animate-pulse">
         {Array.from({ length: rows }).map((_, i) => (

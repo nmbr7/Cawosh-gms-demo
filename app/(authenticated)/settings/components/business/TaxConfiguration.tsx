@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import type { Garage } from "@/app/models/garage";
-import type { TaxForm } from "@/app/models/taxform";
-import { toast } from "sonner";
-import { useGarageStore } from "@/store/garage";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import type { Garage } from '@/app/models/garage';
+import type { TaxForm } from '@/app/models/taxform';
+import { toast } from 'sonner';
+import { useGarageStore } from '@/store/garage';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 export default function TaxSettings({
   garage,
@@ -29,7 +29,7 @@ export default function TaxSettings({
       !garage.billing ||
       !garage.billing.taxRegistrationAddress
     ) {
-      setError("Failed to parse tax configuration: missing data.");
+      setError('Failed to parse tax configuration: missing data.');
       return null;
     }
     return {
@@ -55,7 +55,7 @@ export default function TaxSettings({
 
   const handleChange = (
     field: keyof TaxForm,
-    value: string | number | boolean
+    value: string | number | boolean,
   ) => {
     setForm((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
@@ -93,20 +93,20 @@ export default function TaxSettings({
         },
       };
       const response = await fetchWithAuth(`/api/garages/${garage.id}/tax`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
       if (!response.ok) {
-        throw new Error("Failed to update tax configuration");
+        throw new Error('Failed to update tax configuration');
       }
       const garageResponse = await fetchWithAuth(`/api/garage-settings`);
       const garageData = await garageResponse.json();
       console.log(
-        "Fetched taxRate from backend:",
-        garageData.data.settings.taxRate
+        'Fetched taxRate from backend:',
+        garageData.data.settings.taxRate,
       );
       useGarageStore.getState().setGarage(garageData.data);
       setForm({
@@ -122,13 +122,13 @@ export default function TaxSettings({
         zipCode: garageData.data.billing.taxRegistrationAddress.zipCode,
         country: garageData.data.billing.taxRegistrationAddress.country,
       });
-      toast.success("Tax configuration updated successfully!");
+      toast.success('Tax configuration updated successfully!');
       setIsEditing(false);
     } catch (error) {
       toast.error(
         `Failed to update tax configuration: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       );
     }
   };
@@ -162,7 +162,7 @@ export default function TaxSettings({
               value={form.taxRate}
               disabled={!isEditing}
               onChange={(e) =>
-                handleChange("taxRate", parseFloat(e.target.value) || 0)
+                handleChange('taxRate', parseFloat(e.target.value) || 0)
               }
             />
           </div>
@@ -181,12 +181,12 @@ export default function TaxSettings({
                 checked={form.allowOnlineBooking}
                 disabled={!isEditing}
                 onCheckedChange={(checked) =>
-                  handleChange("allowOnlineBooking", checked)
+                  handleChange('allowOnlineBooking', checked)
                 }
                 id="online-booking-switch"
               />
               <span className="text-sm text-gray-600">
-                {form.allowOnlineBooking ? "Enabled" : "Disabled"}
+                {form.allowOnlineBooking ? 'Enabled' : 'Disabled'}
               </span>
             </div>
           </div>
@@ -201,7 +201,7 @@ export default function TaxSettings({
                 value={form.taxRegistrationNumber}
                 disabled={!isEditing}
                 onChange={(e) =>
-                  handleChange("taxRegistrationNumber", e.target.value)
+                  handleChange('taxRegistrationNumber', e.target.value)
                 }
               />
             </div>
@@ -211,7 +211,7 @@ export default function TaxSettings({
                 value={form.taxRegistrationName}
                 disabled={!isEditing}
                 onChange={(e) =>
-                  handleChange("taxRegistrationName", e.target.value)
+                  handleChange('taxRegistrationName', e.target.value)
                 }
               />
             </div>
@@ -225,7 +225,7 @@ export default function TaxSettings({
                 <Input
                   value={form.street}
                   disabled={!isEditing}
-                  onChange={(e) => handleChange("street", e.target.value)}
+                  onChange={(e) => handleChange('street', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -233,7 +233,7 @@ export default function TaxSettings({
                 <Input
                   value={form.city}
                   disabled={!isEditing}
-                  onChange={(e) => handleChange("city", e.target.value)}
+                  onChange={(e) => handleChange('city', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -241,7 +241,7 @@ export default function TaxSettings({
                 <Input
                   value={form.state}
                   disabled={!isEditing}
-                  onChange={(e) => handleChange("state", e.target.value)}
+                  onChange={(e) => handleChange('state', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -249,7 +249,7 @@ export default function TaxSettings({
                 <Input
                   value={form.zipCode}
                   disabled={!isEditing}
-                  onChange={(e) => handleChange("zipCode", e.target.value)}
+                  onChange={(e) => handleChange('zipCode', e.target.value)}
                 />
               </div>
               <div className="space-y-2">

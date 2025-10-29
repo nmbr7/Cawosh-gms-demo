@@ -4,11 +4,11 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { EmploymentType } from "@/app/models/user";
-import { useUserFormOptions } from "@/hooks/useUserFormOptions";
-import { memo, useMemo } from "react";
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { EmploymentType } from '@/app/models/user';
+import { useUserFormOptions } from '@/hooks/useUserFormOptions';
+import { memo, useMemo } from 'react';
 
 interface EmploymentDetailsProps {
   position: string;
@@ -52,10 +52,10 @@ export const EmploymentDetails = memo(function EmploymentDetails({
     return departments;
   }, [formOptions.departments, department]);
 
-  console.log("EmploymentDetails render - position:", position);
-  console.log("EmploymentDetails render - department:", department);
-  console.log("EmploymentDetails render - employmentType:", employmentType);
-  console.log("EmploymentDetails render - joiningDate:", joiningDate);
+  console.log('EmploymentDetails render - position:', position);
+  console.log('EmploymentDetails render - department:', department);
+  console.log('EmploymentDetails render - employmentType:', employmentType);
+  console.log('EmploymentDetails render - joiningDate:', joiningDate);
 
   return (
     <div className="space-y-4">
@@ -71,7 +71,7 @@ export const EmploymentDetails = memo(function EmploymentDetails({
         >
           <SelectTrigger className="bg-white">
             <SelectValue
-              placeholder={isLoadingOptions ? "Loading..." : "Select position"}
+              placeholder={isLoadingOptions ? 'Loading...' : 'Select position'}
             />
           </SelectTrigger>
           <SelectContent className="bg-white">
@@ -96,7 +96,7 @@ export const EmploymentDetails = memo(function EmploymentDetails({
           <SelectTrigger className="bg-white">
             <SelectValue
               placeholder={
-                isLoadingOptions ? "Loading..." : "Select department"
+                isLoadingOptions ? 'Loading...' : 'Select department'
               }
             />
           </SelectTrigger>
@@ -145,4 +145,4 @@ export const EmploymentDetails = memo(function EmploymentDetails({
   );
 });
 
-EmploymentDetails.displayName = "EmploymentDetails";
+EmploymentDetails.displayName = 'EmploymentDetails';

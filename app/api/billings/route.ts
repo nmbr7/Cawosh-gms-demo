@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import mockBillings from "@/app/data/mock-billings.json";
+import { NextResponse } from 'next/server';
+import mockBillings from '@/app/data/mock-billings.json';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const page = parseInt(searchParams.get("page") || "1");
-  const limit = parseInt(searchParams.get("limit") || "10");
-  const search = searchParams.get("search") || "";
-  const service = searchParams.get("service") || "all";
-  const date = searchParams.get("date") || "";
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '10');
+  const search = searchParams.get('search') || '';
+  const service = searchParams.get('service') || 'all';
+  const date = searchParams.get('date') || '';
 
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -19,9 +19,9 @@ export async function GET(request: Request) {
       billing.invoiceNumber.toLowerCase().includes(search.toLowerCase());
 
     const matchesService =
-      service === "all" || billing.serviceDetails.description === service;
+      service === 'all' || billing.serviceDetails.description === service;
 
-    const matchesDate = date === "" || billing.serviceDetails.date === date;
+    const matchesDate = date === '' || billing.serviceDetails.date === date;
 
     return matchesSearch && matchesService && matchesDate;
   });
@@ -30,12 +30,12 @@ export async function GET(request: Request) {
   const startIndex = (page - 1) * limit;
   const paginatedBillings = filteredBillings.slice(
     startIndex,
-    startIndex + limit
+    startIndex + limit,
   );
 
   // Get unique service types for filter options
   const serviceTypes = Array.from(
-    new Set(mockBillings.billings.map((b) => b.serviceDetails.description))
+    new Set(mockBillings.billings.map((b) => b.serviceDetails.description)),
   );
 
   return NextResponse.json({

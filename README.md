@@ -29,16 +29,16 @@ Out of scope (v1): PDF export, offline mode, customer portal view.
 
 ```ts
 // types/vhc.ts
-export type Powertrain = "ice" | "ev" | "hybrid";
+export type Powertrain = 'ice' | 'ev' | 'hybrid';
 
 export type VHCOptionValue = number | string | boolean;
 
 export type VHCItemType =
-  | "radio" // usually 1..5 scale
-  | "checkbox" // boolean pass/fail
-  | "range" // numeric range
-  | "tread-depth" // mm, auto-rated via thresholds
-  | "note"; // free text
+  | 'radio' // usually 1..5 scale
+  | 'checkbox' // boolean pass/fail
+  | 'range' // numeric range
+  | 'tread-depth' // mm, auto-rated via thresholds
+  | 'note'; // free text
 
 export interface VHCScoreMap {
   [optionValue: string]: number;
@@ -83,11 +83,11 @@ export interface VHCTemplate {
 }
 
 export type VHCStatus =
-  | "draft"
-  | "in_progress"
-  | "submitted"
-  | "approved"
-  | "void";
+  | 'draft'
+  | 'in_progress'
+  | 'submitted'
+  | 'approved'
+  | 'void';
 
 export interface VHCAnswer {
   itemId: string;
@@ -145,19 +145,16 @@ Authentication: bearer/session via existing middleware. Authorization via roles 
 #### Responses
 
 - `POST /api/vhc/responses`
-
   - Body: `{ templateId, powertrain, vehicleId, bookingId?, serviceIds?, assignedTo?, dueAt? }`
   - Creates a `VHCResponse` in `in_progress` (or `draft") state.
 
 - `GET /api/vhc/responses`
-
   - Query: `status?, vehicleId?, bookingId?, assignedTo?, from?, to?`
   - Returns paginated list.
 
 - `GET /api/vhc/responses/:id` → Fetch a response with template snapshot if needed.
 
 - `PATCH /api/vhc/responses/:id`
-
   - Body: `{ answers: VHCAnswer[] }`
   - Merges answers, recomputes `scores` and `progress` server-side.
 

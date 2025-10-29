@@ -1,6 +1,12 @@
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserStatus } from "@/app/models/user";
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { UserStatus } from '@/app/models/user';
 
 interface StatusSelectProps {
   status: UserStatus;
@@ -8,10 +14,16 @@ interface StatusSelectProps {
   disabled?: boolean;
 }
 
-export function StatusSelect({ status, onStatusChange, disabled = false }: StatusSelectProps) {
+export function StatusSelect({
+  status,
+  onStatusChange,
+  disabled = false,
+}: StatusSelectProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="status">Status <span className="text-red-500">*</span></Label>
+      <Label htmlFor="status">
+        Status <span className="text-red-500">*</span>
+      </Label>
       <Select
         value={status}
         onValueChange={(value) => onStatusChange(value as UserStatus)}
@@ -29,4 +41,4 @@ export function StatusSelect({ status, onStatusChange, disabled = false }: Statu
       </Select>
     </div>
   );
-} 
+}

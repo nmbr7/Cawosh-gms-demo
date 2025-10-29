@@ -1,6 +1,6 @@
-export type UserRole = "admin" | "manager" | "staff" | "technician";
-export type UserStatus = "active" | "inactive" | "on-leave";
-export type EmploymentType = "full-time" | "part-time" | "contract";
+export type UserRole = 'admin' | 'manager' | 'staff' | 'technician';
+export type UserStatus = 'active' | 'inactive' | 'on-leave';
+export type EmploymentType = 'full-time' | 'part-time' | 'contract';
 
 export interface UserData {
   id: string;
@@ -156,27 +156,27 @@ export class User {
 
   getStatusColor() {
     switch (this.data.status) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "inactive":
-        return "bg-red-100 text-red-800";
-      case "on-leave":
-        return "bg-yellow-100 text-yellow-800";
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'inactive':
+        return 'bg-red-100 text-red-800';
+      case 'on-leave':
+        return 'bg-yellow-100 text-yellow-800';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   }
 
   getRoleColor() {
     switch (this.data.role) {
-      case "admin":
-        return "bg-purple-100 text-purple-800";
-      case "manager":
-        return "bg-blue-100 text-blue-800";
-      case "staff":
-        return "bg-green-100 text-green-800";
+      case 'admin':
+        return 'bg-purple-100 text-purple-800';
+      case 'manager':
+        return 'bg-blue-100 text-blue-800';
+      case 'staff':
+        return 'bg-green-100 text-green-800';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   }
 }

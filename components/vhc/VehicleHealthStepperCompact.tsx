@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 export type VHCRadioOption = {
   value: number | string;
@@ -22,7 +22,7 @@ export type VHCSection = {
   illustrationCaption?: string;
 };
 
-export type SectionStatus = "done" | "current" | "todo";
+export type SectionStatus = 'done' | 'current' | 'todo';
 
 type Props = {
   sections: VHCSection[];
@@ -36,7 +36,7 @@ type Props = {
   onPrev: () => void;
   onNext: () => void;
   onJumpToSection: (index: number) => void;
-  onExit: (action: "save" | "exit" | "cancel") => void;
+  onExit: (action: 'save' | 'exit' | 'cancel') => void;
 };
 
 export function VehicleHealthStepperCompact({
@@ -73,18 +73,18 @@ export function VehicleHealthStepperCompact({
       <nav aria-label="Progress" className="pb-4" role="group">
         <ol className="flex items-center gap-2">
           {sections.map((s, idx) => {
-            const status = sectionStatuses[idx] ?? "todo";
+            const status = sectionStatuses[idx] ?? 'todo';
             const color =
-              status === "done"
-                ? "bg-green-500"
-                : status === "current"
-                ? "bg-orange-500"
-                : "bg-gray-300";
+              status === 'done'
+                ? 'bg-green-500'
+                : status === 'current'
+                  ? 'bg-orange-500'
+                  : 'bg-gray-300';
             return (
               <li key={s.id} className="flex items-center gap-2">
                 <button
                   type="button"
-                  aria-current={status === "current" ? "step" : undefined}
+                  aria-current={status === 'current' ? 'step' : undefined}
                   aria-label={`Go to ${s.title}`}
                   onClick={() => onJumpToSection(idx)}
                   className={`h-3.5 w-3.5 rounded-full ${color}`}
@@ -135,14 +135,14 @@ export function VehicleHealthStepperCompact({
                           key={String(opt.value)}
                           className={`flex items-center gap-3 rounded-md px-3 py-2 cursor-pointer border transition-colors ${
                             currentValue === opt.value
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-transparent hover:bg-gray-100"
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-transparent hover:bg-gray-100'
                           }`}
                         >
                           <input
                             type="radio"
                             aria-labelledby={`${groupName}-${String(
-                              opt.value
+                              opt.value,
                             )}`}
                             className="h-5 w-5 accent-blue-600"
                             name={groupName}
@@ -215,7 +215,7 @@ export function VehicleHealthStepperCompact({
                 className="px-3 py-2 rounded-md border bg-white hover:bg-gray-50 text-sm"
                 onClick={() => {
                   setConfirmOpen(false);
-                  onExit("cancel");
+                  onExit('cancel');
                 }}
               >
                 Cancel
@@ -224,7 +224,7 @@ export function VehicleHealthStepperCompact({
                 className="px-3 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-sm"
                 onClick={() => {
                   setConfirmOpen(false);
-                  onExit("exit");
+                  onExit('exit');
                 }}
               >
                 Exit Without Saving
@@ -233,7 +233,7 @@ export function VehicleHealthStepperCompact({
                 className="px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm"
                 onClick={() => {
                   setConfirmOpen(false);
-                  onExit("save");
+                  onExit('save');
                 }}
               >
                 Save & Exit

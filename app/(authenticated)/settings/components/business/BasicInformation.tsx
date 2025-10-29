@@ -1,18 +1,18 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { useGarageStore } from "@/store/garage";
-import type { Garage } from "@/app/models/garage";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { useGarageStore } from '@/store/garage';
+import type { Garage } from '@/app/models/garage';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 export default function BasicInformation({
   garage,
@@ -21,12 +21,12 @@ export default function BasicInformation({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: garage?.name || "",
-    street: garage?.address.street || "",
-    city: garage?.address.city || "",
-    state: garage?.address.state || "",
-    zipCode: garage?.address.zipCode || "",
-    country: garage?.address.country || "",
+    name: garage?.name || '',
+    street: garage?.address.street || '',
+    city: garage?.address.city || '',
+    state: garage?.address.state || '',
+    zipCode: garage?.address.zipCode || '',
+    country: garage?.address.country || '',
   });
 
   const hasChanges = () => {
@@ -43,10 +43,10 @@ export default function BasicInformation({
 
   const handleSave = async () => {
     try {
-      const response = await fetchWithAuth("/api/garage-settings/basic", {
-        method: "PATCH",
+      const response = await fetchWithAuth('/api/garage-settings/basic', {
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           name: formData.name,
@@ -61,36 +61,36 @@ export default function BasicInformation({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update garage information");
+        throw new Error('Failed to update garage information');
       }
 
       const data = await response.json();
       useGarageStore.getState().setGarage(data.data);
-      toast.success("Garage information updated successfully");
+      toast.success('Garage information updated successfully');
       setIsEditing(false);
     } catch (error) {
       toast.error(
         `Failed to update garage information: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
       );
     }
   };
 
   const handleCancel = () => {
     setFormData({
-      name: garage?.name || "",
-      street: garage?.address.street || "",
-      city: garage?.address.city || "",
-      state: garage?.address.state || "",
-      zipCode: garage?.address.zipCode || "",
-      country: garage?.address.country || "",
+      name: garage?.name || '',
+      street: garage?.address.street || '',
+      city: garage?.address.city || '',
+      state: garage?.address.state || '',
+      zipCode: garage?.address.zipCode || '',
+      country: garage?.address.country || '',
     });
     setIsEditing(false);
   };
 
   const formatAddress = () => {
-    if (!garage) return "";
+    if (!garage) return '';
     const { street, city, state, zipCode, country } = garage.address;
     return `${street}, ${city}, ${state} ${zipCode}, ${country}`;
   };
@@ -106,7 +106,7 @@ export default function BasicInformation({
             </CardDescription>
           </div>
           <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
-            {isEditing ? "Cancel" : "Edit"}
+            {isEditing ? 'Cancel' : 'Edit'}
           </Button>
         </div>
       </CardHeader>

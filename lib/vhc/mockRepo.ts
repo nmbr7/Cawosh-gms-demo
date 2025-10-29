@@ -1,15 +1,15 @@
-import fs from "fs";
-import path from "path";
-import { randomUUID } from "crypto";
-import { VHCResponse, VHCTemplate, Powertrain, VHCAnswer } from "@/types/vhc";
+import fs from 'fs';
+import path from 'path';
+import { randomUUID } from 'crypto';
+import { VHCResponse, VHCTemplate, Powertrain, VHCAnswer } from '@/types/vhc';
 
 type DBShape = { templates: VHCTemplate[]; responses: VHCResponse[] };
 
-const DB_FILE = path.join(process.cwd(), "mock-db", "vhc.json");
+const DB_FILE = path.join(process.cwd(), 'mock-db', 'vhc.json');
 
 function readDB(): DBShape {
   try {
-    const raw = fs.readFileSync(DB_FILE, "utf-8");
+    const raw = fs.readFileSync(DB_FILE, 'utf-8');
     return JSON.parse(raw) as DBShape;
   } catch {
     return { templates: [], responses: [] };
@@ -51,7 +51,7 @@ class VHCMockRepo {
     page?: number;
     limit?: number;
     sortBy?: string;
-    sortOrder?: "asc" | "desc";
+    sortOrder?: 'asc' | 'desc';
     startDate?: string;
     endDate?: string;
   }) {
@@ -63,13 +63,13 @@ class VHCMockRepo {
       rs = rs.filter((r) => r.assignedTo === params.assignedTo);
     if (params?.vehicleId)
       rs = rs.filter((r) =>
-        r.vehicleId.toLowerCase().includes(params.vehicleId!.toLowerCase())
+        r.vehicleId.toLowerCase().includes(params.vehicleId!.toLowerCase()),
       );
     if (params?.powertrain)
       rs = rs.filter((r) => r.powertrain === params.powertrain);
     if (params?.createdBy)
       rs = rs.filter((r) =>
-        r.createdBy.toLowerCase().includes(params.createdBy!.toLowerCase())
+        r.createdBy.toLowerCase().includes(params.createdBy!.toLowerCase()),
       );
 
     // Apply date filters
@@ -90,27 +90,27 @@ class VHCMockRepo {
         let bValue: string | number;
 
         switch (params.sortBy) {
-          case "createdAt":
+          case 'createdAt':
             aValue = new Date(a.createdAt).getTime();
             bValue = new Date(b.createdAt).getTime();
             break;
-          case "updatedAt":
+          case 'updatedAt':
             aValue = new Date(a.updatedAt).getTime();
             bValue = new Date(b.updatedAt).getTime();
             break;
-          case "vehicleId":
+          case 'vehicleId':
             aValue = a.vehicleId.toLowerCase();
             bValue = b.vehicleId.toLowerCase();
             break;
-          case "status":
+          case 'status':
             aValue = a.status;
             bValue = b.status;
             break;
-          case "powertrain":
+          case 'powertrain':
             aValue = a.powertrain;
             bValue = b.powertrain;
             break;
-          case "score":
+          case 'score':
             aValue = a.scores?.total || 0;
             bValue = b.scores?.total || 0;
             break;
@@ -119,8 +119,8 @@ class VHCMockRepo {
             bValue = b.createdAt;
         }
 
-        if (aValue < bValue) return params.sortOrder === "asc" ? -1 : 1;
-        if (aValue > bValue) return params.sortOrder === "asc" ? 1 : -1;
+        if (aValue < bValue) return params.sortOrder === 'asc' ? -1 : 1;
+        if (aValue > bValue) return params.sortOrder === 'asc' ? 1 : -1;
         return 0;
       });
     }
@@ -159,14 +159,14 @@ class VHCMockRepo {
     createdBy: string;
   }): VHCResponse {
     const template = this.db.templates.find((t) => t.id === input.templateId);
-    if (!template) throw new Error("Template not found");
+    if (!template) throw new Error('Template not found');
     const now = new Date().toISOString();
     const response: VHCResponse = {
       id: randomUUID(),
       templateId: template.id,
       templateVersion: template.version,
       powertrain: input.powertrain,
-      status: "in_progress",
+      status: 'in_progress',
       vehicleId: input.vehicleId,
       bookingId: input.bookingId,
       serviceIds: input.serviceIds,
@@ -184,7 +184,7 @@ class VHCMockRepo {
 
   updateAnswers(id: string, answers: VHCAnswer[]) {
     const res = this.getResponse(id);
-    if (!res) throw new Error("Response not found");
+    if (!res) throw new Error('Response not found');
     const map = new Map(res.answers.map((a) => [a.itemId, a] as const));
     for (const a of answers)
       map.set(a.itemId, { ...map.get(a.itemId), ...a } as VHCAnswer);
@@ -194,7 +194,7 @@ class VHCMockRepo {
     const template = this.db.templates.find((t) => t.id === res.templateId);
     const activeSections =
       template?.sections.filter(
-        (s) => !s.applicable_to || s.applicable_to.includes(res.powertrain)
+        (s) => !s.applicable_to || s.applicable_to.includes(res.powertrain),
       ) || [];
 
     const sectionScores: Record<string, number> = {};
@@ -204,7 +204,7 @@ class VHCMockRepo {
     // Calculate section scores
     for (const section of activeSections) {
       const sectionAnswers = res.answers.filter((answer) =>
-        section.items.some((item) => item.id === answer.itemId)
+        section.items.some((item) => item.id === answer.itemId),
       );
 
       if (sectionAnswers.length === 0) {
@@ -218,7 +218,7 @@ class VHCMockRepo {
 
       for (const answer of sectionAnswers) {
         const item = section.items.find((item) => item.id === answer.itemId);
-        if (item && typeof answer.value === "number") {
+        if (item && typeof answer.value === 'number') {
           // Normalize answer value (1-5) to 0-1 scale, then apply item weight
           const normalizedValue = (answer.value - 1) / 4; // 1->0, 2->0.25, 3->0.5, 4->0.75, 5->1
           const itemScore = normalizedValue * item.weight;
@@ -239,7 +239,7 @@ class VHCMockRepo {
     const overallScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 
     const answered = res.answers.filter(
-      (a) => a.value !== undefined && a.value !== null
+      (a) => a.value !== undefined && a.value !== null,
     ).length;
     const total = activeSections.reduce((acc, s) => acc + s.items.length, 0);
 

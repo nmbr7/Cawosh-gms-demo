@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { NextResponse } from 'next/server';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Define interfaces
 interface Technician {
@@ -50,17 +50,17 @@ export async function GET(request: Request) {
   try {
     // Get query parameters
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const status = searchParams.get("status");
-    const bookingId = searchParams.get("bookingId");
-    const technicianId = searchParams.get("technicianId");
-    const sortBy = searchParams.get("sortBy") || "id";
-    const sortOrder = searchParams.get("sortOrder") || "desc";
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const status = searchParams.get('status');
+    const bookingId = searchParams.get('bookingId');
+    const technicianId = searchParams.get('technicianId');
+    const sortBy = searchParams.get('sortBy') || 'id';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // Read the mock database file
-    const dbPath = path.join(process.cwd(), "app/mock-db/db.json");
-    const dbContent = await fs.readFile(dbPath, "utf-8");
+    const dbPath = path.join(process.cwd(), 'app/mock-db/db.json');
+    const dbContent = await fs.readFile(dbPath, 'utf-8');
     const db = JSON.parse(dbContent);
 
     // Get job sheets, technicians, and bookings from the database
@@ -71,11 +71,11 @@ export async function GET(request: Request) {
     // Create maps for quick lookup
     const technicianMap = new Map(technicians.map((tech) => [tech.id, tech]));
     const bookingMap = new Map(
-      bookings.map((booking) => [booking.id, booking])
+      bookings.map((booking) => [booking.id, booking]),
     );
 
     // Apply filters
-    if (status && status !== "all") {
+    if (status && status !== 'all') {
       jobSheets = jobSheets.filter((js) => js.status === status);
     }
     if (bookingId) {
@@ -92,10 +92,10 @@ export async function GET(request: Request) {
 
       // Handle undefined values
       if (aValue === undefined && bValue === undefined) return 0;
-      if (aValue === undefined) return sortOrder === "asc" ? 1 : -1;
-      if (bValue === undefined) return sortOrder === "asc" ? -1 : 1;
+      if (aValue === undefined) return sortOrder === 'asc' ? 1 : -1;
+      if (bValue === undefined) return sortOrder === 'asc' ? -1 : 1;
 
-      if (sortOrder === "asc") {
+      if (sortOrder === 'asc') {
         return aValue > bValue ? 1 : -1;
       }
       return aValue < bValue ? 1 : -1;
@@ -126,9 +126,9 @@ export async function GET(request: Request) {
     console.log({
       technicians: technicians, // Return all technicians from the database
       statuses: [
-        { value: "completed", label: "Completed" },
-        { value: "in_progress", label: "In Progress" },
-        { value: "not_started", label: "Not Started" },
+        { value: 'completed', label: 'Completed' },
+        { value: 'in_progress', label: 'In Progress' },
+        { value: 'not_started', label: 'Not Started' },
       ],
     });
 
@@ -139,17 +139,17 @@ export async function GET(request: Request) {
       filters: {
         technicians: technicians, // Return all technicians from the database
         statuses: [
-          { value: "completed", label: "Completed" },
-          { value: "in_progress", label: "In Progress" },
-          { value: "not_started", label: "Not Started" },
+          { value: 'completed', label: 'Completed' },
+          { value: 'in_progress', label: 'In Progress' },
+          { value: 'not_started', label: 'Not Started' },
         ],
       },
     });
   } catch (error) {
-    console.error("Error in job sheet API:", error);
+    console.error('Error in job sheet API:', error);
     return NextResponse.json(
-      { error: "Failed to fetch job sheets" },
-      { status: 500 }
+      { error: 'Failed to fetch job sheets' },
+      { status: 500 },
     );
   }
 }

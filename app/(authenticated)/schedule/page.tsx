@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Calendar } from "@/app/components/calendar";
-import { MonthView } from "@/app/components/month-view";
-import { Booking } from "@/app/models/booking";
-import { format } from "date-fns";
-import { DayView } from "@/app/components/day-view";
-import { WeekView } from "@/app/components/week-view";
+import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar } from '@/app/components/calendar';
+import { MonthView } from '@/app/components/month-view';
+import { Booking } from '@/app/models/booking';
+import { format } from 'date-fns';
+import { DayView } from '@/app/components/day-view';
+import { WeekView } from '@/app/components/week-view';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { useGarageStore } from "@/store/garage";
+} from '@/components/ui/select';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { useGarageStore } from '@/store/garage';
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedBay, setSelectedBay] = useState<"all" | number>("all");
-  const [viewMode, setViewMode] = useState<"Day" | "Week" | "Month">("Month");
+  const [selectedBay, setSelectedBay] = useState<'all' | number>('all');
+  const [viewMode, setViewMode] = useState<'Day' | 'Week' | 'Month'>('Month');
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,19 +37,19 @@ export default function SchedulePage() {
         const monthStart = new Date(
           selectedDate.getFullYear(),
           selectedDate.getMonth(),
-          1
+          1,
         );
         const monthEnd = new Date(
           selectedDate.getFullYear(),
           selectedDate.getMonth() + 1,
-          0
+          0,
         );
 
-        const startDateStr = format(monthStart, "yyyy-MM-dd");
-        const endDateStr = format(monthEnd, "yyyy-MM-dd");
+        const startDateStr = format(monthStart, 'yyyy-MM-dd');
+        const endDateStr = format(monthEnd, 'yyyy-MM-dd');
 
         if (!garage) {
-          throw new Error("Garage not found");
+          throw new Error('Garage not found');
         }
 
         // Build query parameters
@@ -57,21 +57,21 @@ export default function SchedulePage() {
           garageId: garage.id,
           startDate: startDateStr,
           endDate: endDateStr,
-          all: "true",
+          all: 'true',
         };
-        if (selectedBay !== "all") {
+        if (selectedBay !== 'all') {
           paramsObj.bay = selectedBay.toString();
         }
         const params = new URLSearchParams(paramsObj);
 
         const response = await fetchWithAuth(
-          `/api/bookings?${params.toString()}`
+          `/api/bookings?${params.toString()}`,
         );
         const data = await response.json();
 
         setBookings(data.bookings);
       } catch (error) {
-        console.error("Error fetching bookings:", error);
+        console.error('Error fetching bookings:', error);
       } finally {
         setIsLoading(false);
       }
@@ -82,7 +82,7 @@ export default function SchedulePage() {
 
   useEffect(() => {
     // If 'All Bays' is selected and viewMode is not 'Month', switch to Bay 1
-    if (selectedBay === "all" && viewMode !== "Month") {
+    if (selectedBay === 'all' && viewMode !== 'Month') {
       setSelectedBay(1);
     }
   }, [viewMode, selectedBay]);
@@ -90,7 +90,7 @@ export default function SchedulePage() {
   // Generate time slots from 8 AM to 5 PM
   const timeSlots = Array.from({ length: 10 }, (_, i) => {
     const hour = i + 8;
-    return `${hour.toString().padStart(2, "0")}:00`;
+    return `${hour.toString().padStart(2, '0')}:00`;
   });
 
   // Get week dates
@@ -106,10 +106,10 @@ export default function SchedulePage() {
   };
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
+    return new Intl.DateTimeFormat('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
     }).format(date);
   };
 
@@ -124,7 +124,7 @@ export default function SchedulePage() {
 
   const handleDayClick = (date: Date) => {
     setSelectedDate(date);
-    setViewMode("Day");
+    setViewMode('Day');
   };
 
   const handlePreviousDay = () => {
@@ -181,8 +181,8 @@ export default function SchedulePage() {
             <Select
               value={selectedBay.toString()}
               onValueChange={(value) =>
-                value === "all"
-                  ? setSelectedBay("all")
+                value === 'all'
+                  ? setSelectedBay('all')
                   : setSelectedBay(parseInt(value))
               }
             >
@@ -190,7 +190,7 @@ export default function SchedulePage() {
                 <SelectValue placeholder="Select bay" />
               </SelectTrigger>
               <SelectContent className="bg-white">
-                {viewMode === "Month" && (
+                {viewMode === 'Month' && (
                   <SelectItem value="all" className="hover:bg-gray-100">
                     All Bays
                   </SelectItem>
@@ -211,7 +211,7 @@ export default function SchedulePage() {
             <Select
               value={viewMode}
               onValueChange={(value) =>
-                setViewMode(value as "Day" | "Week" | "Month")
+                setViewMode(value as 'Day' | 'Week' | 'Month')
               }
             >
               <SelectTrigger className="w-[180px] bg-white">
@@ -242,14 +242,14 @@ export default function SchedulePage() {
               <div className="w-12 h-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin absolute top-0 left-0"></div>
             </div>
           </div>
-        ) : viewMode === "Month" ? (
+        ) : viewMode === 'Month' ? (
           <MonthView
             selectedDate={selectedDate}
             selectedBay={selectedBay}
             bookings={bookings}
             onDayClick={handleDayClick}
           />
-        ) : viewMode === "Day" ? (
+        ) : viewMode === 'Day' ? (
           <DayView
             selectedDate={selectedDate}
             selectedBay={selectedBay}

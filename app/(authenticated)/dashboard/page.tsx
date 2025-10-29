@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DashboardStatCard } from "@/app/components/DashboardStatCard";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DashboardStatCard } from '@/app/components/DashboardStatCard';
 
 import {
   Calendar,
@@ -13,7 +13,7 @@ import {
   Timer,
   ArrowsClockwise,
   // ArrowClockwise,
-} from "phosphor-react";
+} from 'phosphor-react';
 
 export default function DashboardPage() {
   return (

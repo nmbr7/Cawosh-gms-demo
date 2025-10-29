@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function POST() {
   try {
@@ -10,10 +10,10 @@ export async function POST() {
     // 2. Send the OTP via email
 
     return NextResponse.json({
-      message: "OTP sent successfully",
+      message: 'OTP sent successfully',
       otp, // Remove this in production
     });
   } catch {
-    return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to send OTP' }, { status: 500 });
   }
 }

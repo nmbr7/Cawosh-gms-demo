@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
 export interface Service {
   id: string;
@@ -40,17 +40,17 @@ interface ServiceApiResponse {
 
 // Helper to normalize API response to flat Service[]
 export function normalizeServiceApiResponse(
-  apiData: ServiceApiResponse
+  apiData: ServiceApiResponse,
 ): Service[] {
   if (!apiData || !Array.isArray(apiData.data)) return [];
   return apiData.data.map((item) => {
     return {
-      id: item._doc?.serviceId || item.serviceId || "",
+      id: item._doc?.serviceId || item.serviceId || '',
       isActive: item._doc?.isActive ?? item.isActive ?? false,
       customPrice: item._doc?.customPrice ?? item.customPrice,
       customDuration: item._doc?.customDuration ?? item.customDuration,
-      name: item.name || item._doc?.name || "",
-      description: item.description || item._doc?.description || "",
+      name: item.name || item._doc?.name || '',
+      description: item.description || item._doc?.description || '',
       // Optionally add more fields as needed
     };
   });
@@ -67,9 +67,9 @@ export const ServiceMultiSelect: React.FC<ServiceMultiSelectProps> = ({
   garageId,
   selectedServices,
   onChange,
-  placeholder = "Select services...",
+  placeholder = 'Select services...',
 }) => {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [options, setOptions] = useState<Service[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -82,8 +82,8 @@ export const ServiceMultiSelect: React.FC<ServiceMultiSelectProps> = ({
       setLoading(true);
       const res = await fetch(
         `/api/garages/${garageId}/services/search?query=${encodeURIComponent(
-          input
-        )}`
+          input,
+        )}`,
       );
       const data = await res.json();
       setOptions(normalizeServiceApiResponse(data));
@@ -94,7 +94,7 @@ export const ServiceMultiSelect: React.FC<ServiceMultiSelectProps> = ({
   }, [input, garageId]);
 
   const filtered = options.filter(
-    (s) => !selectedServices.some((sel) => sel.id === s.id)
+    (s) => !selectedServices.some((sel) => sel.id === s.id),
   );
 
   return (
@@ -116,7 +116,7 @@ export const ServiceMultiSelect: React.FC<ServiceMultiSelectProps> = ({
               className="px-2 py-1 cursor-pointer hover:bg-gray-100"
               onClick={() => {
                 onChange([...selectedServices, s]);
-                setInput("");
+                setInput('');
               }}
             >
               {s.name}

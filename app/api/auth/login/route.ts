@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-const API_URL = "http://localhost:8090"
-console.log(API_URL)
+const API_URL = 'http://localhost:8090';
+console.log(API_URL);
 
 export async function POST(request: Request) {
   try {
@@ -10,25 +10,25 @@ export async function POST(request: Request) {
     // Validate required fields
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 }
+        { error: 'Email and password are required' },
+        { status: 400 },
       );
     }
 
     // Get backend URL from environment variable
     const backendUrl = process.env.BACKEND_URL;
     if (!backendUrl) {
-      throw new Error("BACKEND_URL environment variable is not set");
+      throw new Error('BACKEND_URL environment variable is not set');
     }
 
     // Forward the request to the real backend
     const response = await fetch(`${backendUrl}/api/v1/auth/login`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "X-Tenant-Slug": "autocare-pro",
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:8000",
+        'X-Tenant-Slug': 'autocare-pro',
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:8000',
       },
       body: JSON.stringify({ email, password }),
     });
@@ -40,48 +40,48 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            data.error.message || data.message || "Invalid email or password",
+            data.error.message || data.message || 'Invalid email or password',
         },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
     // Create the response
     const nextResponse = NextResponse.json({
       success: true,
-      message: "Login successful",
+      message: 'Login successful',
       data: data.data,
     });
 
     // Set the access token in an HTTP-only cookie
     if (data.tokens) {
-      nextResponse.cookies.set("access_token", data.tokens.access_token, {
+      nextResponse.cookies.set('access_token', data.tokens.access_token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
         maxAge: 60 * 60 * 24 * 7, // 7 days
       });
     }
 
     return nextResponse;
   } catch (error) {
-    console.error("Login error:", error);
+    console.error('Login error:', error);
 
     // Handle specific error cases
-    if (error instanceof TypeError && error.message.includes("fetch failed")) {
+    if (error instanceof TypeError && error.message.includes('fetch failed')) {
       return NextResponse.json(
         {
           error:
-            "Unable to connect to authentication service. Please try again later.",
+            'Unable to connect to authentication service. Please try again later.',
         },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
     return NextResponse.json(
-      { error: "Failed to process login request" },
-      { status: 500 }
+      { error: 'Failed to process login request' },
+      { status: 500 },
     );
   }
 }

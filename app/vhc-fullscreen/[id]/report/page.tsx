@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { VHC_VALUE_MAPPING } from "@/lib/vhc/answerMapping";
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { VHC_VALUE_MAPPING } from '@/lib/vhc/answerMapping';
 import {
   Download,
   Mail,
@@ -11,7 +11,7 @@ import {
   CheckCircle,
   AlertTriangle,
   XCircle,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface VHCResponse {
   id: string;
@@ -71,22 +71,22 @@ export default function VHCReportFullscreenPage() {
         // Fetch VHC response
         const resp = await fetchWithAuth(`/api/vhc/responses/${params.id}`);
         if (!resp.ok) {
-          throw new Error("Failed to fetch VHC response");
+          throw new Error('Failed to fetch VHC response');
         }
         const responseData = await resp.json();
         setResponse(responseData);
 
         // Fetch VHC template
         const tpl = await fetchWithAuth(
-          `/api/vhc/templates/${responseData.templateId}`
+          `/api/vhc/templates/${responseData.templateId}`,
         );
         if (!tpl.ok) {
-          throw new Error("Failed to fetch VHC template");
+          throw new Error('Failed to fetch VHC template');
         }
         const templateData = await tpl.json();
         setTemplate(templateData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
         setLoading(false);
       }
@@ -98,9 +98,9 @@ export default function VHCReportFullscreenPage() {
   }, [params.id]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 0.8) return "text-green-600";
-    if (score >= 0.6) return "text-yellow-600";
-    return "text-red-600";
+    if (score >= 0.8) return 'text-green-600';
+    if (score >= 0.6) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   const getScoreIcon = (score: number) => {
@@ -111,19 +111,19 @@ export default function VHCReportFullscreenPage() {
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 0.8) return "Good";
-    if (score >= 0.6) return "Fair";
-    return "Poor";
+    if (score >= 0.8) return 'Good';
+    if (score >= 0.6) return 'Fair';
+    return 'Poor';
   };
 
   const handleDownloadReport = () => {
     // TODO: Implement PDF generation and download
-    console.log("Download report functionality to be implemented");
+    console.log('Download report functionality to be implemented');
   };
 
   const handleEmailReport = () => {
     // TODO: Implement email functionality
-    console.log("Email report functionality to be implemented");
+    console.log('Email report functionality to be implemented');
   };
 
   if (loading) {
@@ -146,10 +146,10 @@ export default function VHCReportFullscreenPage() {
             Error Loading Report
           </h2>
           <p className="text-gray-600 mb-6 text-lg">
-            {error || "Report not found"}
+            {error || 'Report not found'}
           </p>
           <button
-            onClick={() => router.push("/vehicle-health-checks")}
+            onClick={() => router.push('/vehicle-health-checks')}
             className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-lg"
           >
             Back to VHC List
@@ -166,7 +166,7 @@ export default function VHCReportFullscreenPage() {
   const applicableSections = template.sections.filter(
     (section) =>
       !section.applicable_to ||
-      section.applicable_to.includes(response.powertrain)
+      section.applicable_to.includes(response.powertrain),
   );
 
   return (
@@ -176,7 +176,7 @@ export default function VHCReportFullscreenPage() {
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <button
-              onClick={() => router.push("/vehicle-health-checks")}
+              onClick={() => router.push('/vehicle-health-checks')}
               className="flex items-center gap-3 text-gray-600 hover:text-gray-900 text-lg"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -229,7 +229,7 @@ export default function VHCReportFullscreenPage() {
             </div>
             <p
               className={`text-2xl font-medium ${getScoreColor(
-                totalScore
+                totalScore,
               )} mb-6`}
             >
               {getScoreLabel(totalScore)} Condition
@@ -238,10 +238,10 @@ export default function VHCReportFullscreenPage() {
               <div
                 className={`h-4 rounded-full transition-all duration-500 ${
                   totalScore >= 0.8
-                    ? "bg-green-500"
+                    ? 'bg-green-500'
                     : totalScore >= 0.6
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500'
                 }`}
                 style={{ width: `${scorePercentage}%` }}
               ></div>
@@ -259,7 +259,7 @@ export default function VHCReportFullscreenPage() {
               const sectionScore = response.scores.section[section.id] || 0;
               const sectionPercentage = Math.round(sectionScore * 100);
               const sectionAnswers = response.answers.filter((answer) =>
-                section.items.some((item) => item.id === answer.itemId)
+                section.items.some((item) => item.id === answer.itemId),
               );
 
               return (
@@ -275,7 +275,7 @@ export default function VHCReportFullscreenPage() {
                       {getScoreIcon(sectionScore)}
                       <span
                         className={`font-bold text-xl ${getScoreColor(
-                          sectionScore
+                          sectionScore,
                         )}`}
                       >
                         {sectionPercentage}%
@@ -286,10 +286,10 @@ export default function VHCReportFullscreenPage() {
                     <div
                       className={`h-3 rounded-full transition-all duration-500 ${
                         sectionScore >= 0.8
-                          ? "bg-green-500"
+                          ? 'bg-green-500'
                           : sectionScore >= 0.6
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
+                            ? 'bg-yellow-500'
+                            : 'bg-red-500'
                       }`}
                       style={{ width: `${sectionPercentage}%` }}
                     ></div>
@@ -321,14 +321,14 @@ export default function VHCReportFullscreenPage() {
                 <div className="space-y-3">
                   {section.items.map((item) => {
                     const answer = response.answers.find(
-                      (a) => a.itemId === item.id
+                      (a) => a.itemId === item.id,
                     );
                     const value = answer?.value;
                     const title = value
                       ? VHC_VALUE_MAPPING[
                           value as keyof typeof VHC_VALUE_MAPPING
                         ]
-                      : "Not assessed";
+                      : 'Not assessed';
 
                     return (
                       <div
@@ -342,11 +342,11 @@ export default function VHCReportFullscreenPage() {
                           className={`font-semibold text-lg ${
                             value
                               ? value >= 4
-                                ? "text-green-600"
+                                ? 'text-green-600'
                                 : value >= 3
-                                ? "text-yellow-600"
-                                : "text-red-600"
-                              : "text-gray-400"
+                                  ? 'text-yellow-600'
+                                  : 'text-red-600'
+                              : 'text-gray-400'
                           }`}
                         >
                           {title}

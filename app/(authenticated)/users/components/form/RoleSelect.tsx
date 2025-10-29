@@ -1,6 +1,12 @@
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserRole } from "@/app/models/user";
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { UserRole } from '@/app/models/user';
 
 interface RoleSelectProps {
   role: UserRole;
@@ -8,10 +14,16 @@ interface RoleSelectProps {
   disabled?: boolean;
 }
 
-export function RoleSelect({ role, onRoleChange, disabled = false }: RoleSelectProps) {
+export function RoleSelect({
+  role,
+  onRoleChange,
+  disabled = false,
+}: RoleSelectProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="role">Role <span className="text-red-500">*</span></Label>
+      <Label htmlFor="role">
+        Role <span className="text-red-500">*</span>
+      </Label>
       <Select
         value={role}
         onValueChange={(value) => onRoleChange(value as UserRole)}
@@ -29,4 +41,4 @@ export function RoleSelect({ role, onRoleChange, disabled = false }: RoleSelectP
       </Select>
     </div>
   );
-} 
+}

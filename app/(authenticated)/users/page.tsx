@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { UserRole, UserStatus, EmploymentType } from "@/app/models/user";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect, useCallback } from 'react';
+import { UserRole, UserStatus, EmploymentType } from '@/app/models/user';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import {
   ChevronLeft,
   ChevronRight,
@@ -22,13 +22,13 @@ import {
   Users,
   X,
   Search,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import React from "react";
-import { PlusIcon } from "lucide-react";
-import { AddUserModal } from "./components/AddUserModal";
-import { toast } from "sonner";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import React from 'react';
+import { PlusIcon } from 'lucide-react';
+import { AddUserModal } from './components/AddUserModal';
+import { toast } from 'sonner';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 interface PaginationInfo {
   currentPage: number;
@@ -38,11 +38,11 @@ interface PaginationInfo {
 }
 
 interface FilterState {
-  role: UserRole | "all";
-  status: "active" | "inactive" | "all";
+  role: UserRole | 'all';
+  status: 'active' | 'inactive' | 'all';
   search: string | null;
   sortBy: string;
-  sortOrder: "asc" | "desc";
+  sortOrder: 'asc' | 'desc';
 }
 
 interface ISkillRef {
@@ -98,7 +98,7 @@ export default function UsersPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<ApiUser | null>(null);
-  const [modalMode, setModalMode] = useState<"view" | "edit" | "add">("add");
+  const [modalMode, setModalMode] = useState<'view' | 'edit' | 'add'>('add');
   const [paginationInfo, setPaginationInfo] = useState<PaginationInfo>({
     currentPage: 1,
     totalPages: 1,
@@ -108,44 +108,44 @@ export default function UsersPage() {
 
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
-    role: "all",
-    status: "all",
+    role: 'all',
+    status: 'all',
     search: null,
-    sortBy: "name",
-    sortOrder: "asc",
+    sortBy: 'name',
+    sortOrder: 'asc',
   });
   const [showFilters, setShowFilters] = useState(false);
 
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
   const fetchUsers = useCallback(async () => {
-    console.log("fetching users");
+    console.log('fetching users');
     try {
       setIsLoading(true);
       setError(null);
 
       const params = new URLSearchParams({
         page: currentPage.toString(),
-        limit: "10",
+        limit: '10',
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder,
       });
 
-      if (filters.role !== "all") {
-        params.append("role", filters.role);
+      if (filters.role !== 'all') {
+        params.append('role', filters.role);
       }
 
-      if (filters.status !== "all") {
-        params.append("status", filters.status);
+      if (filters.status !== 'all') {
+        params.append('status', filters.status);
       }
 
       if (filters.search) {
-        params.append("search", filters.search);
+        params.append('search', filters.search);
       }
 
       const response = await fetchWithAuth(`/api/users?${params.toString()}`);
       if (!response.ok) {
-        throw new Error("Failed to fetch users");
+        throw new Error('Failed to fetch users');
       }
       const data = await response.json();
       setUsers(
@@ -154,12 +154,12 @@ export default function UsersPage() {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          phone: user.phone || "",
+          phone: user.phone || '',
           role: user.role,
           status: user.status,
           permissions: user.permissions || [],
-          accessLevel: user.accessLevel || "",
-          employmentType: user.employmentType || "full-time",
+          accessLevel: user.accessLevel || '',
+          employmentType: user.employmentType || 'full-time',
           employeeId: user.employeeId,
           position: user.position,
           department: user.department,
@@ -170,7 +170,7 @@ export default function UsersPage() {
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
           workingHours: user.workingHours,
-        }))
+        })),
       );
       setPaginationInfo({
         currentPage: data.pagination.page || 1,
@@ -179,7 +179,7 @@ export default function UsersPage() {
         itemsPerPage: data.pagination.limit || 10,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -206,7 +206,7 @@ export default function UsersPage() {
       ...prev,
       sortBy: field,
       sortOrder:
-        prev.sortBy === field && prev.sortOrder === "asc" ? "desc" : "asc",
+        prev.sortBy === field && prev.sortOrder === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -218,57 +218,57 @@ export default function UsersPage() {
 
   const handleAddUser = async (userData: UserData) => {
     try {
-      const method = modalMode === "edit" && selectedUser ? "PUT" : "POST";
+      const method = modalMode === 'edit' && selectedUser ? 'PUT' : 'POST';
       const url =
-        modalMode === "edit" && selectedUser
+        modalMode === 'edit' && selectedUser
           ? `/api/users?id=${selectedUser._id}`
-          : "/api/users";
+          : '/api/users';
 
       const response = await fetchWithAuth(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...userData,
-          ...(modalMode === "edit" &&
+          ...(modalMode === 'edit' &&
             selectedUser && { _id: selectedUser._id }),
         }),
       });
 
       if (!response.ok) {
         throw new Error(
-          `Failed to ${modalMode === "edit" ? "update" : "create"} user`
+          `Failed to ${modalMode === 'edit' ? 'update' : 'create'} user`,
         );
       }
 
       toast.success(
-        `User ${modalMode === "edit" ? "updated" : "created"} successfully`
+        `User ${modalMode === 'edit' ? 'updated' : 'created'} successfully`,
       );
       setIsAddUserModalOpen(false);
       setSelectedUser(null);
-      setModalMode("add");
+      setModalMode('add');
       fetchUsers();
     } catch (error) {
       toast.error(
-        `Failed to ${modalMode === "edit" ? "update" : "create"} user`
+        `Failed to ${modalMode === 'edit' ? 'update' : 'create'} user`,
       );
       console.error(
-        `Error ${modalMode === "edit" ? "updating" : "adding"} user:`,
-        error
+        `Error ${modalMode === 'edit' ? 'updating' : 'adding'} user:`,
+        error,
       );
     }
   };
 
   const handleViewUser = (user: ApiUser) => {
     setSelectedUser(user);
-    setModalMode("view");
+    setModalMode('view');
     setIsAddUserModalOpen(true);
   };
 
   const handleEditUser = (user: ApiUser) => {
     setSelectedUser(user);
-    setModalMode("edit");
+    setModalMode('edit');
     setIsAddUserModalOpen(true);
   };
 
@@ -285,9 +285,9 @@ export default function UsersPage() {
                 type="text"
                 placeholder="Search users..."
                 className="w-[300px] pl-9 pr-8 bg-white"
-                value={filters.search || ""}
+                value={filters.search || ''}
                 onChange={(e) =>
-                  handleFilterChange("search", e.target.value || null)
+                  handleFilterChange('search', e.target.value || null)
                 }
               />
               {filters.search && (
@@ -295,7 +295,7 @@ export default function UsersPage() {
                   variant="ghost"
                   size="icon"
                   className="absolute right-0 top-0 h-full px-2 hover:bg-transparent"
-                  onClick={() => handleFilterChange("search", null)}
+                  onClick={() => handleFilterChange('search', null)}
                 >
                   <X className="h-4 w-4 text-gray-500" />
                 </Button>
@@ -307,8 +307,8 @@ export default function UsersPage() {
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
               className={cn(
-                "flex items-center gap-2",
-                showFilters && "bg-blue-100"
+                'flex items-center gap-2',
+                showFilters && 'bg-blue-100',
               )}
             >
               <Filter className="w-4 h-4" />
@@ -321,15 +321,15 @@ export default function UsersPage() {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => handleSortChange("name")}
+                onClick={() => handleSortChange('name')}
                 className={cn(
-                  "flex items-center gap-2",
-                  filters.sortBy === "name" && "bg-blue-100"
+                  'flex items-center gap-2',
+                  filters.sortBy === 'name' && 'bg-blue-100',
                 )}
               >
                 Name
-                {filters.sortBy === "name" &&
-                  (filters.sortOrder === "asc" ? (
+                {filters.sortBy === 'name' &&
+                  (filters.sortOrder === 'asc' ? (
                     <SortAsc className="w-4 h-4" />
                   ) : (
                     <SortDesc className="w-4 h-4" />
@@ -337,15 +337,15 @@ export default function UsersPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleSortChange("role")}
+                onClick={() => handleSortChange('role')}
                 className={cn(
-                  "flex items-center gap-2",
-                  filters.sortBy === "role" && "bg-blue-100"
+                  'flex items-center gap-2',
+                  filters.sortBy === 'role' && 'bg-blue-100',
                 )}
               >
                 Role
-                {filters.sortBy === "role" &&
-                  (filters.sortOrder === "asc" ? (
+                {filters.sortBy === 'role' &&
+                  (filters.sortOrder === 'asc' ? (
                     <SortAsc className="w-4 h-4" />
                   ) : (
                     <SortDesc className="w-4 h-4" />
@@ -353,15 +353,15 @@ export default function UsersPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleSortChange("status")}
+                onClick={() => handleSortChange('status')}
                 className={cn(
-                  "flex items-center gap-2",
-                  filters.sortBy === "status" && "bg-blue-100"
+                  'flex items-center gap-2',
+                  filters.sortBy === 'status' && 'bg-blue-100',
                 )}
               >
                 Status
-                {filters.sortBy === "status" &&
-                  (filters.sortOrder === "asc" ? (
+                {filters.sortBy === 'status' &&
+                  (filters.sortOrder === 'asc' ? (
                     <SortAsc className="w-4 h-4" />
                   ) : (
                     <SortDesc className="w-4 h-4" />
@@ -371,7 +371,7 @@ export default function UsersPage() {
             <Button
               onClick={() => {
                 setSelectedUser(null);
-                setModalMode("add");
+                setModalMode('add');
                 setIsAddUserModalOpen(true);
               }}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -394,7 +394,7 @@ export default function UsersPage() {
                 <Select
                   value={filters.role}
                   onValueChange={(value) =>
-                    handleFilterChange("role", value as UserRole | "all")
+                    handleFilterChange('role', value as UserRole | 'all')
                   }
                 >
                   <SelectTrigger className="bg-white">
@@ -418,8 +418,8 @@ export default function UsersPage() {
                   value={filters.status}
                   onValueChange={(value) =>
                     handleFilterChange(
-                      "status",
-                      value as "active" | "inactive" | "all"
+                      'status',
+                      value as 'active' | 'inactive' | 'all',
                     )
                   }
                 >
@@ -530,9 +530,9 @@ export default function UsersPage() {
               type="text"
               placeholder="Search users..."
               className="w-[300px] pl-9 pr-8 bg-white"
-              value={filters.search || ""}
+              value={filters.search || ''}
               onChange={(e) =>
-                handleFilterChange("search", e.target.value || null)
+                handleFilterChange('search', e.target.value || null)
               }
             />
             {filters.search && (
@@ -540,7 +540,7 @@ export default function UsersPage() {
                 variant="ghost"
                 size="icon"
                 className="absolute right-0 top-0 h-full px-2 hover:bg-transparent"
-                onClick={() => handleFilterChange("search", null)}
+                onClick={() => handleFilterChange('search', null)}
               >
                 <X className="h-4 w-4 text-gray-500" />
               </Button>
@@ -552,8 +552,8 @@ export default function UsersPage() {
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "flex items-center gap-2",
-              showFilters && "bg-blue-100"
+              'flex items-center gap-2',
+              showFilters && 'bg-blue-100',
             )}
           >
             <Filter className="w-4 h-4" />
@@ -566,15 +566,15 @@ export default function UsersPage() {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => handleSortChange("name")}
+              onClick={() => handleSortChange('name')}
               className={cn(
-                "flex items-center gap-2",
-                filters.sortBy === "name" && "bg-blue-100"
+                'flex items-center gap-2',
+                filters.sortBy === 'name' && 'bg-blue-100',
               )}
             >
               Name
-              {filters.sortBy === "name" &&
-                (filters.sortOrder === "asc" ? (
+              {filters.sortBy === 'name' &&
+                (filters.sortOrder === 'asc' ? (
                   <SortAsc className="w-4 h-4" />
                 ) : (
                   <SortDesc className="w-4 h-4" />
@@ -582,15 +582,15 @@ export default function UsersPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleSortChange("role")}
+              onClick={() => handleSortChange('role')}
               className={cn(
-                "flex items-center gap-2",
-                filters.sortBy === "role" && "bg-blue-100"
+                'flex items-center gap-2',
+                filters.sortBy === 'role' && 'bg-blue-100',
               )}
             >
               Role
-              {filters.sortBy === "role" &&
-                (filters.sortOrder === "asc" ? (
+              {filters.sortBy === 'role' &&
+                (filters.sortOrder === 'asc' ? (
                   <SortAsc className="w-4 h-4" />
                 ) : (
                   <SortDesc className="w-4 h-4" />
@@ -598,15 +598,15 @@ export default function UsersPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleSortChange("status")}
+              onClick={() => handleSortChange('status')}
               className={cn(
-                "flex items-center gap-2",
-                filters.sortBy === "status" && "bg-blue-100"
+                'flex items-center gap-2',
+                filters.sortBy === 'status' && 'bg-blue-100',
               )}
             >
               Status
-              {filters.sortBy === "status" &&
-                (filters.sortOrder === "asc" ? (
+              {filters.sortBy === 'status' &&
+                (filters.sortOrder === 'asc' ? (
                   <SortAsc className="w-4 h-4" />
                 ) : (
                   <SortDesc className="w-4 h-4" />
@@ -616,7 +616,7 @@ export default function UsersPage() {
           <Button
             onClick={() => {
               setSelectedUser(null);
-              setModalMode("add");
+              setModalMode('add');
               setIsAddUserModalOpen(true);
             }}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -639,7 +639,7 @@ export default function UsersPage() {
               <Select
                 value={filters.role}
                 onValueChange={(value) =>
-                  handleFilterChange("role", value as UserRole | "all")
+                  handleFilterChange('role', value as UserRole | 'all')
                 }
               >
                 <SelectTrigger className="bg-white">
@@ -663,8 +663,8 @@ export default function UsersPage() {
                 value={filters.status}
                 onValueChange={(value) =>
                   handleFilterChange(
-                    "status",
-                    value as "active" | "inactive" | "all"
+                    'status',
+                    value as 'active' | 'inactive' | 'all',
                   )
                 }
               >
@@ -688,18 +688,18 @@ export default function UsersPage() {
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <Users className="h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900">
-              {filters.role !== "all" ||
-              filters.status !== "all" ||
+              {filters.role !== 'all' ||
+              filters.status !== 'all' ||
               filters.search
-                ? "No users match your filters"
-                : "No users found"}
+                ? 'No users match your filters'
+                : 'No users found'}
             </h3>
             <p className="mt-1 text-sm text-gray-500">
-              {filters.role !== "all" ||
-              filters.status !== "all" ||
+              {filters.role !== 'all' ||
+              filters.status !== 'all' ||
               filters.search
-                ? "Try adjusting your filters or search criteria"
-                : "Please contact your administrator"}
+                ? 'Try adjusting your filters or search criteria'
+                : 'Please contact your administrator'}
             </p>
           </div>
         ) : (
@@ -745,14 +745,15 @@ export default function UsersPage() {
                     <div className="flex flex-col gap-1">
                       <span
                         className={cn(
-                          "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                          user.role === "admin" &&
-                            "bg-purple-100 text-purple-800",
-                          user.role === "manager" &&
-                            "bg-blue-100 text-blue-800",
-                          user.role === "technician" &&
-                            "bg-green-100 text-green-800",
-                          user.role === "staff" && "bg-green-100 text-green-800"
+                          'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                          user.role === 'admin' &&
+                            'bg-purple-100 text-purple-800',
+                          user.role === 'manager' &&
+                            'bg-blue-100 text-blue-800',
+                          user.role === 'technician' &&
+                            'bg-green-100 text-green-800',
+                          user.role === 'staff' &&
+                            'bg-green-100 text-green-800',
                         )}
                       >
                         {user.role}
@@ -768,12 +769,12 @@ export default function UsersPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={cn(
-                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                        user.status === "active" &&
-                          "bg-green-100 text-green-800",
-                        user.status === "inactive" && "bg-red-100 text-red-800",
-                        user.status === "on-leave" &&
-                          "bg-yellow-100 text-yellow-800"
+                        'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        user.status === 'active' &&
+                          'bg-green-100 text-green-800',
+                        user.status === 'inactive' && 'bg-red-100 text-red-800',
+                        user.status === 'on-leave' &&
+                          'bg-yellow-100 text-yellow-800',
                       )}
                     >
                       {user.status}
@@ -789,9 +790,9 @@ export default function UsersPage() {
                           {spec.displayName}
                         </span>
                       ))}
-                      {!user.skills && user.role === "manager" && (
+                      {!user.skills && user.role === 'manager' && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                          {user.managedDepartments?.join(", ")}
+                          {user.managedDepartments?.join(', ')}
                         </span>
                       )}
                     </div>
@@ -831,11 +832,11 @@ export default function UsersPage() {
       {/* Pagination */}
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          Showing {(currentPage - 1) * paginationInfo.itemsPerPage + 1} to{" "}
+          Showing {(currentPage - 1) * paginationInfo.itemsPerPage + 1} to{' '}
           {Math.min(
             currentPage * paginationInfo.itemsPerPage,
-            paginationInfo.totalItems
-          )}{" "}
+            paginationInfo.totalItems,
+          )}{' '}
           of {paginationInfo.totalItems} users
         </div>
         <div className="flex items-center gap-2">
@@ -851,16 +852,16 @@ export default function UsersPage() {
           <div className="flex gap-1">
             {Array.from(
               { length: paginationInfo.totalPages },
-              (_, i) => i + 1
+              (_, i) => i + 1,
             ).map((page) => (
               <Button
                 key={page}
-                variant={currentPage === page ? "default" : "outline"}
+                variant={currentPage === page ? 'default' : 'outline'}
                 onClick={() => handlePageChange(page)}
                 className={cn(
-                  "w-8 h-8 p-0",
+                  'w-8 h-8 p-0',
                   currentPage === page &&
-                    "bg-blue-500 text-white hover:bg-blue-600"
+                    'bg-blue-500 text-white hover:bg-blue-600',
                 )}
               >
                 {page}
@@ -883,7 +884,7 @@ export default function UsersPage() {
         onClose={() => {
           setIsAddUserModalOpen(false);
           setSelectedUser(null);
-          setModalMode("add");
+          setModalMode('add');
         }}
         onSave={handleAddUser}
         initialData={
@@ -891,13 +892,13 @@ export default function UsersPage() {
             ? {
                 ...selectedUser,
                 role: selectedUser.role as UserRole,
-                position: selectedUser.position || "",
-                department: selectedUser.department || "",
+                position: selectedUser.position || '',
+                department: selectedUser.department || '',
                 status: selectedUser.status as UserStatus,
                 employmentType: selectedUser.employmentType as EmploymentType,
                 workingHours: selectedUser.workingHours || {
-                  start: "",
-                  end: "",
+                  start: '',
+                  end: '',
                   days: [],
                 },
                 skills: selectedUser.skills || [],

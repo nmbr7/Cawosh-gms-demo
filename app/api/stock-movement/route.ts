@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
 
 interface StockMovement {
   id: string;
   itemId: string;
-  type: "purchase" | "sale" | "adjustment" | "return";
+  type: 'purchase' | 'sale' | 'adjustment' | 'return';
   quantity: number;
   reference: string;
   notes: string;
@@ -33,10 +33,10 @@ interface InventoryItem {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const itemId = searchParams.get("itemId");
-    const type = searchParams.get("type");
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const itemId = searchParams.get('itemId');
+    const type = searchParams.get('type');
 
     let movements = [...db.stockMovements];
 
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
 
     // Sort by date (newest first)
     movements.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
     );
 
     // Apply pagination
@@ -68,10 +68,10 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Error fetching stock movements:", error);
+    console.error('Error fetching stock movements:', error);
     return NextResponse.json(
-      { error: "Failed to fetch stock movements" },
-      { status: 500 }
+      { error: 'Failed to fetch stock movements' },
+      { status: 500 },
     );
   }
 }
@@ -87,12 +87,12 @@ export async function POST(request: Request) {
 
     // Update inventory quantity
     const itemIndex = db.inventory.findIndex(
-      (item: InventoryItem) => item.id === data.itemId
+      (item: InventoryItem) => item.id === data.itemId,
     );
     if (itemIndex === -1) {
       return NextResponse.json(
-        { error: "Inventory item not found" },
-        { status: 404 }
+        { error: 'Inventory item not found' },
+        { status: 404 },
       );
     }
 
@@ -101,12 +101,12 @@ export async function POST(request: Request) {
 
     // Adjust quantity based on movement type
     switch (data.type) {
-      case "sale":
-      case "adjustment":
+      case 'sale':
+      case 'adjustment':
         quantityChange = -Math.abs(quantityChange);
         break;
-      case "purchase":
-      case "return":
+      case 'purchase':
+      case 'return':
         quantityChange = Math.abs(quantityChange);
         break;
     }
@@ -120,10 +120,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(newMovement, { status: 201 });
   } catch (error) {
-    console.error("Error creating stock movement:", error);
+    console.error('Error creating stock movement:', error);
     return NextResponse.json(
-      { error: "Failed to create stock movement" },
-      { status: 500 }
+      { error: 'Failed to create stock movement' },
+      { status: 500 },
     );
   }
 }

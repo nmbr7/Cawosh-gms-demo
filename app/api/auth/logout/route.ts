@@ -1,30 +1,30 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
-  console.log("Logout request received");
+  console.log('Logout request received');
   console.log(request);
   try {
     // Create a response
     const response = NextResponse.json({
       success: true,
-      message: "Logged out successfully",
+      message: 'Logged out successfully',
     });
 
     // Clear the HTTP-only cookie
-    response.cookies.set("access_token", "", {
+    response.cookies.set('access_token', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
       maxAge: 0, // Expire immediately
     });
 
     return response;
   } catch (error) {
-    console.error("Logout error:", error);
+    console.error('Logout error:', error);
     return NextResponse.json(
-      { error: "Failed to process logout request" },
-      { status: 500 }
+      { error: 'Failed to process logout request' },
+      { status: 500 },
     );
   }
 }

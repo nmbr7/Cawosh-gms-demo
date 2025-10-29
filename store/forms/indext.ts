@@ -1,1 +1,1 @@
-export { useUserFormOptionsStore } from "./user-form-options";
+export { useUserFormOptionsStore } from './user-form-options';

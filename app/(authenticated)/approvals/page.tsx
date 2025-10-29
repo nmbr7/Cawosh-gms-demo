@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Filter, Eye } from "lucide-react";
-import { cn } from "@/lib/utils";
-import React from "react";
-import { useJobSheetStore, JobSheet as StoreJobSheet } from "@/store/jobSheet";
-import { useBookingStore } from "@/store/booking";
-import { format } from "date-fns";
-import { ApprovalDetailsModal } from "@/app/components/approvals/ApprovalDetailsModal";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, Filter, Eye } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import React from 'react';
+import { useJobSheetStore, JobSheet as StoreJobSheet } from '@/store/jobSheet';
+import { useBookingStore } from '@/store/booking';
+import { format } from 'date-fns';
+import { ApprovalDetailsModal } from '@/app/components/approvals/ApprovalDetailsModal';
 
 interface PaginationInfo {
   currentPage: number;
@@ -26,10 +26,10 @@ interface PaginationInfo {
 
 // Filter and sort state interface
 interface FilterState {
-  status: string | "all";
+  status: string | 'all';
   technicianId: string | null;
   sortBy: string;
-  sortOrder: "asc" | "desc";
+  sortOrder: 'asc' | 'desc';
 }
 
 export default function ApprovalsPage() {
@@ -64,10 +64,10 @@ export default function ApprovalsPage() {
 
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
-    status: "all",
+    status: 'all',
     technicianId: null,
-    sortBy: "createdAt",
-    sortOrder: "desc",
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -85,20 +85,20 @@ export default function ApprovalsPage() {
     const pendingApprovals = jobSheetsWithBookings.filter(
       (js) =>
         js.requiresDiagnosis &&
-        js.approvalStatus === "pending" &&
+        js.approvalStatus === 'pending' &&
         js.diagnosedServices &&
-        js.diagnosedServices.length > 0
+        js.diagnosedServices.length > 0,
     );
 
     // Apply filters
     const filtered = pendingApprovals.filter((js) => {
       const statusOk =
-        filters.status === "all" || js.approvalStatus === filters.status;
+        filters.status === 'all' || js.approvalStatus === filters.status;
 
       const technicianOk =
         !filters.technicianId ||
         (js.diagnosedServices?.some(
-          (s) => s.addedBy === filters.technicianId
+          (s) => s.addedBy === filters.technicianId,
         ) ??
           false);
 
@@ -107,16 +107,16 @@ export default function ApprovalsPage() {
 
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
-      const dir = filters.sortOrder === "asc" ? 1 : -1;
-      if (filters.sortBy === "id") {
+      const dir = filters.sortOrder === 'asc' ? 1 : -1;
+      if (filters.sortBy === 'id') {
         return a.id.localeCompare(b.id) * dir;
       }
-      if (filters.sortBy === "approvalStatus") {
+      if (filters.sortBy === 'approvalStatus') {
         return (
-          (a.approvalStatus || "").localeCompare(b.approvalStatus || "") * dir
+          (a.approvalStatus || '').localeCompare(b.approvalStatus || '') * dir
         );
       }
-      if (filters.sortBy === "createdAt") {
+      if (filters.sortBy === 'createdAt') {
         return (
           new Date(a.createdAt).getTime() -
           new Date(b.createdAt).getTime() * dir
@@ -153,14 +153,14 @@ export default function ApprovalsPage() {
       setCurrentPage(1); // Reset to first page
       await fetchApprovals();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsRefreshing(false);
     }
   };
 
   const handleFilterChange = (key: keyof FilterState, value: string | null) => {
-    console.log("handleFilterChange", key, value);
+    console.log('handleFilterChange', key, value);
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1); // Reset to first page when filters change
   };
@@ -177,11 +177,11 @@ export default function ApprovalsPage() {
   const getStatusBadge = (status: string | undefined) => {
     const statusMap = {
       pending: {
-        label: "Pending Approval",
-        className: "bg-amber-100 text-amber-800",
+        label: 'Pending Approval',
+        className: 'bg-amber-100 text-amber-800',
       },
-      approved: { label: "Approved", className: "bg-green-100 text-green-800" },
-      rejected: { label: "Rejected", className: "bg-red-100 text-red-800" },
+      approved: { label: 'Approved', className: 'bg-green-100 text-green-800' },
+      rejected: { label: 'Rejected', className: 'bg-red-100 text-red-800' },
     };
 
     const statusInfo =
@@ -190,8 +190,8 @@ export default function ApprovalsPage() {
     return (
       <span
         className={cn(
-          "px-2 py-1 text-xs font-medium rounded-full",
-          statusInfo.className
+          'px-2 py-1 text-xs font-medium rounded-full',
+          statusInfo.className,
         )}
       >
         {statusInfo.label}
@@ -215,7 +215,7 @@ export default function ApprovalsPage() {
       jobSheet.booking.assignedTechnicians.length > 0
     ) {
       const assignedTech = jobSheet.booking.assignedTechnicians.find(
-        (tech) => tech.technicianId === technicianId
+        (tech) => tech.technicianId === technicianId,
       );
       if (assignedTech) {
         return assignedTech.technicianName;
@@ -224,18 +224,18 @@ export default function ApprovalsPage() {
 
     // Fallback to filter options
     const technician = filterOptions.technicians.find(
-      (t) => t.id === technicianId
+      (t) => t.id === technicianId,
     );
-    return technician ? technician.name : "Unknown Technician";
+    return technician ? technician.name : 'Unknown Technician';
   };
 
   // Get pending approvals for display
   const pendingApprovals = jobSheetsWithBookings.filter(
     (js) =>
       js.requiresDiagnosis &&
-      js.approvalStatus === "pending" &&
+      js.approvalStatus === 'pending' &&
       js.diagnosedServices &&
-      js.diagnosedServices.length > 0
+      js.diagnosedServices.length > 0,
   );
 
   return (
@@ -255,7 +255,7 @@ export default function ApprovalsPage() {
             onClick={handleRefresh}
             disabled={isRefreshing}
           >
-            {isRefreshing ? "Refreshing..." : "Refresh"}
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
         </div>
       </div>
@@ -270,7 +270,7 @@ export default function ApprovalsPage() {
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="h-4 w-4 mr-2" />
-            {showFilters ? "Hide" : "Show"} Filters
+            {showFilters ? 'Hide' : 'Show'} Filters
           </Button>
         </div>
 
@@ -282,7 +282,7 @@ export default function ApprovalsPage() {
               </label>
               <Select
                 value={filters.status}
-                onValueChange={(value) => handleFilterChange("status", value)}
+                onValueChange={(value) => handleFilterChange('status', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -301,9 +301,9 @@ export default function ApprovalsPage() {
                 Technician
               </label>
               <Select
-                value={filters.technicianId || ""}
+                value={filters.technicianId || ''}
                 onValueChange={(value) =>
-                  handleFilterChange("technicianId", value || null)
+                  handleFilterChange('technicianId', value || null)
                 }
               >
                 <SelectTrigger>
@@ -326,7 +326,7 @@ export default function ApprovalsPage() {
               </label>
               <Select
                 value={filters.sortBy}
-                onValueChange={(value) => handleFilterChange("sortBy", value)}
+                onValueChange={(value) => handleFilterChange('sortBy', value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -354,7 +354,7 @@ export default function ApprovalsPage() {
           <div className="text-2xl font-bold text-green-600">
             {
               jobSheetsWithBookings.filter(
-                (js) => js.approvalStatus === "approved"
+                (js) => js.approvalStatus === 'approved',
               ).length
             }
           </div>
@@ -424,24 +424,24 @@ export default function ApprovalsPage() {
                         {jobSheet.id}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {format(new Date(jobSheet.createdAt), "MMM dd, yyyy")}
+                        {format(new Date(jobSheet.createdAt), 'MMM dd, yyyy')}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {jobSheet.booking?.customer.name || "N/A"}
+                        {jobSheet.booking?.customer.name || 'N/A'}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {jobSheet.booking?.customer.phone || "N/A"}
+                        {jobSheet.booking?.customer.phone || 'N/A'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {jobSheet.booking?.vehicle.make}{" "}
+                        {jobSheet.booking?.vehicle.make}{' '}
                         {jobSheet.booking?.vehicle.model}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {jobSheet.booking?.vehicle.year} •{" "}
+                        {jobSheet.booking?.vehicle.year} •{' '}
                         {jobSheet.booking?.vehicle.license}
                       </div>
                     </td>
@@ -452,23 +452,23 @@ export default function ApprovalsPage() {
                       <div className="text-sm text-gray-500">
                         £
                         {getTotalPrice(
-                          jobSheet.diagnosedServices || []
-                        ).toFixed(2)}{" "}
+                          jobSheet.diagnosedServices || [],
+                        ).toFixed(2)}{' '}
                         (inc. VAT)
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
                         {getTechnicianName(
-                          jobSheet.diagnosedServices?.[0]?.addedBy || "",
-                          jobSheet
+                          jobSheet.diagnosedServices?.[0]?.addedBy || '',
+                          jobSheet,
                         )}
                       </div>
                       <div className="text-sm text-gray-500">
                         {jobSheet.diagnosedServices?.[0]?.addedAt &&
                           format(
                             new Date(jobSheet.diagnosedServices[0].addedAt),
-                            "MMM dd, HH:mm"
+                            'MMM dd, HH:mm',
                           )}
                       </div>
                     </td>
@@ -499,11 +499,11 @@ export default function ApprovalsPage() {
       {paginationInfo.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-700">
-            Showing {(currentPage - 1) * paginationInfo.itemsPerPage + 1} to{" "}
+            Showing {(currentPage - 1) * paginationInfo.itemsPerPage + 1} to{' '}
             {Math.min(
               currentPage * paginationInfo.itemsPerPage,
-              paginationInfo.totalItems
-            )}{" "}
+              paginationInfo.totalItems,
+            )}{' '}
             of {paginationInfo.totalItems} results
           </div>
           <div className="flex items-center space-x-2">

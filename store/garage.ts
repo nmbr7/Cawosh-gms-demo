@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { Garage } from "@/app/models/garage";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { Garage } from '@/app/models/garage';
 
 type GarageState = {
   garage: Garage | null;
@@ -16,7 +16,7 @@ export const useGarageStore = create<GarageState>()(
       clearGarage: () => set({ garage: null }),
     }),
     {
-      name: "garage-storage",
-    }
-  )
+      name: 'garage-storage',
+    },
+  ),
 );

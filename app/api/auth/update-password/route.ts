@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     if (!email || !newPassword) {
       return NextResponse.json(
         { error: 'Email and new password are required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -16,12 +16,12 @@ export async function POST(request: Request) {
     if (newPassword.length < 8) {
       return NextResponse.json(
         { error: 'Password must be at least 8 characters long' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // In a real application, you would:
     // 1. Hash the new password
@@ -29,15 +29,15 @@ export async function POST(request: Request) {
     // 3. Invalidate any existing sessions/tokens
     // For this example, we'll just return a success response
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      message: 'Password has been reset successfully'
+      message: 'Password has been reset successfully',
     });
   } catch (error) {
     console.error('Password update error:', error);
     return NextResponse.json(
       { error: 'Failed to update password' },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

@@ -1,7 +1,7 @@
 // components/DashboardStatCard.tsx
-import React from "react";
-import { cn } from "@/lib/utils"; // If you use a classnames utility
-import Image from "next/image";
+import React from 'react';
+import { cn } from '@/lib/utils'; // If you use a classnames utility
+import Image from 'next/image';
 
 interface DashboardStatCardProps {
   label: string;
@@ -24,9 +24,9 @@ export const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
 }) => (
   <div
     className={cn(
-      "flex items-center gap-4 rounded-xl px-8 py-3 shadow-sm transition-colors",
-      active ? "bg-[#E6E86A] text-black" : "bg-white text-[#0B0D19]",
-      className
+      'flex items-center gap-4 rounded-xl px-8 py-3 shadow-sm transition-colors',
+      active ? 'bg-[#E6E86A] text-black' : 'bg-white text-[#0B0D19]',
+      className,
     )}
     style={{ minWidth: 220 }}
   >

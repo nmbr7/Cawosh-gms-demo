@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useInventory } from "@/store/inventory";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { useInventory } from '@/store/inventory';
 
 function AlertBanner({
   tone,
@@ -10,23 +10,23 @@ function AlertBanner({
   onClick,
   onDismiss,
 }: {
-  tone: "LOW" | "OUT";
+  tone: 'LOW' | 'OUT';
   count: number;
   onClick: () => void;
   onDismiss: () => void;
 }) {
   if (count === 0) return null;
 
-  const isLow = tone === "LOW";
-  const bg = isLow ? "bg-yellow-50" : "bg-red-50";
-  const border = isLow ? "border-yellow-200" : "border-red-200";
-  const text = isLow ? "text-yellow-900" : "text-red-900";
-  const dot = isLow ? "bg-yellow-400" : "bg-red-400";
+  const isLow = tone === 'LOW';
+  const bg = isLow ? 'bg-yellow-50' : 'bg-red-50';
+  const border = isLow ? 'border-yellow-200' : 'border-red-200';
+  const text = isLow ? 'text-yellow-900' : 'text-red-900';
+  const dot = isLow ? 'bg-yellow-400' : 'bg-red-400';
 
   const label =
-    tone === "LOW"
-      ? `${count} item${count > 1 ? "s" : ""} low in stock`
-      : `${count} item${count > 1 ? "s" : ""} out of stock`;
+    tone === 'LOW'
+      ? `${count} item${count > 1 ? 's' : ''} low in stock`
+      : `${count} item${count > 1 ? 's' : ''} out of stock`;
 
   return (
     <div
@@ -67,7 +67,7 @@ export function InventoryAlerts() {
         <AlertBanner
           tone="LOW"
           count={alerts.lowCount}
-          onClick={() => setFilters({ status: "LOW" })}
+          onClick={() => setFilters({ status: 'LOW' })}
           onDismiss={() => setDismissed((s) => ({ ...s, LOW: true }))}
         />
       )}
@@ -75,7 +75,7 @@ export function InventoryAlerts() {
         <AlertBanner
           tone="OUT"
           count={alerts.outCount}
-          onClick={() => setFilters({ status: "OUT" })}
+          onClick={() => setFilters({ status: 'OUT' })}
           onDismiss={() => setDismissed((s) => ({ ...s, OUT: true }))}
         />
       )}

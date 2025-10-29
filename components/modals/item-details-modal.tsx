@@ -3,8 +3,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { InventoryItem } from "@/models/inventory";
+} from '@/components/ui/dialog';
+import { InventoryItem } from '@/models/inventory';
 
 interface ItemDetailsModalProps {
   item: InventoryItem | null;

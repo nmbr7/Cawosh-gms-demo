@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
+import { NextRequest, NextResponse } from 'next/server';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 export async function GET(request: NextRequest) {
   try {
     // Get the access token from cookies
     const cookies = request.cookies;
-    const accessToken = cookies.get("access_token")?.value;
+    const accessToken = cookies.get('access_token')?.value;
     if (!accessToken) {
       return NextResponse.json(
-        { error: "No access token found" },
-        { status: 401 }
+        { error: 'No access token found' },
+        { status: 401 },
       );
     }
 
@@ -30,19 +30,19 @@ export async function GET(request: NextRequest) {
           error:
             errorData.error ||
             errorData.message ||
-            "Failed to fetch job sheets",
+            'Failed to fetch job sheets',
         },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error fetching job sheets:", error);
+    console.error('Error fetching job sheets:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      { error: 'Internal server error' },
+      { status: 500 },
     );
   }
 }

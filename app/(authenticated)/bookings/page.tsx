@@ -1,33 +1,33 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Booking as StoreBooking } from "@/types/booking";
-import { BookingStatus, BookingUtil } from "@/app/models/booking";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect } from 'react';
+import { Booking as StoreBooking } from '@/types/booking';
+import { BookingStatus, BookingUtil } from '@/app/models/booking';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import {
   ChevronLeft,
   ChevronRight,
   Filter,
   SortAsc,
   SortDesc,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import React from "react";
-import { BookingDetailsModal } from "@/app/components/booking-details-modal";
-import { BookingCreateModal } from "@/app/components/BookingCreateModal";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import React from 'react';
+import { BookingDetailsModal } from '@/app/components/booking-details-modal';
+import { BookingCreateModal } from '@/app/components/BookingCreateModal';
 // import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { useGarageStore } from "@/store/garage";
-import { useBookingStore } from "@/store/booking";
-import { DataTable } from "@/components/ui/data-table";
+import { useGarageStore } from '@/store/garage';
+import { useBookingStore } from '@/store/booking';
+import { DataTable } from '@/components/ui/data-table';
 
 interface PaginationInfo {
   currentPage: number;
@@ -38,7 +38,7 @@ interface PaginationInfo {
 
 // Filter and sort state interface
 interface FilterState {
-  status: BookingStatus | "all";
+  status: BookingStatus | 'all';
   customerName: string | null;
   serviceId: string | null;
   serviceStatus: string | null;
@@ -47,12 +47,12 @@ interface FilterState {
   startDate: string | null;
   endDate: string | null;
   sortBy: string;
-  sortOrder: "asc" | "desc";
-  dateFilter: "created" | "booking"; // New filter for date type
+  sortOrder: 'asc' | 'desc';
+  dateFilter: 'created' | 'booking'; // New filter for date type
 }
 
 export default function BookingsPage() {
-  const [selectedBay, setSelectedBay] = useState<number | "all">("all");
+  const [selectedBay, setSelectedBay] = useState<number | 'all'>('all');
   const [bookings, setBookings] = useState<StoreBooking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -65,14 +65,14 @@ export default function BookingsPage() {
     itemsPerPage: 10,
   });
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
-    null
+    null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
-    status: "all",
+    status: 'all',
     customerName: null,
     serviceId: null,
     serviceStatus: null,
@@ -80,9 +80,9 @@ export default function BookingsPage() {
     maxPrice: null,
     startDate: null,
     endDate: null,
-    sortBy: "date",
-    sortOrder: "desc",
-    dateFilter: "created", // Default to date created
+    sortBy: 'date',
+    sortOrder: 'desc',
+    dateFilter: 'created', // Default to date created
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -95,136 +95,136 @@ export default function BookingsPage() {
   // Define table columns
   const columns = [
     {
-      header: "Booking ID",
-      accessorKey: "bookingId" as keyof StoreBooking,
+      header: 'Booking ID',
+      accessorKey: 'bookingId' as keyof StoreBooking,
       cell: (booking: StoreBooking) => (
         <span className="font-medium text-gray-900">
-          {booking.bookingId || booking._id || "N/A"}
+          {booking.bookingId || booking._id || 'N/A'}
         </span>
       ),
     },
     {
-      header: "Customer",
-      accessorKey: "customer" as keyof StoreBooking,
+      header: 'Customer',
+      accessorKey: 'customer' as keyof StoreBooking,
       cell: (booking: StoreBooking) => (
         <div>
           <div className="font-medium">
-            {booking.customer?.name || "Unknown Customer"}
+            {booking.customer?.name || 'Unknown Customer'}
           </div>
           <div className="text-xs text-gray-400">
-            {booking.customer?.email || "No email"}
+            {booking.customer?.email || 'No email'}
           </div>
         </div>
       ),
     },
     {
-      header: "Service & Vehicle",
-      accessorKey: "services" as keyof StoreBooking,
+      header: 'Service & Vehicle',
+      accessorKey: 'services' as keyof StoreBooking,
       cell: (booking: StoreBooking) => (
         <div>
           <div className="font-medium">
-            {booking.vehicle?.make || "Unknown"}{" "}
-            {booking.vehicle?.model || "Vehicle"} (
-            {booking.vehicle?.year || "N/A"})
+            {booking.vehicle?.make || 'Unknown'}{' '}
+            {booking.vehicle?.model || 'Vehicle'} (
+            {booking.vehicle?.year || 'N/A'})
           </div>
           <div className="mt-1 text-xs text-gray-400">
             {booking.services && booking.services.length
               ? (() => {
                   const names = booking.services.map((svc) => svc.name);
                   if (names.length <= 2) {
-                    return names.join(", ");
+                    return names.join(', ');
                   } else {
-                    return `${names.slice(0, 2).join(", ")} +${
+                    return `${names.slice(0, 2).join(', ')} +${
                       names.length - 2
                     } more`;
                   }
                 })()
-              : "Unknown Service"}
+              : 'Unknown Service'}
           </div>
         </div>
       ),
     },
     {
-      header: "Date",
-      accessorKey: "bookingDate" as keyof StoreBooking,
+      header: 'Date',
+      accessorKey: 'bookingDate' as keyof StoreBooking,
       cell: (booking: StoreBooking) => {
         try {
-          const date = new Date(booking.bookingDate || "");
+          const date = new Date(booking.bookingDate || '');
           if (isNaN(date.getTime())) {
             return <span className="text-red-500">Invalid Date</span>;
           }
-          return format(date, "MMM dd, yyyy");
+          return format(date, 'MMM dd, yyyy');
         } catch {
           return <span className="text-red-500">Invalid Date</span>;
         }
       },
     },
     {
-      header: "Time",
-      accessorKey: "services" as keyof StoreBooking,
+      header: 'Time',
+      accessorKey: 'services' as keyof StoreBooking,
       cell: (booking: StoreBooking) => {
-        if (!booking.services || booking.services.length === 0) return "N/A";
+        if (!booking.services || booking.services.length === 0) return 'N/A';
         const sorted = [...booking.services].sort(
           (a, b) =>
             new Date(a.startTime || 0).getTime() -
-            new Date(b.startTime || 0).getTime()
+            new Date(b.startTime || 0).getTime(),
         );
         const first = sorted[0];
         const last = sorted[sorted.length - 1];
         const start = new Date(first.startTime || 0).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
+          hour: '2-digit',
+          minute: '2-digit',
         });
         const end = new Date(last.endTime || 0).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
+          hour: '2-digit',
+          minute: '2-digit',
         });
         return `${start} - ${end}`;
       },
     },
     {
-      header: "Bay",
-      accessorKey: "services" as keyof StoreBooking,
+      header: 'Bay',
+      accessorKey: 'services' as keyof StoreBooking,
       cell: (booking: StoreBooking) => {
-        if (!booking.services?.length) return "";
+        if (!booking.services?.length) return '';
         // Get unique bay IDs from all services
         const uniqueBays = [
-          ...new Set(booking.services.map((svc) => svc.bayId || "Unknown")),
+          ...new Set(booking.services.map((svc) => svc.bayId || 'Unknown')),
         ];
-        return uniqueBays.join(", ");
+        return uniqueBays.join(', ');
       },
     },
     {
-      header: "Technician",
-      accessorKey: "services" as keyof StoreBooking,
+      header: 'Technician',
+      accessorKey: 'services' as keyof StoreBooking,
       cell: (booking: StoreBooking) => {
-        if (!booking.services?.length) return "";
+        if (!booking.services?.length) return '';
         // Get unique technicians from all services
         const technicians = booking.services
           .map((svc) => {
-            if (typeof svc.technicianId === "object" && svc.technicianId) {
-              return `${svc.technicianId.firstName || "Unknown"} ${
-                svc.technicianId.lastName || "Technician"
+            if (typeof svc.technicianId === 'object' && svc.technicianId) {
+              return `${svc.technicianId.firstName || 'Unknown'} ${
+                svc.technicianId.lastName || 'Technician'
               }`;
             }
-            return svc.technicianId || "Not assigned";
+            return svc.technicianId || 'Not assigned';
           })
           .filter((tech, index, arr) => arr.indexOf(tech) === index); // Remove duplicates
-        return technicians.join(", ");
+        return technicians.join(', ');
       },
     },
     {
-      header: "Status",
-      accessorKey: "status" as keyof StoreBooking,
+      header: 'Status',
+      accessorKey: 'status' as keyof StoreBooking,
       cell: (booking: StoreBooking) => {
         return (
           <span
             className={cn(
-              "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-              BookingUtil.getStatusColor(booking.status || "pending")
+              'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+              BookingUtil.getStatusColor(booking.status || 'pending'),
             )}
           >
-            {booking.status || "pending"}
+            {booking.status || 'pending'}
           </span>
         );
       },
@@ -310,11 +310,11 @@ export default function BookingsPage() {
     // filters
     const filtered = all.filter((b) => {
       const bayOk =
-        selectedBay === "all" ||
+        selectedBay === 'all' ||
         (b.services?.some((s) => s.bayId?.endsWith(String(selectedBay))) ??
           false);
 
-      const statusOk = filters.status === "all" || b.status === filters.status;
+      const statusOk = filters.status === 'all' || b.status === filters.status;
 
       const customerOk =
         !filters.customerName ||
@@ -325,7 +325,7 @@ export default function BookingsPage() {
       const serviceOk =
         !filters.serviceId ||
         (b.services?.some((s) =>
-          s.name?.toLowerCase().includes(filters.serviceId!.toLowerCase())
+          s.name?.toLowerCase().includes(filters.serviceId!.toLowerCase()),
         ) ??
           false);
 
@@ -339,12 +339,12 @@ export default function BookingsPage() {
 
     // sort
     const sorted = [...filtered].sort((a, b) => {
-      const dir = filters.sortOrder === "asc" ? 1 : -1;
+      const dir = filters.sortOrder === 'asc' ? 1 : -1;
 
-      if (filters.sortBy === "date") {
-        if (filters.dateFilter === "created") {
+      if (filters.sortBy === 'date') {
+        if (filters.dateFilter === 'created') {
           // Sort by creation date (latest first by default)
-          if (filters.sortOrder === "desc") {
+          if (filters.sortOrder === 'desc') {
             return (
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
@@ -355,7 +355,7 @@ export default function BookingsPage() {
           }
         } else {
           // Sort by booking date (upcoming first by default)
-          if (filters.sortOrder === "desc") {
+          if (filters.sortOrder === 'desc') {
             return (
               new Date(a.bookingDate).getTime() -
               new Date(b.bookingDate).getTime()
@@ -369,12 +369,12 @@ export default function BookingsPage() {
         }
       }
 
-      if (filters.sortBy === "customerName") {
-        return a.customer?.name?.localeCompare(b.customer?.name || "") * dir;
+      if (filters.sortBy === 'customerName') {
+        return a.customer?.name?.localeCompare(b.customer?.name || '') * dir;
       }
-      if (filters.sortBy === "serviceId") {
-        const an = a.services?.[0]?.name || "";
-        const bn = b.services?.[0]?.name || "";
+      if (filters.sortBy === 'serviceId') {
+        const an = a.services?.[0]?.name || '';
+        const bn = b.services?.[0]?.name || '';
         return an.localeCompare(bn) * dir;
       }
 
@@ -415,7 +415,7 @@ export default function BookingsPage() {
       ...prev,
       sortBy: field,
       sortOrder:
-        prev.sortBy === field && prev.sortOrder === "asc" ? "desc" : "asc",
+        prev.sortBy === field && prev.sortOrder === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -444,7 +444,7 @@ export default function BookingsPage() {
             <Select
               value={selectedBay.toString()}
               onValueChange={(value) =>
-                setSelectedBay(value === "all" ? "all" : parseInt(value))
+                setSelectedBay(value === 'all' ? 'all' : parseInt(value))
               }
             >
               <SelectTrigger className="w-[180px] bg-white">
@@ -463,8 +463,8 @@ export default function BookingsPage() {
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
               className={cn(
-                "flex items-center gap-2",
-                showFilters && "bg-blue-100"
+                'flex items-center gap-2',
+                showFilters && 'bg-blue-100',
               )}
             >
               <Filter className="w-4 h-4" />
@@ -477,8 +477,8 @@ export default function BookingsPage() {
               onClick={handleRefresh}
               disabled={isRefreshing}
               className={cn(
-                "flex items-center gap-2",
-                isRefreshing && "opacity-50 cursor-not-allowed"
+                'flex items-center gap-2',
+                isRefreshing && 'opacity-50 cursor-not-allowed',
               )}
             >
               {isRefreshing ? (
@@ -512,7 +512,7 @@ export default function BookingsPage() {
                   />
                 </svg>
               )}
-              {isRefreshing ? "Refreshing..." : "Refresh"}
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
             </Button>
           </div>
 
@@ -521,15 +521,15 @@ export default function BookingsPage() {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => handleSortChange("date")}
+                onClick={() => handleSortChange('date')}
                 className={cn(
-                  "flex items-center gap-2",
-                  filters.sortBy === "date" && "bg-blue-100"
+                  'flex items-center gap-2',
+                  filters.sortBy === 'date' && 'bg-blue-100',
                 )}
               >
                 Date
-                {filters.sortBy === "date" &&
-                  (filters.sortOrder === "asc" ? (
+                {filters.sortBy === 'date' &&
+                  (filters.sortOrder === 'asc' ? (
                     <SortAsc className="w-4 h-4" />
                   ) : (
                     <SortDesc className="w-4 h-4" />
@@ -537,15 +537,15 @@ export default function BookingsPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleSortChange("customerName")}
+                onClick={() => handleSortChange('customerName')}
                 className={cn(
-                  "flex items-center gap-2",
-                  filters.sortBy === "customerName" && "bg-blue-100"
+                  'flex items-center gap-2',
+                  filters.sortBy === 'customerName' && 'bg-blue-100',
                 )}
               >
                 Customer
-                {filters.sortBy === "customerName" &&
-                  (filters.sortOrder === "asc" ? (
+                {filters.sortBy === 'customerName' &&
+                  (filters.sortOrder === 'asc' ? (
                     <SortAsc className="w-4 h-4" />
                   ) : (
                     <SortDesc className="w-4 h-4" />
@@ -553,15 +553,15 @@ export default function BookingsPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleSortChange("serviceId")}
+                onClick={() => handleSortChange('serviceId')}
                 className={cn(
-                  "flex items-center gap-2",
-                  filters.sortBy === "serviceId" && "bg-blue-100"
+                  'flex items-center gap-2',
+                  filters.sortBy === 'serviceId' && 'bg-blue-100',
                 )}
               >
                 Service
-                {filters.sortBy === "serviceId" &&
-                  (filters.sortOrder === "asc" ? (
+                {filters.sortBy === 'serviceId' &&
+                  (filters.sortOrder === 'asc' ? (
                     <SortAsc className="w-4 h-4" />
                   ) : (
                     <SortDesc className="w-4 h-4" />
@@ -590,9 +590,9 @@ export default function BookingsPage() {
                 </label>
                 <Input
                   type="text"
-                  value={filters.customerName || ""}
+                  value={filters.customerName || ''}
                   onChange={(e) =>
-                    handleFilterChange("customerName", e.target.value || null)
+                    handleFilterChange('customerName', e.target.value || null)
                   }
                   placeholder="Search customer..."
                 />
@@ -605,9 +605,9 @@ export default function BookingsPage() {
                 </label>
                 <Input
                   type="text"
-                  value={filters.serviceId || ""}
+                  value={filters.serviceId || ''}
                   onChange={(e) =>
-                    handleFilterChange("serviceId", e.target.value || null)
+                    handleFilterChange('serviceId', e.target.value || null)
                   }
                   placeholder="Search service..."
                 />
@@ -621,7 +621,7 @@ export default function BookingsPage() {
                 <Select
                   value={filters.status}
                   onValueChange={(value) =>
-                    handleFilterChange("status", value as BookingStatus | "all")
+                    handleFilterChange('status', value as BookingStatus | 'all')
                   }
                 >
                   <SelectTrigger className="bg-white">
@@ -647,8 +647,8 @@ export default function BookingsPage() {
                   value={filters.dateFilter}
                   onValueChange={(value) =>
                     handleFilterChange(
-                      "dateFilter",
-                      value as "created" | "booking"
+                      'dateFilter',
+                      value as 'created' | 'booking',
                     )
                   }
                 >
@@ -769,7 +769,7 @@ export default function BookingsPage() {
           <Select
             value={selectedBay.toString()}
             onValueChange={(value) =>
-              setSelectedBay(value === "all" ? "all" : parseInt(value))
+              setSelectedBay(value === 'all' ? 'all' : parseInt(value))
             }
           >
             <SelectTrigger className="w-[180px] bg-white">
@@ -788,8 +788,8 @@ export default function BookingsPage() {
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "flex items-center gap-2",
-              showFilters && "bg-blue-100"
+              'flex items-center gap-2',
+              showFilters && 'bg-blue-100',
             )}
           >
             <Filter className="w-4 h-4" />
@@ -802,8 +802,8 @@ export default function BookingsPage() {
             onClick={handleRefresh}
             disabled={isRefreshing}
             className={cn(
-              "flex items-center gap-2",
-              isRefreshing && "opacity-50 cursor-not-allowed"
+              'flex items-center gap-2',
+              isRefreshing && 'opacity-50 cursor-not-allowed',
             )}
           >
             {isRefreshing ? (
@@ -837,7 +837,7 @@ export default function BookingsPage() {
                 />
               </svg>
             )}
-            {isRefreshing ? "Refreshing..." : "Refresh"}
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
         </div>
 
@@ -846,15 +846,15 @@ export default function BookingsPage() {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => handleSortChange("date")}
+              onClick={() => handleSortChange('date')}
               className={cn(
-                "flex items-center gap-2",
-                filters.sortBy === "date" && "bg-blue-100"
+                'flex items-center gap-2',
+                filters.sortBy === 'date' && 'bg-blue-100',
               )}
             >
               Date
-              {filters.sortBy === "date" &&
-                (filters.sortOrder === "asc" ? (
+              {filters.sortBy === 'date' &&
+                (filters.sortOrder === 'asc' ? (
                   <SortAsc className="w-4 h-4" />
                 ) : (
                   <SortDesc className="w-4 h-4" />
@@ -862,15 +862,15 @@ export default function BookingsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleSortChange("customerName")}
+              onClick={() => handleSortChange('customerName')}
               className={cn(
-                "flex items-center gap-2",
-                filters.sortBy === "customerName" && "bg-blue-100"
+                'flex items-center gap-2',
+                filters.sortBy === 'customerName' && 'bg-blue-100',
               )}
             >
               Customer
-              {filters.sortBy === "customerName" &&
-                (filters.sortOrder === "asc" ? (
+              {filters.sortBy === 'customerName' &&
+                (filters.sortOrder === 'asc' ? (
                   <SortAsc className="w-4 h-4" />
                 ) : (
                   <SortDesc className="w-4 h-4" />
@@ -878,15 +878,15 @@ export default function BookingsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleSortChange("serviceId")}
+              onClick={() => handleSortChange('serviceId')}
               className={cn(
-                "flex items-center gap-2",
-                filters.sortBy === "serviceId" && "bg-blue-100"
+                'flex items-center gap-2',
+                filters.sortBy === 'serviceId' && 'bg-blue-100',
               )}
             >
               Service
-              {filters.sortBy === "serviceId" &&
-                (filters.sortOrder === "asc" ? (
+              {filters.sortBy === 'serviceId' &&
+                (filters.sortOrder === 'asc' ? (
                   <SortAsc className="w-4 h-4" />
                 ) : (
                   <SortDesc className="w-4 h-4" />
@@ -915,9 +915,9 @@ export default function BookingsPage() {
               </label>
               <Input
                 type="text"
-                value={filters.customerName || ""}
+                value={filters.customerName || ''}
                 onChange={(e) =>
-                  handleFilterChange("customerName", e.target.value || null)
+                  handleFilterChange('customerName', e.target.value || null)
                 }
                 placeholder="Search customer..."
               />
@@ -930,9 +930,9 @@ export default function BookingsPage() {
               </label>
               <Input
                 type="text"
-                value={filters.serviceId || ""}
+                value={filters.serviceId || ''}
                 onChange={(e) =>
-                  handleFilterChange("serviceId", e.target.value || null)
+                  handleFilterChange('serviceId', e.target.value || null)
                 }
                 placeholder="Search service..."
               />
@@ -946,7 +946,7 @@ export default function BookingsPage() {
               <Select
                 value={filters.status}
                 onValueChange={(value) =>
-                  handleFilterChange("status", value as BookingStatus | "all")
+                  handleFilterChange('status', value as BookingStatus | 'all')
                 }
               >
                 <SelectTrigger className="bg-white">
@@ -976,22 +976,22 @@ export default function BookingsPage() {
           setIsModalOpen(true);
         }}
         emptyMessage={
-          filters.status !== "all" || filters.customerName || filters.serviceId
-            ? "No bookings match your filters"
-            : "No bookings found"
+          filters.status !== 'all' || filters.customerName || filters.serviceId
+            ? 'No bookings match your filters'
+            : 'No bookings found'
         }
         emptySubMessage={
-          filters.status !== "all" || filters.customerName || filters.serviceId
-            ? "Try adjusting your filters or search criteria"
-            : "Get started by creating a new booking"
+          filters.status !== 'all' || filters.customerName || filters.serviceId
+            ? 'Try adjusting your filters or search criteria'
+            : 'Get started by creating a new booking'
         }
         emptyAction={
-          filters.status !== "all" || filters.customerName || filters.serviceId
+          filters.status !== 'all' || filters.customerName || filters.serviceId
             ? {
-                label: "Clear filters",
+                label: 'Clear filters',
                 onClick: () => {
                   setFilters({
-                    status: "all",
+                    status: 'all',
                     customerName: null,
                     serviceId: null,
                     serviceStatus: null,
@@ -999,14 +999,14 @@ export default function BookingsPage() {
                     maxPrice: null,
                     startDate: null,
                     endDate: null,
-                    sortBy: "date",
-                    sortOrder: "desc",
-                    dateFilter: "created",
+                    sortBy: 'date',
+                    sortOrder: 'desc',
+                    dateFilter: 'created',
                   });
                 },
               }
             : {
-                label: "Create Booking",
+                label: 'Create Booking',
                 onClick: () => setIsCreateModalOpen(true),
               }
         }
@@ -1015,11 +1015,11 @@ export default function BookingsPage() {
       {/* Pagination */}
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          Showing {(currentPage - 1) * paginationInfo.itemsPerPage + 1} to{" "}
+          Showing {(currentPage - 1) * paginationInfo.itemsPerPage + 1} to{' '}
           {Math.min(
             currentPage * paginationInfo.itemsPerPage,
-            paginationInfo.totalItems
-          )}{" "}
+            paginationInfo.totalItems,
+          )}{' '}
           of {paginationInfo.totalItems} bookings
         </div>
         <div className="flex items-center gap-2">
@@ -1035,16 +1035,16 @@ export default function BookingsPage() {
           <div className="flex gap-1">
             {Array.from(
               { length: paginationInfo.totalPages },
-              (_, i) => i + 1
+              (_, i) => i + 1,
             ).map((page) => (
               <Button
                 key={page}
-                variant={currentPage === page ? "default" : "outline"}
+                variant={currentPage === page ? 'default' : 'outline'}
                 onClick={() => handlePageChange(page)}
                 className={cn(
-                  "w-8 h-8 p-0",
+                  'w-8 h-8 p-0',
                   currentPage === page &&
-                    "bg-blue-500 text-white hover:bg-blue-600"
+                    'bg-blue-500 text-white hover:bg-blue-600',
                 )}
               >
                 {page}

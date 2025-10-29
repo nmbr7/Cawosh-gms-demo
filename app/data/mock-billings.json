@@ -15,24 +15,24 @@
         "duration": "1 hour"
       },
       "charges": {
-        "labor": 75.00,
+        "labor": 75.0,
         "parts": [
           {
             "name": "Engine Oil (5W-30)",
             "quantity": 5,
-            "unitPrice": 12.00,
-            "total": 60.00
+            "unitPrice": 12.0,
+            "total": 60.0
           },
           {
             "name": "Oil Filter",
             "quantity": 1,
-            "unitPrice": 15.00,
-            "total": 15.00
+            "unitPrice": 15.0,
+            "total": 15.0
           }
         ],
-        "subtotal": 150.00,
-        "tax": 15.00,
-        "total": 165.00
+        "subtotal": 150.0,
+        "tax": 15.0,
+        "total": 165.0
       },
       "paymentStatus": "paid",
       "paymentMethod": "credit_card",
@@ -54,24 +54,24 @@
         "duration": "1.5 hours"
       },
       "charges": {
-        "labor": 120.00,
+        "labor": 120.0,
         "parts": [
           {
             "name": "Brake Pads (Front)",
             "quantity": 2,
-            "unitPrice": 45.00,
-            "total": 90.00
+            "unitPrice": 45.0,
+            "total": 90.0
           },
           {
             "name": "Brake Fluid",
             "quantity": 1,
-            "unitPrice": 25.00,
-            "total": 25.00
+            "unitPrice": 25.0,
+            "total": 25.0
           }
         ],
-        "subtotal": 235.00,
-        "tax": 23.50,
-        "total": 258.50
+        "subtotal": 235.0,
+        "tax": 23.5,
+        "total": 258.5
       },
       "paymentStatus": "paid",
       "paymentMethod": "debit_card",
@@ -93,11 +93,11 @@
         "duration": "1 hour"
       },
       "charges": {
-        "labor": 60.00,
+        "labor": 60.0,
         "parts": [],
-        "subtotal": 60.00,
-        "tax": 6.00,
-        "total": 66.00
+        "subtotal": 60.0,
+        "tax": 6.0,
+        "total": 66.0
       },
       "paymentStatus": "paid",
       "paymentMethod": "cash",
@@ -119,18 +119,18 @@
         "duration": "1 hour"
       },
       "charges": {
-        "labor": 90.00,
+        "labor": 90.0,
         "parts": [
           {
             "name": "Battery Terminal Cleaner",
             "quantity": 1,
-            "unitPrice": 15.00,
-            "total": 15.00
+            "unitPrice": 15.0,
+            "total": 15.0
           }
         ],
-        "subtotal": 105.00,
-        "tax": 10.50,
-        "total": 115.50
+        "subtotal": 105.0,
+        "tax": 10.5,
+        "total": 115.5
       },
       "paymentStatus": "paid",
       "paymentMethod": "online_transfer",
@@ -152,30 +152,30 @@
         "duration": "2 hours"
       },
       "charges": {
-        "labor": 180.00,
+        "labor": 180.0,
         "parts": [
           {
             "name": "Transmission Fluid",
             "quantity": 12,
-            "unitPrice": 15.00,
-            "total": 180.00
+            "unitPrice": 15.0,
+            "total": 180.0
           },
           {
             "name": "Transmission Filter",
             "quantity": 1,
-            "unitPrice": 45.00,
-            "total": 45.00
+            "unitPrice": 45.0,
+            "total": 45.0
           },
           {
             "name": "Gasket",
             "quantity": 1,
-            "unitPrice": 25.00,
-            "total": 25.00
+            "unitPrice": 25.0,
+            "total": 25.0
           }
         ],
-        "subtotal": 430.00,
-        "tax": 43.00,
-        "total": 473.00
+        "subtotal": 430.0,
+        "tax": 43.0,
+        "total": 473.0
       },
       "paymentStatus": "paid",
       "paymentMethod": "credit_card",
@@ -183,4 +183,4 @@
       "invoiceNumber": "INV-2025-005"
     }
   ]
-} 
+}

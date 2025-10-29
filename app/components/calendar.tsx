@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { format } from "date-fns";
+import { useEffect, useRef, useState } from 'react';
+import { format } from 'date-fns';
 
 interface CalendarProps {
   selectedDate: Date;
@@ -18,7 +18,7 @@ export function Calendar({
 }: CalendarProps) {
   const calendarRef = useRef<HTMLDivElement>(null);
   const [dateValue, setDateValue] = useState(
-    format(selectedDate, "yyyy-MM-dd")
+    format(selectedDate, 'yyyy-MM-dd'),
   );
 
   useEffect(() => {
@@ -32,11 +32,11 @@ export function Calendar({
     }
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen, onClose]);
 

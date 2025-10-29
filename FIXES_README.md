@@ -27,13 +27,13 @@ This document outlines critical security vulnerabilities, architectural issues, 
 ```typescript
 // ❌ CURRENT (INSECURE)
 export const MOCK_ADMIN: User = {
-  email: "admin@cawosh.com",
+  email: 'admin@cawosh.com',
   // Password: "admin" - HARDCODED!
 };
 
 // ✅ FIXED VERSION
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 export class AuthService {
   static async hashPassword(password: string): Promise<string> {
@@ -42,13 +42,13 @@ export class AuthService {
 
   static async verifyPassword(
     password: string,
-    hash: string
+    hash: string,
   ): Promise<boolean> {
     return bcrypt.compare(password, hash);
   }
 
   static generateToken(userId: string): string {
-    return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: "7d" });
+    return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: '7d' });
   }
 }
 ```
@@ -80,12 +80,12 @@ export class AuthService {
 
 ```typescript
 // ❌ CURRENT (UNSAFE)
-const dbPath = path.join(process.cwd(), "db.json");
-const dbData = JSON.parse(fs.readFileSync(dbPath, "utf-8"));
+const dbPath = path.join(process.cwd(), 'db.json');
+const dbData = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
 
 // ✅ FIXED VERSION
-import { PrismaClient } from "@prisma/client";
-import { Pool } from "pg";
+import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
 
 const prisma = new PrismaClient();
 
@@ -138,7 +138,7 @@ export class AppError extends Error {
   constructor(
     public message: string,
     public statusCode: number = 500,
-    public isOperational: boolean = true
+    public isOperational: boolean = true,
   ) {
     super(message);
     Error.captureStackTrace(this, this.constructor);
@@ -148,7 +148,7 @@ export class AppError extends Error {
 export class ErrorHandler {
   static handle(error: Error, req: Request, res: Response, next: NextFunction) {
     let statusCode = 500;
-    let message = "Internal Server Error";
+    let message = 'Internal Server Error';
 
     if (error instanceof AppError) {
       statusCode = error.statusCode;
@@ -162,7 +162,7 @@ export class ErrorHandler {
     res.status(statusCode).json({
       success: false,
       error: message,
-      ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
+      ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
     });
   }
 }

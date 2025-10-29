@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import type { Billing } from "@/app/models/garage";
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import type { Billing } from '@/app/models/garage';
 
 export async function PATCH(request: Request) {
   try {
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
+    const accessToken = cookieStore.get('access_token')?.value;
 
     if (!accessToken) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -17,28 +17,28 @@ export async function PATCH(request: Request) {
     const response = await fetch(
       `${process.env.BACKEND_URL}/api/garages/settings`,
       {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           billing,
         }),
-      }
+      },
     );
 
     if (!response.ok) {
-      throw new Error("Failed to update tax settings");
+      throw new Error('Failed to update tax settings');
     }
 
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error("Error updating tax settings:", error);
+    console.error('Error updating tax settings:', error);
     return NextResponse.json(
-      { error: "Failed to update tax settings" },
-      { status: 500 }
+      { error: 'Failed to update tax settings' },
+      { status: 500 },
     );
   }
 }

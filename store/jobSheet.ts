@@ -1,19 +1,19 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { useBookingStore } from "./booking";
-import type { Booking } from "@/types/booking";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { useBookingStore } from './booking';
+import type { Booking } from '@/types/booking';
 
 export type JobSheetStatus =
-  | "PENDING"
-  | "IN_PROGRESS"
-  | "PAUSED"
-  | "HALTED"
-  | "COMPLETED"
-  | "CANCELLED";
+  | 'PENDING'
+  | 'IN_PROGRESS'
+  | 'PAUSED'
+  | 'HALTED'
+  | 'COMPLETED'
+  | 'CANCELLED';
 
 export interface TimeLog {
   id: string;
-  action: "START" | "PAUSE" | "RESUME" | "HALT" | "COMPLETE";
+  action: 'START' | 'PAUSE' | 'RESUME' | 'HALT' | 'COMPLETE';
   timestamp: string;
   technicianId: string;
   notes?: string;
@@ -36,10 +36,10 @@ export interface JobSheet {
     addedBy: string; // technician ID
     addedAt: string;
   }>;
-  approvalStatus?: "pending" | "approved" | "rejected";
+  approvalStatus?: 'pending' | 'approved' | 'rejected';
   approvedBy?: string; // advisor user ID
   approvedAt?: string; // timestamp
-  customerApprovalMethod?: "manual" | "api"; // for future API integration
+  customerApprovalMethod?: 'manual' | 'api'; // for future API integration
   // Work tracking fields
   startedAt?: string;
   pausedAt?: string;
@@ -71,12 +71,12 @@ type JobSheetState = {
       duration: number;
       price: number;
       addedBy: string;
-    }>
+    }>,
   ) => void;
   setApprovalStatus: (
     jobSheetId: string,
-    status: "pending" | "approved" | "rejected",
-    approvedBy?: string
+    status: 'pending' | 'approved' | 'rejected',
+    approvedBy?: string,
   ) => void;
   // Work tracking actions
   startJob: (jobSheetId: string, technicianId: string) => void;
@@ -93,23 +93,23 @@ export const useJobSheetStore = create<JobSheetState>()(
       jobSheets: [], // Start with empty jobsheets
       filterOptions: {
         statuses: [
-          { value: "PENDING", label: "Pending" },
-          { value: "IN_PROGRESS", label: "In Progress" },
-          { value: "PAUSED", label: "Paused" },
-          { value: "HALTED", label: "Halted" },
-          { value: "COMPLETED", label: "Completed" },
-          { value: "CANCELLED", label: "Cancelled" },
+          { value: 'PENDING', label: 'Pending' },
+          { value: 'IN_PROGRESS', label: 'In Progress' },
+          { value: 'PAUSED', label: 'Paused' },
+          { value: 'HALTED', label: 'Halted' },
+          { value: 'COMPLETED', label: 'Completed' },
+          { value: 'CANCELLED', label: 'Cancelled' },
         ],
         serviceStatuses: [
-          { value: "pending", label: "Pending" },
-          { value: "in-progress", label: "In Progress" },
-          { value: "completed", label: "Completed" },
+          { value: 'pending', label: 'Pending' },
+          { value: 'in-progress', label: 'In Progress' },
+          { value: 'completed', label: 'Completed' },
         ],
         technicians: [
-          { id: "tech-1", name: "John Smith" },
-          { id: "tech-2", name: "Sarah Johnson" },
-          { id: "tech-3", name: "Mike Davis" },
-          { id: "tech-4", name: "Lisa Wilson" },
+          { id: 'tech-1', name: 'John Smith' },
+          { id: 'tech-2', name: 'Sarah Johnson' },
+          { id: 'tech-3', name: 'Mike Davis' },
+          { id: 'tech-4', name: 'Lisa Wilson' },
         ],
       },
       createFromBooking: (bookingId) => {
@@ -121,9 +121,9 @@ export const useJobSheetStore = create<JobSheetState>()(
         const booking = bookingStore.bookings.find((b) => b._id === bookingId);
 
         const js: JobSheet = {
-          id: `JB-${nextId.toString().padStart(4, "0")}`,
+          id: `JB-${nextId.toString().padStart(4, '0')}`,
           bookingId,
-          status: "PENDING",
+          status: 'PENDING',
           createdAt: new Date().toISOString(),
           requiresDiagnosis: booking?.requiresDiagnosis || false,
           timeLogs: [],
@@ -135,16 +135,16 @@ export const useJobSheetStore = create<JobSheetState>()(
         // Log into booking history that a job sheet was created
         if (booking) {
           useBookingStore.getState().addBookingHistory(bookingId, {
-            status: "pending",
+            status: 'pending',
             changedBy: {
-              _id: "system",
-              firstName: "System",
-              lastName: "User",
-              email: "system@local",
+              _id: 'system',
+              firstName: 'System',
+              lastName: 'User',
+              email: 'system@local',
             },
             changedAt: new Date().toISOString(),
             notes: `Job sheet ${js.id} created`,
-            type: "job_sheet_created",
+            type: 'job_sheet_created',
           });
         }
         return js;
@@ -152,7 +152,7 @@ export const useJobSheetStore = create<JobSheetState>()(
       setStatus: (id, status) =>
         set((s) => ({
           jobSheets: s.jobSheets.map((j) =>
-            j.id === id ? { ...j, status } : j
+            j.id === id ? { ...j, status } : j,
           ),
         })),
       addDiagnosedServices: (jobSheetId, services) =>
@@ -165,9 +165,9 @@ export const useJobSheetStore = create<JobSheetState>()(
                     ...service,
                     addedAt: new Date().toISOString(),
                   })),
-                  approvalStatus: "pending" as const,
+                  approvalStatus: 'pending' as const,
                 }
-              : j
+              : j,
           ),
         })),
       setApprovalStatus: (jobSheetId, status, approvedBy) =>
@@ -180,7 +180,7 @@ export const useJobSheetStore = create<JobSheetState>()(
                   approvedBy,
                   approvedAt: new Date().toISOString(),
                 }
-              : j
+              : j,
           ),
         })),
       getFilterOptions: () => get().filterOptions,
@@ -188,7 +188,7 @@ export const useJobSheetStore = create<JobSheetState>()(
       startJob: (jobSheetId, technicianId) => {
         const timeLog: TimeLog = {
           id: crypto.randomUUID(),
-          action: "START",
+          action: 'START',
           timestamp: new Date().toISOString(),
           technicianId,
         };
@@ -198,18 +198,18 @@ export const useJobSheetStore = create<JobSheetState>()(
             j.id === jobSheetId
               ? {
                   ...j,
-                  status: "IN_PROGRESS" as const,
+                  status: 'IN_PROGRESS' as const,
                   startedAt: timeLog.timestamp,
                   timeLogs: [...j.timeLogs, timeLog],
                 }
-              : j
+              : j,
           ),
         }));
       },
       pauseJob: (jobSheetId, technicianId, notes) => {
         const timeLog: TimeLog = {
           id: crypto.randomUUID(),
-          action: "PAUSE",
+          action: 'PAUSE',
           timestamp: new Date().toISOString(),
           technicianId,
           notes,
@@ -220,18 +220,18 @@ export const useJobSheetStore = create<JobSheetState>()(
             j.id === jobSheetId
               ? {
                   ...j,
-                  status: "PAUSED" as const,
+                  status: 'PAUSED' as const,
                   pausedAt: timeLog.timestamp,
                   timeLogs: [...j.timeLogs, timeLog],
                 }
-              : j
+              : j,
           ),
         }));
       },
       resumeJob: (jobSheetId, technicianId) => {
         const timeLog: TimeLog = {
           id: crypto.randomUUID(),
-          action: "RESUME",
+          action: 'RESUME',
           timestamp: new Date().toISOString(),
           technicianId,
         };
@@ -241,17 +241,17 @@ export const useJobSheetStore = create<JobSheetState>()(
             j.id === jobSheetId
               ? {
                   ...j,
-                  status: "IN_PROGRESS" as const,
+                  status: 'IN_PROGRESS' as const,
                   timeLogs: [...j.timeLogs, timeLog],
                 }
-              : j
+              : j,
           ),
         }));
       },
       haltJob: (jobSheetId, technicianId, reason) => {
         const timeLog: TimeLog = {
           id: crypto.randomUUID(),
-          action: "HALT",
+          action: 'HALT',
           timestamp: new Date().toISOString(),
           technicianId,
           notes: reason,
@@ -262,18 +262,18 @@ export const useJobSheetStore = create<JobSheetState>()(
             j.id === jobSheetId
               ? {
                   ...j,
-                  status: "HALTED" as const,
+                  status: 'HALTED' as const,
                   haltReason: reason,
                   timeLogs: [...j.timeLogs, timeLog],
                 }
-              : j
+              : j,
           ),
         }));
       },
       completeJob: (jobSheetId, technicianId) => {
         const timeLog: TimeLog = {
           id: crypto.randomUUID(),
-          action: "COMPLETE",
+          action: 'COMPLETE',
           timestamp: new Date().toISOString(),
           technicianId,
         };
@@ -283,11 +283,11 @@ export const useJobSheetStore = create<JobSheetState>()(
             j.id === jobSheetId
               ? {
                   ...j,
-                  status: "COMPLETED" as const,
+                  status: 'COMPLETED' as const,
                   completedAt: timeLog.timestamp,
                   timeLogs: [...j.timeLogs, timeLog],
                 }
-              : j
+              : j,
           ),
         }));
       },
@@ -296,12 +296,12 @@ export const useJobSheetStore = create<JobSheetState>()(
         let lastStart: Date | null = null;
 
         timeLogs.forEach((log) => {
-          if (log.action === "START" || log.action === "RESUME") {
+          if (log.action === 'START' || log.action === 'RESUME') {
             lastStart = new Date(log.timestamp);
           } else if (
-            (log.action === "PAUSE" ||
-              log.action === "HALT" ||
-              log.action === "COMPLETE") &&
+            (log.action === 'PAUSE' ||
+              log.action === 'HALT' ||
+              log.action === 'COMPLETE') &&
             lastStart
           ) {
             const duration =
@@ -316,9 +316,9 @@ export const useJobSheetStore = create<JobSheetState>()(
       },
     }),
     {
-      name: "jobsheet-storage",
+      name: 'jobsheet-storage',
       // Only persist jobSheets, not filterOptions or other computed values
       partialize: (state) => ({ jobSheets: state.jobSheets }),
-    }
-  )
+    },
+  ),
 );

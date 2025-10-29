@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useJobSheetStore } from "@/store/jobSheet";
-import { useBookingStore } from "@/store/booking";
-import { useInventory } from "@/store/inventory";
-import { useBillingStore } from "@/store/billing";
+} from '@/components/ui/select';
+import { useJobSheetStore } from '@/store/jobSheet';
+import { useBookingStore } from '@/store/booking';
+import { useInventory } from '@/store/inventory';
+import { useBillingStore } from '@/store/billing';
 import {
   getInventoryRequirementsForServices,
   checkInventoryAvailability,
-} from "@/utils/serviceInventoryMap";
+} from '@/utils/serviceInventoryMap';
 import {
   Play,
   Pause,
@@ -40,7 +40,7 @@ import {
   Wrench,
   CheckSquare,
   Square as EmptySquare,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface WorkTrackingModalProps {
   isOpen: boolean;
@@ -80,8 +80,8 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
   const booking = bookings.find((b) => b._id === jobSheet?.bookingId);
 
   // State for pause/halt reasons
-  const [pauseReason, setPauseReason] = useState("");
-  const [haltReason, setHaltReason] = useState("");
+  const [pauseReason, setPauseReason] = useState('');
+  const [haltReason, setHaltReason] = useState('');
   const [showPauseDialog, setShowPauseDialog] = useState(false);
   const [showHaltDialog, setShowHaltDialog] = useState(false);
   const [showCompleteDialog, setShowCompleteDialog] = useState(false);
@@ -97,16 +97,16 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
     if (isOpen && jobSheet && booking) {
       const services = jobSheet.diagnosedServices || booking.services;
       const checklist = services.map((service) => ({
-        serviceId: "id" in service ? service.id : service.serviceId._id,
+        serviceId: 'id' in service ? service.id : service.serviceId._id,
         serviceName: service.name,
         completed: false,
-        notes: "",
+        notes: '',
       }));
       setServiceChecklist(checklist);
 
       // Check inventory availability
       const serviceIds = services.map((s) =>
-        "id" in s ? s.id : s.serviceId._id
+        'id' in s ? s.id : s.serviceId._id,
       );
       const requiredItems = getInventoryRequirementsForServices(serviceIds);
       const availability = checkInventoryAvailability(requiredItems, allItems);
@@ -118,7 +118,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
               item.quantity
             }, have ${
               allItems.find((i) => i.id === item.itemId)?.quantity || 0
-            })`
+            })`,
         );
         setInventoryWarnings(warnings);
       } else {
@@ -132,7 +132,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
     ? calculateWorkDuration(jobSheet.timeLogs)
     : 0;
 
-  const canInteractWithChecklist = jobSheet?.status === "IN_PROGRESS";
+  const canInteractWithChecklist = jobSheet?.status === 'IN_PROGRESS';
 
   // Action handlers
   const handleStartWork = () => {
@@ -142,20 +142,20 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
         jobSheet.diagnosedServices ||
         booking?.services ||
         []
-      ).map((s) => ("id" in s ? s.id : s.serviceId._id));
+      ).map((s) => ('id' in s ? s.id : s.serviceId._id));
       const requiredItems = getInventoryRequirementsForServices(serviceIds);
 
       requiredItems.forEach((item) => {
         adjustStock({
           itemId: item.itemId,
-          mode: "DECREASE",
+          mode: 'DECREASE',
           quantity: item.quantity,
-          reason: "Job started",
+          reason: 'Job started',
           reference: jobSheet.id,
-          performedBy: "system",
+          performedBy: 'system',
           jobSheetId: jobSheet.id,
           bookingId: booking?._id,
-          notes: "Auto-deduct on job start",
+          notes: 'Auto-deduct on job start',
         });
 
         // Log inventory usage to booking
@@ -173,21 +173,21 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
       });
     }
 
-    startJob(jobSheetId, "Starting work on job");
+    startJob(jobSheetId, 'Starting work on job');
 
     // Booking history log
     if (booking) {
       addBookingHistory(booking._id, {
-        status: "in_progress",
+        status: 'in_progress',
         changedBy: {
-          _id: "system",
-          firstName: "System",
-          lastName: "User",
-          email: "system@local",
+          _id: 'system',
+          firstName: 'System',
+          lastName: 'User',
+          email: 'system@local',
         },
         changedAt: new Date().toISOString(),
         notes: `Job ${jobSheetId} started`,
-        type: "job_started",
+        type: 'job_started',
       });
     }
   };
@@ -197,85 +197,85 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
       pauseJob(jobSheetId, pauseReason);
       if (booking) {
         addBookingHistory(booking._id, {
-          status: "in_progress",
+          status: 'in_progress',
           changedBy: {
-            _id: "system",
-            firstName: "System",
-            lastName: "User",
-            email: "system@local",
+            _id: 'system',
+            firstName: 'System',
+            lastName: 'User',
+            email: 'system@local',
           },
           changedAt: new Date().toISOString(),
           notes: `Job ${jobSheetId} paused: ${pauseReason}`,
-          type: "job_paused",
+          type: 'job_paused',
         });
       }
-      setPauseReason("");
+      setPauseReason('');
       setShowPauseDialog(false);
     }
   };
 
   const handleResumeWork = () => {
-    resumeJob(jobSheetId, "Resuming work");
+    resumeJob(jobSheetId, 'Resuming work');
     if (booking) {
       addBookingHistory(booking._id, {
-        status: "in_progress",
+        status: 'in_progress',
         changedBy: {
-          _id: "system",
-          firstName: "System",
-          lastName: "User",
-          email: "system@local",
+          _id: 'system',
+          firstName: 'System',
+          lastName: 'User',
+          email: 'system@local',
         },
         changedAt: new Date().toISOString(),
         notes: `Job ${jobSheetId} resumed`,
-        type: "job_resumed",
+        type: 'job_resumed',
       });
     }
   };
 
   const handleHaltWork = () => {
     if (haltReason.trim()) {
-      haltJob(jobSheetId, haltReason, "system");
+      haltJob(jobSheetId, haltReason, 'system');
       if (booking) {
         addBookingHistory(booking._id, {
-          status: "in_progress",
+          status: 'in_progress',
           changedBy: {
-            _id: "system",
-            firstName: "System",
-            lastName: "User",
-            email: "system@local",
+            _id: 'system',
+            firstName: 'System',
+            lastName: 'User',
+            email: 'system@local',
           },
           changedAt: new Date().toISOString(),
           notes: `Job ${jobSheetId} halted: ${haltReason}`,
-          type: "job_halted",
+          type: 'job_halted',
         });
       }
-      setHaltReason("");
+      setHaltReason('');
       setShowHaltDialog(false);
     }
   };
 
   const handleCompleteWork = () => {
     const allServicesCompleted = serviceChecklist.every(
-      (item) => item.completed
+      (item) => item.completed,
     );
     if (allServicesCompleted) {
       // Complete the job
-      completeJob(jobSheetId, "All services completed");
+      completeJob(jobSheetId, 'All services completed');
 
       // Update booking status to completed
       if (booking) {
-        updateBooking(booking._id, { status: "completed" });
+        updateBooking(booking._id, { status: 'completed' });
         addBookingHistory(booking._id, {
-          status: "completed",
+          status: 'completed',
           changedBy: {
-            _id: "system",
-            firstName: "System",
-            lastName: "User",
-            email: "system@local",
+            _id: 'system',
+            firstName: 'System',
+            lastName: 'User',
+            email: 'system@local',
           },
           changedAt: new Date().toISOString(),
           notes: `Job ${jobSheetId} completed`,
-          type: "job_completed",
+          type: 'job_completed',
         });
       }
 
@@ -296,7 +296,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
           // Calculate totals
           const subtotal = services.reduce(
             (sum, service) => sum + service.price,
-            0
+            0,
           );
           const serviceCharge = 15.0; // Fixed service charge
           const vatRate = 0.2; // 20% VAT
@@ -322,22 +322,22 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
             serviceCharge,
             vat: vat,
             totalAmount,
-            status: "DRAFT",
+            status: 'DRAFT',
             notes: `Invoice for job ${jobSheet.id}`,
-            createdBy: "system",
+            createdBy: 'system',
             createdAt: new Date().toISOString(),
           });
 
-          console.log("Invoice generated:", invoice.invoiceNumber);
+          console.log('Invoice generated:', invoice.invoiceNumber);
         } catch (error) {
-          console.error("Failed to generate invoice:", error);
+          console.error('Failed to generate invoice:', error);
         }
       }
 
       setShowCompleteDialog(false);
       onClose();
     } else {
-      alert("Please complete all services before finishing the job.");
+      alert('Please complete all services before finishing the job.');
     }
   };
 
@@ -346,16 +346,16 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
       prev.map((item) =>
         item.serviceId === serviceId
           ? { ...item, completed: !item.completed }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
   const updateServiceNotes = (serviceId: string, notes: string) => {
     setServiceChecklist((prev) =>
       prev.map((item) =>
-        item.serviceId === serviceId ? { ...item, notes } : item
-      )
+        item.serviceId === serviceId ? { ...item, notes } : item,
+      ),
     );
   };
 
@@ -363,18 +363,18 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
     if (!jobSheet) return null;
 
     const statusConfig = {
-      PENDING: { label: "Pending", className: "bg-yellow-100 text-yellow-800" },
+      PENDING: { label: 'Pending', className: 'bg-yellow-100 text-yellow-800' },
       IN_PROGRESS: {
-        label: "In Progress",
-        className: "bg-blue-100 text-blue-800",
+        label: 'In Progress',
+        className: 'bg-blue-100 text-blue-800',
       },
-      PAUSED: { label: "Paused", className: "bg-orange-100 text-orange-800" },
-      HALTED: { label: "Halted", className: "bg-red-100 text-red-800" },
+      PAUSED: { label: 'Paused', className: 'bg-orange-100 text-orange-800' },
+      HALTED: { label: 'Halted', className: 'bg-red-100 text-red-800' },
       COMPLETED: {
-        label: "Completed",
-        className: "bg-green-100 text-green-800",
+        label: 'Completed',
+        className: 'bg-green-100 text-green-800',
       },
-      CANCELLED: { label: "Cancelled", className: "bg-gray-100 text-gray-800" },
+      CANCELLED: { label: 'Cancelled', className: 'bg-gray-100 text-gray-800' },
     };
 
     const config = statusConfig[jobSheet.status] || statusConfig.PENDING;
@@ -388,12 +388,12 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
   };
 
   console.log(
-    "WorkTrackingModal render - isOpen:",
+    'WorkTrackingModal render - isOpen:',
     isOpen,
-    "jobSheetId:",
+    'jobSheetId:',
     jobSheetId,
-    "jobSheet:",
-    jobSheet
+    'jobSheet:',
+    jobSheet,
   );
 
   if (!jobSheet || !booking) {
@@ -507,8 +507,8 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                         disabled={!canInteractWithChecklist}
                         className={`mt-1 ${
                           !canInteractWithChecklist
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
+                            ? 'opacity-50 cursor-not-allowed'
+                            : ''
                         }`}
                       >
                         {item.completed ? (
@@ -521,7 +521,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                         <div className="flex items-center gap-2">
                           <span
                             className={`font-medium ${
-                              item.completed ? "line-through text-gray-500" : ""
+                              item.completed ? 'line-through text-gray-500' : ''
                             }`}
                           >
                             {item.serviceName}
@@ -541,7 +541,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                           }}
                           disabled={!canInteractWithChecklist}
                           className={`mt-2 w-full p-2 border rounded text-sm resize-none ${
-                            !canInteractWithChecklist ? "bg-gray-50" : ""
+                            !canInteractWithChecklist ? 'bg-gray-50' : ''
                           }`}
                           rows={2}
                         />
@@ -554,7 +554,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 justify-center">
-              {jobSheet.status === "PENDING" && (
+              {jobSheet.status === 'PENDING' && (
                 <Button
                   onClick={handleStartWork}
                   className="bg-green-600 hover:bg-green-700"
@@ -564,7 +564,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                 </Button>
               )}
 
-              {jobSheet.status === "IN_PROGRESS" && (
+              {jobSheet.status === 'IN_PROGRESS' && (
                 <>
                   <Button
                     onClick={() => setShowPauseDialog(true)}
@@ -590,7 +590,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                 </>
               )}
 
-              {jobSheet.status === "PAUSED" && (
+              {jobSheet.status === 'PAUSED' && (
                 <>
                   <Button
                     onClick={handleResumeWork}
@@ -618,7 +618,7 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                 </>
               )}
 
-              {jobSheet.status === "HALTED" && (
+              {jobSheet.status === 'HALTED' && (
                 <>
                   <Button
                     onClick={handleResumeWork}

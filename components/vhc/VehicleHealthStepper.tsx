@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React, { useId, useState } from "react";
-import Image from "next/image";
+import React, { useId, useState } from 'react';
+import Image from 'next/image';
 
 export type VHCRadioOption = {
   value: number | string;
@@ -23,7 +23,7 @@ export type VHCSection = {
   illustrationCaption?: string;
 };
 
-export type SectionStatus = "done" | "current" | "todo";
+export type SectionStatus = 'done' | 'current' | 'todo';
 
 type Props = {
   sections: VHCSection[];
@@ -37,7 +37,7 @@ type Props = {
   onPrev: () => void;
   onNext: () => void;
   onJumpToSection: (index: number) => void;
-  onExit: (action: "save" | "exit" | "cancel") => void;
+  onExit: (action: 'save' | 'exit' | 'cancel') => void;
   showIllustration?: boolean;
 };
 
@@ -77,18 +77,18 @@ export function VehicleHealthStepper({
       <nav aria-label="Progress" className="pb-4" role="group">
         <ol className="flex items-center gap-2">
           {sections.map((s, idx) => {
-            const status = sectionStatuses[idx] ?? "todo";
+            const status = sectionStatuses[idx] ?? 'todo';
             const color =
-              status === "done"
-                ? "bg-green-500"
-                : status === "current"
-                ? "bg-orange-500"
-                : "bg-gray-300";
+              status === 'done'
+                ? 'bg-green-500'
+                : status === 'current'
+                  ? 'bg-orange-500'
+                  : 'bg-gray-300';
             return (
               <li key={s.id} className="flex items-center gap-2">
                 <button
                   type="button"
-                  aria-current={status === "current" ? "step" : undefined}
+                  aria-current={status === 'current' ? 'step' : undefined}
                   aria-label={`Go to ${s.title}`}
                   onClick={() => onJumpToSection(idx)}
                   className={`h-3.5 w-3.5 rounded-full ${color}`}
@@ -130,8 +130,8 @@ export function VehicleHealthStepper({
                     key={String(opt.value)}
                     className={`flex items-center gap-3 rounded-md px-3 py-2 cursor-pointer border transition-colors ${
                       currentValue === opt.value
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-transparent hover:bg-gray-100"
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-transparent hover:bg-gray-100'
                     }`}
                   >
                     <input
@@ -177,7 +177,7 @@ export function VehicleHealthStepper({
         {/* Right ~40% */}
         <aside
           className={`lg:col-span-5 ${
-            showIllustration ? "block" : "hidden md:block"
+            showIllustration ? 'block' : 'hidden md:block'
           }`}
         >
           <div className="h-full rounded-md bg-gray-100 p-4 md:p-6 flex flex-col">
@@ -223,7 +223,7 @@ export function VehicleHealthStepper({
                 className="px-3 py-2 rounded-md border bg-white hover:bg-gray-50 text-sm"
                 onClick={() => {
                   setConfirmOpen(false);
-                  onExit("cancel");
+                  onExit('cancel');
                 }}
               >
                 Cancel
@@ -232,7 +232,7 @@ export function VehicleHealthStepper({
                 className="px-3 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-sm"
                 onClick={() => {
                   setConfirmOpen(false);
-                  onExit("exit");
+                  onExit('exit');
                 }}
               >
                 Exit Without Saving
@@ -241,7 +241,7 @@ export function VehicleHealthStepper({
                 className="px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm"
                 onClick={() => {
                   setConfirmOpen(false);
-                  onExit("save");
+                  onExit('save');
                 }}
               >
                 Save & Exit

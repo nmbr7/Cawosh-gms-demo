@@ -1,1 +1,1 @@
-export { ServiceList } from "./ServiceList";
+export { ServiceList } from './ServiceList';

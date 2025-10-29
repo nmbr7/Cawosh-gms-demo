@@ -1,22 +1,22 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Check, X, User, Car, Wrench } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { useJobSheetStore } from "@/store/jobSheet";
-import { useBookingStore } from "@/store/booking";
-import { useApprovalStore } from "@/store/approval";
-import { toast } from "sonner";
-import type { JobSheet } from "@/store/jobSheet";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Check, X, User, Car, Wrench } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { useJobSheetStore } from '@/store/jobSheet';
+import { useBookingStore } from '@/store/booking';
+import { useApprovalStore } from '@/store/approval';
+import { toast } from 'sonner';
+import type { JobSheet } from '@/store/jobSheet';
 
 interface ApprovalDetailsModalProps {
   jobSheet: JobSheet;
@@ -32,9 +32,9 @@ export function ApprovalDetailsModal({
   onApprovalChange,
 }: ApprovalDetailsModalProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [approvalNotes, setApprovalNotes] = useState("");
+  const [approvalNotes, setApprovalNotes] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
+  const [rejectReason, setRejectReason] = useState('');
 
   const jobSheetStore = useJobSheetStore();
   const bookingStore = useBookingStore();
@@ -45,7 +45,7 @@ export function ApprovalDetailsModal({
 
   const servicesSubtotal = diagnosedServices.reduce(
     (acc, service) => acc + service.price,
-    0
+    0,
   );
   const serviceCharge = 15.0; // Fixed service charge
   const subtotal = servicesSubtotal + serviceCharge;
@@ -53,7 +53,7 @@ export function ApprovalDetailsModal({
   const totalPrice = subtotal + vat;
   const totalDuration = diagnosedServices.reduce(
     (acc, service) => acc + service.duration,
-    0
+    0,
   );
 
   const handleApprove = async () => {
@@ -64,7 +64,7 @@ export function ApprovalDetailsModal({
       const approval = addApproval({
         jobSheetId: jobSheet.id,
         bookingId: jobSheet.bookingId,
-        customerName: booking?.customer?.name || "Unknown",
+        customerName: booking?.customer?.name || 'Unknown',
         vehicleInfo: `${booking?.vehicle?.make} ${booking?.vehicle?.model} (${booking?.vehicle?.license})`,
         services: diagnosedServices.map((service) => ({
           id: service.id,
@@ -74,20 +74,20 @@ export function ApprovalDetailsModal({
           price: service.price,
         })),
         totalAmount: totalPrice,
-        status: "approved",
+        status: 'approved',
         notes: approvalNotes,
       });
 
       // Update approval status
       updateApprovalStatus(
         approval.id,
-        "approved",
-        "current-user",
-        approvalNotes
+        'approved',
+        'current-user',
+        approvalNotes,
       );
 
       // Update job sheet approval status
-      jobSheetStore.setApprovalStatus(jobSheet.id, "approved", "current-user");
+      jobSheetStore.setApprovalStatus(jobSheet.id, 'approved', 'current-user');
 
       // Update the original booking with the diagnosed services
       if (booking) {
@@ -102,12 +102,12 @@ export function ApprovalDetailsModal({
         bookingStore.updateBookingServices(booking._id, servicesToUpdate);
       }
 
-      toast.success("Work order approved successfully!");
+      toast.success('Work order approved successfully!');
       onApprovalChange();
       onClose();
     } catch (error) {
-      console.error("Error approving work order:", error);
-      toast.error("Failed to approve work order");
+      console.error('Error approving work order:', error);
+      toast.error('Failed to approve work order');
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +115,7 @@ export function ApprovalDetailsModal({
 
   const handleReject = async () => {
     if (!rejectReason.trim()) {
-      toast.error("Please provide a reason for rejection");
+      toast.error('Please provide a reason for rejection');
       return;
     }
 
@@ -126,7 +126,7 @@ export function ApprovalDetailsModal({
       const approval = addApproval({
         jobSheetId: jobSheet.id,
         bookingId: jobSheet.bookingId,
-        customerName: booking?.customer?.name || "Unknown",
+        customerName: booking?.customer?.name || 'Unknown',
         vehicleInfo: `${booking?.vehicle?.make} ${booking?.vehicle?.model} (${booking?.vehicle?.license})`,
         services: diagnosedServices.map((service) => ({
           id: service.id,
@@ -136,28 +136,28 @@ export function ApprovalDetailsModal({
           price: service.price,
         })),
         totalAmount: totalPrice,
-        status: "rejected",
+        status: 'rejected',
         notes: approvalNotes,
       });
 
       // Update approval status
       updateApprovalStatus(
         approval.id,
-        "rejected",
-        "current-user",
+        'rejected',
+        'current-user',
         approvalNotes,
-        rejectReason
+        rejectReason,
       );
 
       // Update job sheet approval status
-      jobSheetStore.setApprovalStatus(jobSheet.id, "rejected", "current-user");
+      jobSheetStore.setApprovalStatus(jobSheet.id, 'rejected', 'current-user');
 
-      toast.success("Work order rejected");
+      toast.success('Work order rejected');
       onApprovalChange();
       onClose();
     } catch (error) {
-      console.error("Error rejecting work order:", error);
-      toast.error("Failed to reject work order");
+      console.error('Error rejecting work order:', error);
+      toast.error('Failed to reject work order');
     } finally {
       setIsLoading(false);
     }
@@ -166,11 +166,11 @@ export function ApprovalDetailsModal({
   const getStatusBadge = (status: string | undefined) => {
     const statusMap = {
       pending: {
-        label: "Pending Approval",
-        className: "bg-amber-100 text-amber-800",
+        label: 'Pending Approval',
+        className: 'bg-amber-100 text-amber-800',
       },
-      approved: { label: "Approved", className: "bg-green-100 text-green-800" },
-      rejected: { label: "Rejected", className: "bg-red-100 text-red-800" },
+      approved: { label: 'Approved', className: 'bg-green-100 text-green-800' },
+      rejected: { label: 'Rejected', className: 'bg-red-100 text-red-800' },
     };
 
     const statusInfo =
@@ -178,7 +178,7 @@ export function ApprovalDetailsModal({
 
     return (
       <Badge
-        className={cn("px-2 py-1 text-xs font-medium", statusInfo.className)}
+        className={cn('px-2 py-1 text-xs font-medium', statusInfo.className)}
       >
         {statusInfo.label}
       </Badge>
@@ -192,7 +192,7 @@ export function ApprovalDetailsModal({
       booking.assignedTechnicians.length > 0
     ) {
       const assignedTech = booking.assignedTechnicians.find(
-        (tech) => tech.technicianId === technicianId
+        (tech) => tech.technicianId === technicianId,
       );
       if (assignedTech) {
         return assignedTech.technicianName;
@@ -201,12 +201,12 @@ export function ApprovalDetailsModal({
 
     // Fallback to hardcoded map
     const technicianMap: Record<string, string> = {
-      "tech-1": "John Smith",
-      "tech-2": "Sarah Johnson",
-      "tech-3": "Mike Davis",
-      "tech-4": "Lisa Wilson",
+      'tech-1': 'John Smith',
+      'tech-2': 'Sarah Johnson',
+      'tech-3': 'Mike Davis',
+      'tech-4': 'Lisa Wilson',
     };
-    return technicianMap[technicianId] || "Unknown Technician";
+    return technicianMap[technicianId] || 'Unknown Technician';
   };
 
   if (!booking) {
@@ -232,12 +232,12 @@ export function ApprovalDetailsModal({
             <div className="flex items-center gap-4">
               {getStatusBadge(jobSheet.approvalStatus)}
               <div className="text-sm text-gray-600">
-                Diagnosed by{" "}
-                {getTechnicianName(diagnosedServices[0]?.addedBy || "")} on{" "}
+                Diagnosed by{' '}
+                {getTechnicianName(diagnosedServices[0]?.addedBy || '')} on{' '}
                 {diagnosedServices[0]?.addedAt &&
                   format(
                     new Date(diagnosedServices[0].addedAt),
-                    "MMM dd, yyyy 'at' HH:mm"
+                    "MMM dd, yyyy 'at' HH:mm",
                   )}
               </div>
             </div>
@@ -296,7 +296,7 @@ export function ApprovalDetailsModal({
                   size="sm"
                   onClick={() => {
                     setShowRejectForm(false);
-                    setRejectReason("");
+                    setRejectReason('');
                   }}
                 >
                   Cancel
@@ -414,8 +414,8 @@ export function ApprovalDetailsModal({
                   <div className="flex justify-between text-sm text-gray-500">
                     <span>Duration: {service.duration} minutes</span>
                     <span>
-                      Added:{" "}
-                      {format(new Date(service.addedAt), "MMM dd, HH:mm")}
+                      Added:{' '}
+                      {format(new Date(service.addedAt), 'MMM dd, HH:mm')}
                     </span>
                   </div>
                 </div>

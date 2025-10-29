@@ -1,5 +1,5 @@
-import React from "react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { cn } from '@/lib/utils';
 
 interface Column<T> {
   header: string;
@@ -27,15 +27,15 @@ export function DataTable<T>({
   data,
   isLoading = false,
   onRowClick,
-  emptyMessage = "No data found",
-  emptySubMessage = "Get started by adding new data",
+  emptyMessage = 'No data found',
+  emptySubMessage = 'Get started by adding new data',
   emptyAction,
   className,
 }: DataTableProps<T>) {
   if (isLoading) {
     return (
       <div
-        className={cn("bg-white rounded-lg shadow overflow-hidden", className)}
+        className={cn('bg-white rounded-lg shadow overflow-hidden', className)}
       >
         <table className="min-w-full">
           <thead className="bg-gray-50">
@@ -65,8 +65,8 @@ export function DataTable<T>({
                     <td key={index} className="px-6 py-4">
                       <div
                         className={cn(
-                          "h-4 bg-gray-200 rounded",
-                          column.width || "w-24"
+                          'h-4 bg-gray-200 rounded',
+                          column.width || 'w-24',
                         )}
                       ></div>
                     </td>
@@ -89,7 +89,7 @@ export function DataTable<T>({
 
   return (
     <div
-      className={cn("bg-white rounded-lg shadow overflow-hidden", className)}
+      className={cn('bg-white rounded-lg shadow overflow-hidden', className)}
     >
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -151,8 +151,8 @@ export function DataTable<T>({
                   key={rowIndex}
                   onClick={() => onRowClick?.(item)}
                   className={cn(
-                    "hover:bg-gray-50",
-                    onRowClick && "cursor-pointer"
+                    'hover:bg-gray-50',
+                    onRowClick && 'cursor-pointer',
                   )}
                 >
                   {columns.map((column, colIndex) => (

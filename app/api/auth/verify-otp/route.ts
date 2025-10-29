@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
@@ -7,8 +7,8 @@ export async function POST(request: Request) {
     // Validate required fields
     if (!email || !otp) {
       return NextResponse.json(
-        { error: "Email and OTP are required" },
-        { status: 400 }
+        { error: 'Email and OTP are required' },
+        { status: 400 },
       );
     }
 
@@ -16,33 +16,33 @@ export async function POST(request: Request) {
     const response = await fetch(
       `${process.env.BACKEND_URL}/api/auth/verify-otp`,
       {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, otp }),
-      }
+      },
     );
 
     const data = await response.json();
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data.error || "Failed to verify OTP" },
-        { status: response.status }
+        { error: data.error || 'Failed to verify OTP' },
+        { status: response.status },
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: data.message || "OTP verified successfully",
+      message: data.message || 'OTP verified successfully',
       data: data.data,
     });
   } catch (error) {
-    console.error("Verify OTP error:", error);
+    console.error('Verify OTP error:', error);
     return NextResponse.json(
-      { error: "Failed to verify OTP" },
-      { status: 500 }
+      { error: 'Failed to verify OTP' },
+      { status: 500 },
     );
   }
 }

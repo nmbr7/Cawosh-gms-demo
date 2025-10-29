@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { use, useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import VHCSectionGrid from "@/components/vhc/VHCSectionGrid";
+import { use, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import VHCSectionGrid from '@/components/vhc/VHCSectionGrid';
 import {
   VHC_VALUE_MAPPING,
   getVHCTitle,
   convertAnswersForStorage,
-} from "@/lib/vhc/answerMapping";
+} from '@/lib/vhc/answerMapping';
 
 type Template = {
   id: string;
@@ -42,7 +42,7 @@ export default function VHCFullscreen({
 
   const load = useCallback(async () => {
     const res = await fetchWithAuth(`/api/vhc/responses/${id}`, {
-      method: "GET",
+      method: 'GET',
     });
     const data = await res.json();
     setResp({
@@ -51,7 +51,7 @@ export default function VHCFullscreen({
       answers: data.answers || [],
     });
     const tRes = await fetchWithAuth(`/api/vhc/templates/active`, {
-      method: "GET",
+      method: 'GET',
     });
     const template = await tRes.json();
     setTpl(template);
@@ -73,24 +73,24 @@ export default function VHCFullscreen({
       setIsTabletLandscape(isLandscape && isTablet);
     };
     evaluate();
-    window.addEventListener("resize", evaluate);
+    window.addEventListener('resize', evaluate);
     window.addEventListener(
-      "orientationchange",
-      evaluate as unknown as EventListener
+      'orientationchange',
+      evaluate as unknown as EventListener,
     );
     return () => {
-      window.removeEventListener("resize", evaluate);
+      window.removeEventListener('resize', evaluate);
       window.removeEventListener(
-        "orientationchange",
-        evaluate as unknown as EventListener
+        'orientationchange',
+        evaluate as unknown as EventListener,
       );
     };
   }, []);
 
   const sections = useMemo(() => {
-    if (!tpl || !resp) return [] as Template["sections"];
+    if (!tpl || !resp) return [] as Template['sections'];
     return tpl.sections.filter(
-      (s) => !s.applicable_to || s.applicable_to.includes(resp.powertrain)
+      (s) => !s.applicable_to || s.applicable_to.includes(resp.powertrain),
     );
   }, [tpl, resp]);
 
@@ -124,8 +124,8 @@ export default function VHCFullscreen({
         const convertedPartial = convertAnswersForStorage(partial);
 
         const res = await fetchWithAuth(`/api/vhc/responses/${resp.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ answers: convertedPartial }),
         });
         const updated = await res.json();
@@ -138,7 +138,7 @@ export default function VHCFullscreen({
         setSaving(false);
       }
     },
-    [resp]
+    [resp],
   );
 
   if (!tpl || !resp || !current) {
@@ -178,15 +178,15 @@ export default function VHCFullscreen({
     <div
       className={
         isTabletLandscape
-          ? "h-screen w-screen bg-gray-100 overflow-hidden"
-          : "min-h-screen bg-gray-100 p-3 md:p-4"
+          ? 'h-screen w-screen bg-gray-100 overflow-hidden'
+          : 'min-h-screen bg-gray-100 p-3 md:p-4'
       }
     >
       <div
         className={
           isTabletLandscape
-            ? "h-full w-full rounded-none p-4 md:p-6 bg-white shadow"
-            : "rounded-lg p-4 md:p-6 mx-auto w-full md:w-full lg:max-w-5xl bg-white shadow"
+            ? 'h-full w-full rounded-none p-4 md:p-6 bg-white shadow'
+            : 'rounded-lg p-4 md:p-6 mx-auto w-full md:w-full lg:max-w-5xl bg-white shadow'
         }
       >
         <div className="space-y-6">
@@ -194,7 +194,7 @@ export default function VHCFullscreen({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <button
-                onClick={() => router.push("/vehicle-health-checks")}
+                onClick={() => router.push('/vehicle-health-checks')}
                 className="text-gray-600 hover:text-gray-900 text-sm"
               >
                 ← Back to VHC List
@@ -205,7 +205,7 @@ export default function VHCFullscreen({
               </span>
             </div>
             <div className="text-sm text-gray-500">
-              {saving ? "Saving..." : "Saved"}
+              {saving ? 'Saving...' : 'Saved'}
             </div>
           </div>
 
@@ -213,7 +213,7 @@ export default function VHCFullscreen({
           <div className="flex items-center gap-2 overflow-x-auto pb-2">
             {sections.map((section, index) => {
               const isCompleted = section.items.every(
-                (item) => currentValues[item.id] !== undefined
+                (item) => currentValues[item.id] !== undefined,
               );
               const isCurrent = index === currentSectionIndex;
 
@@ -223,10 +223,10 @@ export default function VHCFullscreen({
                   onClick={() => setCurrentSectionIndex(index)}
                   className={`flex-shrink-0 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isCurrent
-                      ? "bg-blue-100 text-blue-700 border border-blue-200"
+                      ? 'bg-blue-100 text-blue-700 border border-blue-200'
                       : isCompleted
-                      ? "bg-green-100 text-green-700 border border-green-200"
-                      : "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+                        ? 'bg-green-100 text-green-700 border border-green-200'
+                        : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -269,7 +269,7 @@ export default function VHCFullscreen({
                   router.push(`/vhc-fullscreen/${id}/report`);
                 } else {
                   setCurrentSectionIndex((i) =>
-                    Math.min(sections.length - 1, i + 1)
+                    Math.min(sections.length - 1, i + 1),
                   );
                 }
               }}
@@ -277,8 +277,8 @@ export default function VHCFullscreen({
               className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm"
             >
               {currentSectionIndex >= sections.length - 1
-                ? "View Report"
-                : "Next Section"}
+                ? 'View Report'
+                : 'Next Section'}
             </button>
           </div>
         </div>

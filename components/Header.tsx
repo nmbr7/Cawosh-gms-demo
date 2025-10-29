@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 // import { Search } from "lucide-react";
-import { MagnifyingGlass, ChatTeardropText, BellRinging } from "phosphor-react";
-import { useAuthStore } from "@/store/auth";
-import Image from "next/image";
-import { HamburgerMenu } from "./MobileMenu";
+import { MagnifyingGlass, ChatTeardropText, BellRinging } from 'phosphor-react';
+import { useAuthStore } from '@/store/auth';
+import Image from 'next/image';
+import { HamburgerMenu } from './MobileMenu';
 
 export default function Header() {
   const [showMessages, setShowMessages] = useState(false);
@@ -21,13 +21,13 @@ export default function Header() {
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   return (
     <header className="sticky top-0 z-40 flex flex-wrap md:flex-nowrap items-center justify-between p-4 bg-white text-black shadow-md min-w-full">
-      {" "}
+      {' '}
       {/* Left section - Greeting */}
       {isMobile && <HamburgerMenu />}
       <div className="w-full flex flex-row md:w-auto md:order-2 order-3">
@@ -50,7 +50,7 @@ export default function Header() {
               type="text"
               placeholder="Search..."
               className="w-full p-2.5 rounded-lg bg-gray-200 text-black pl-10 pr-10"
-              onFocus={() => console.log("Focus search")}
+              onFocus={() => console.log('Focus search')}
             />
             <span className="absolute right-4  text-gray-500">⌘ K</span>
           </div>
@@ -106,19 +106,19 @@ export default function Header() {
           {showProfileMenu && (
             <div className="absolute right-0 mt-2 w-48 bg-white text-black p-4 shadow-lg rounded-md">
               <button
-                onClick={() => router.push("/profile")}
+                onClick={() => router.push('/profile')}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded"
               >
                 Profile
               </button>
               <button
-                onClick={() => router.push("/settings")}
+                onClick={() => router.push('/settings')}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded"
               >
                 Settings
               </button>
               <button
-                onClick={() => router.push("/logout")}
+                onClick={() => router.push('/logout')}
                 className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded"
               >
                 Logout

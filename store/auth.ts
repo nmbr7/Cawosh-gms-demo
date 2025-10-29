@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { User } from "@/types/user";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { User } from '@/types/user';
 
 type AuthState = {
   user: User | null;
@@ -19,24 +19,24 @@ export const useAuthStore = create<AuthState>()(
           await fetch('/api/auth/logout', {
             method: 'POST',
           });
-          
+
           // Clear the store state
           set({ user: null });
           // Clear persisted data from localStorage
-          localStorage.removeItem("auth-storage");
+          localStorage.removeItem('auth-storage');
           // Force a hard navigation to login to prevent back button issues
-          window.location.href = "/login";
+          window.location.href = '/login';
         } catch (error) {
           console.error('Logout error:', error);
           // Even if the API call fails, we should still clear local state
           set({ user: null });
-          localStorage.removeItem("auth-storage");
-          window.location.href = "/login";
+          localStorage.removeItem('auth-storage');
+          window.location.href = '/login';
         }
       },
     }),
     {
-      name: "auth-storage",
-    }
-  )
+      name: 'auth-storage',
+    },
+  ),
 );

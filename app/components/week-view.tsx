@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { Booking } from "@/app/models/booking";
-import { format } from "date-fns";
+import { cn } from '@/lib/utils';
+import { Booking } from '@/app/models/booking';
+import { format } from 'date-fns';
 
 interface WeekViewProps {
   selectedDate: Date;
-  selectedBay: number | "all";
+  selectedBay: number | 'all';
   bookings: Booking[];
   timeSlots: string[];
   weekDates: Date[];
@@ -20,34 +20,34 @@ export function WeekView({
 }: WeekViewProps) {
   // Get bookings for a specific day
   const getBookingsForDay = (date: Date) => {
-    const dayStr = format(date, "yyyy-MM-dd");
+    const dayStr = format(date, 'yyyy-MM-dd');
     const bookingsForDay = bookings.filter((booking) => {
       // Check if any service in this booking falls on the selected day
       const hasServiceOnDay = booking.services.some((service) => {
-        const serviceDateStr = service.startTime.split("T")[0];
+        const serviceDateStr = service.startTime.split('T')[0];
         return serviceDateStr === dayStr;
       });
 
       if (!hasServiceOnDay) return false;
 
       // If bay is specified, check if any service is in that bay
-      if (selectedBay !== "all") {
+      if (selectedBay !== 'all') {
         return booking.services.some(
-          (service) => service.bayId === `bay${selectedBay}`
+          (service) => service.bayId === `bay${selectedBay}`,
         );
       }
 
       return true;
     });
 
-    console.log("bookingsForDay", bookingsForDay);
+    console.log('bookingsForDay', bookingsForDay);
     return bookingsForDay;
   };
 
   const formatDayDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
     }).format(date);
   };
 
@@ -104,16 +104,16 @@ export function WeekView({
                   <div
                     key={booking._id}
                     className={cn(
-                      "absolute w-full px-2",
-                      booking.status === "completed"
-                        ? "bg-green-100 text-green-700"
-                        : booking.status === "in-progress"
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-blue-100 text-blue-700"
+                      'absolute w-full px-2',
+                      booking.status === 'completed'
+                        ? 'bg-green-100 text-green-700'
+                        : booking.status === 'in-progress'
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-blue-100 text-blue-700',
                     )}
                     style={{
-                      top: "0px",
-                      height: "60px",
+                      top: '0px',
+                      height: '60px',
                     }}
                   >
                     <div className="p-2 flex flex-col h-full">
@@ -123,7 +123,7 @@ export function WeekView({
                       <div className="text-sm text-gray-600">
                         {booking.services
                           .map((service) => service.name)
-                          .join(", ")}
+                          .join(', ')}
                       </div>
                     </div>
                   </div>

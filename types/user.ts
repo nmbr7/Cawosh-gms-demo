@@ -28,12 +28,12 @@ export type User = {
   phone: string;
   role: string;
   position: string;
-  status: "active" | "inactive" | "suspended";
+  status: 'active' | 'inactive' | 'suspended';
   permissions: string[];
   accessLevel: number;
   department: string;
   joiningDate: DateField;
-  employmentType: "full-time" | "part-time" | "contract";
+  employmentType: 'full-time' | 'part-time' | 'contract';
   workingHours: WorkingHours;
   skills: string[];
   certifications: string[];

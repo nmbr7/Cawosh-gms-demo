@@ -1,13 +1,13 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Menu, X } from 'lucide-react';
-import Image from "next/image";
+import Image from 'next/image';
 import { links } from './Sidebar';
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
-export const HamburgerMenu=()=> {
+export const HamburgerMenu = () => {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -44,27 +44,27 @@ export const HamburgerMenu=()=> {
             </Dialog.Close>
           </div>
           <nav className="flex flex-col gap-1 p-0">
-          {links.map(({ name, href, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-md text-base font-medium",
-                pathname === href
-                  ? "bg-blue-100 text-blue-700"
-                  : "text-gray-700 hover:bg-gray-100"
-              )}
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              <Icon className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm">{name}</span>
-            </Link>
-          ))}
-        </nav>
+            {links.map(({ name, href, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-3 rounded-md text-base font-medium',
+                  pathname === href
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-100',
+                )}
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm">{name}</span>
+              </Link>
+            ))}
+          </nav>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   );
-}
+};

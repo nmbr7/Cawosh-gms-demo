@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Stethoscope,
   Plus,
@@ -17,14 +17,14 @@ import {
   AlertCircle,
   User,
   Car,
-} from "lucide-react";
-import { format } from "date-fns";
-import { useJobSheetStore } from "@/store/jobSheet";
-import { useBookingStore } from "@/store/booking";
-import { ServiceDropdown } from "@/app/components/booking/ServiceDropdown";
-import { toast } from "sonner";
-import type { JobSheet } from "@/store/jobSheet";
-import type { StoreService } from "@/store/booking";
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { useJobSheetStore } from '@/store/jobSheet';
+import { useBookingStore } from '@/store/booking';
+import { ServiceDropdown } from '@/app/components/booking/ServiceDropdown';
+import { toast } from 'sonner';
+import type { JobSheet } from '@/store/jobSheet';
+import type { StoreService } from '@/store/booking';
 
 interface DiagnosisSubmissionModalProps {
   jobSheet: JobSheet;
@@ -60,12 +60,12 @@ export function DiagnosisSubmissionModal({
   const [customServices, setCustomServices] = useState<CustomService[]>([]);
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [newCustomService, setNewCustomService] = useState<CustomService>({
-    name: "",
-    description: "",
+    name: '',
+    description: '',
     duration: 30,
     price: 0,
   });
-  const [diagnosisNotes, setDiagnosisNotes] = useState("");
+  const [diagnosisNotes, setDiagnosisNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const jobSheetStore = useJobSheetStore();
@@ -77,17 +77,17 @@ export function DiagnosisSubmissionModal({
   // Quick add services (most common)
   const quickAddServices = services.filter((service) =>
     [
-      "service-1", // Oil Change
-      "service-3", // Brake Inspection
-      "service-7", // Battery Check
-      "service-4", // Engine Diagnostic
-      "service-10", // Air Filter Replacement
-      "service-18", // Front Brake Pads Replacement
-      "service-22", // Spark Plugs Replacement (4-cylinder)
-      "service-15", // Coolant Flush
-      "service-2", // Tire Rotation
-      "service-6", // AC Service
-    ].includes(service.id)
+      'service-1', // Oil Change
+      'service-3', // Brake Inspection
+      'service-7', // Battery Check
+      'service-4', // Engine Diagnostic
+      'service-10', // Air Filter Replacement
+      'service-18', // Front Brake Pads Replacement
+      'service-22', // Spark Plugs Replacement (4-cylinder)
+      'service-15', // Coolant Flush
+      'service-2', // Tire Rotation
+      'service-6', // AC Service
+    ].includes(service.id),
   );
 
   const handleQuickAdd = (service: StoreService) => {
@@ -108,8 +108,8 @@ export function DiagnosisSubmissionModal({
     if (newCustomService.name.trim() && newCustomService.price > 0) {
       setCustomServices([...customServices, { ...newCustomService }]);
       setNewCustomService({
-        name: "",
-        description: "",
+        name: '',
+        description: '',
         duration: 30,
         price: 0,
       });
@@ -119,12 +119,12 @@ export function DiagnosisSubmissionModal({
 
   const handleSubmitDiagnosis = async () => {
     if (selectedServices.length === 0 && customServices.length === 0) {
-      toast.error("Please add at least one service");
+      toast.error('Please add at least one service');
       return;
     }
 
     if (!diagnosisNotes.trim()) {
-      toast.error("Please provide diagnosis notes");
+      toast.error('Please provide diagnosis notes');
       return;
     }
 
@@ -139,7 +139,7 @@ export function DiagnosisSubmissionModal({
           description: service.name, // Use name as description for predefined services
           duration: service.duration,
           price: service.price,
-          addedBy: "current-technician", // This would come from auth context
+          addedBy: 'current-technician', // This would come from auth context
           addedAt: new Date().toISOString(),
         })),
         ...customServices.map((service, index) => ({
@@ -148,7 +148,7 @@ export function DiagnosisSubmissionModal({
           description: service.description,
           duration: service.duration,
           price: service.price,
-          addedBy: "current-technician",
+          addedBy: 'current-technician',
           addedAt: new Date().toISOString(),
         })),
       ];
@@ -156,12 +156,12 @@ export function DiagnosisSubmissionModal({
       // Add diagnosed services to job sheet
       jobSheetStore.addDiagnosedServices(jobSheet.id, diagnosedServices);
 
-      toast.success("Diagnosis submitted for approval");
+      toast.success('Diagnosis submitted for approval');
       onDiagnosisSubmitted();
       onClose();
     } catch (error) {
-      toast.error("Failed to submit diagnosis");
-      console.error("Error submitting diagnosis:", error);
+      toast.error('Failed to submit diagnosis');
+      console.error('Error submitting diagnosis:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -198,10 +198,10 @@ export function DiagnosisSubmissionModal({
                   <span className="text-sm font-medium">Customer</span>
                 </div>
                 <p className="text-sm text-gray-900">
-                  {booking?.customer?.name || "N/A"}
+                  {booking?.customer?.name || 'N/A'}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {booking?.customer?.email || "No email"}
+                  {booking?.customer?.email || 'No email'}
                 </p>
               </div>
               <div className="space-y-2">
@@ -233,10 +233,10 @@ export function DiagnosisSubmissionModal({
                     {booking.assignedTechnicians[0].technicianName}
                   </div>
                   <div className="text-xs text-blue-600">
-                    Assigned on:{" "}
+                    Assigned on:{' '}
                     {format(
                       new Date(booking.assignedTechnicians[0].assignedAt),
-                      "MMM dd, yyyy 'at' HH:mm"
+                      "MMM dd, yyyy 'at' HH:mm",
                     )}
                   </div>
                 </div>
@@ -448,7 +448,7 @@ export function DiagnosisSubmissionModal({
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        if ("id" in service) {
+                        if ('id' in service) {
                           handleRemoveService(service.id);
                         } else {
                           handleRemoveCustomService(index);
@@ -530,7 +530,7 @@ export function DiagnosisSubmissionModal({
               }
               className="bg-blue-600 hover:bg-blue-700"
             >
-              {isSubmitting ? "Submitting..." : "Submit Diagnosis for Approval"}
+              {isSubmitting ? 'Submitting...' : 'Submit Diagnosis for Approval'}
             </Button>
           </div>
         </div>

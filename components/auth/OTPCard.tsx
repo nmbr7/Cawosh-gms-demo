@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
-import { Input } from "@/components/ui/input";
-import { CustomButton } from "@/components/ui/custom-button";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useState, useRef } from 'react';
+import { Input } from '@/components/ui/input';
+import { CustomButton } from '@/components/ui/custom-button';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface OTPCardProps {
   email: string;
@@ -9,10 +9,10 @@ interface OTPCardProps {
 }
 
 export const OTPCard: React.FC<OTPCardProps> = ({ email, onSubmit }) => {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleCodeChange = (index: number, value: string) => {
@@ -33,36 +33,36 @@ export const OTPCard: React.FC<OTPCardProps> = ({ email, onSubmit }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
-    setSuccess("");
+    setError('');
+    setSuccess('');
 
     try {
-      const response = await fetch("/api/auth/verify-otp", {
-        method: "POST",
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           email,
-          otp: otp.join(""),
+          otp: otp.join(''),
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Failed to verify OTP");
+        setError(data.error || 'Failed to verify OTP');
         setLoading(false);
         return;
       }
 
-      setSuccess(data.message || "OTP verified successfully");
+      setSuccess(data.message || 'OTP verified successfully');
       onSubmit(data.data.tempToken);
     } catch (error) {
       setError(
         `An error occurred: ${
-          error instanceof Error ? error.message : "Please try again."
-        }`
+          error instanceof Error ? error.message : 'Please try again.'
+        }`,
       );
     } finally {
       setLoading(false);
@@ -97,7 +97,7 @@ export const OTPCard: React.FC<OTPCardProps> = ({ email, onSubmit }) => {
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         {success && <p className="text-green-500 text-sm mb-4">{success}</p>}
         <CustomButton type="submit" disabled={loading}>
-          {loading ? <LoadingSpinner /> : "Verify OTP"}
+          {loading ? <LoadingSpinner /> : 'Verify OTP'}
         </CustomButton>
       </form>
     </div>

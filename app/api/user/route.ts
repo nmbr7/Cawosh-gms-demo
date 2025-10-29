@@ -8,4 +8,4 @@ export async function GET() {
     role: 'Owner',
   };
   return NextResponse.json(user);
-} 
+}

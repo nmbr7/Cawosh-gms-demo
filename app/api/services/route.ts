@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import db from "@/app/mock-db/db.json";
+import { NextResponse } from 'next/server';
+import db from '@/app/mock-db/db.json';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const tenantId = searchParams.get("tenant_id") || "garage_001";
-    const category = searchParams.get("category");
-    const isActive = searchParams.get("isActive");
+    const tenantId = searchParams.get('tenant_id') || 'garage_001';
+    const category = searchParams.get('category');
+    const isActive = searchParams.get('isActive');
 
     const garage = db.garages.find((g) => g.id === tenantId);
     if (!garage) {
@@ -23,9 +23,9 @@ export async function GET(request: Request) {
 
     // Apply active status filter if provided
     if (isActive !== null) {
-      const activeStatus = isActive === "true";
+      const activeStatus = isActive === 'true';
       services = services.filter(
-        (service) => service.isActive === activeStatus
+        (service) => service.isActive === activeStatus,
       );
     }
 
@@ -41,10 +41,10 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Error fetching services:", error);
+    console.error('Error fetching services:', error);
     return NextResponse.json(
-      { error: "Failed to fetch services" },
-      { status: 500 }
+      { error: 'Failed to fetch services' },
+      { status: 500 },
     );
   }
 }

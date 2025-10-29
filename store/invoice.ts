@@ -1,11 +1,11 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 import type {
   Invoice,
   InvoiceStatus,
   InvoiceFilters,
   InvoiceSummary,
-} from "@/types/invoice";
-import type { JobSheet } from "./jobSheet";
+} from '@/types/invoice';
+import type { JobSheet } from './jobSheet';
 
 interface InvoiceState {
   invoices: Invoice[];
@@ -39,7 +39,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   generateInvoiceNumber: () => {
     const { invoices } = get();
     const nextNumber = invoices.length + 1;
-    return `INV-${nextNumber.toString().padStart(4, "0")}`;
+    return `INV-${nextNumber.toString().padStart(4, '0')}`;
   },
 
   createInvoiceFromJobSheet: (jobSheet) => {
@@ -48,7 +48,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
     // Get booking data from job sheet
     const booking = jobSheet.booking;
     if (!booking) {
-      throw new Error("Booking data not found for job sheet");
+      throw new Error('Booking data not found for job sheet');
     }
 
     // Get services from diagnosed services or original booking services
@@ -90,10 +90,10 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       serviceCharge,
       vat,
       totalAmount,
-      status: "DRAFT",
+      status: 'DRAFT',
       issuedDate: new Date().toISOString(),
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-      createdBy: "technician", // TODO: Get from auth context
+      createdBy: 'technician', // TODO: Get from auth context
       createdAt: new Date().toISOString(),
     };
 
@@ -107,7 +107,7 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
   updateInvoiceStatus: (invoiceId, status) => {
     set((state) => ({
       invoices: state.invoices.map((invoice) =>
-        invoice.id === invoiceId ? { ...invoice, status } : invoice
+        invoice.id === invoiceId ? { ...invoice, status } : invoice,
       ),
     }));
   },
@@ -152,13 +152,13 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
       totalInvoices: invoices.length,
       totalAmount: invoices.reduce((sum, inv) => sum + inv.totalAmount, 0),
       paidAmount: invoices
-        .filter((inv) => inv.status === "PAID")
+        .filter((inv) => inv.status === 'PAID')
         .reduce((sum, inv) => sum + inv.totalAmount, 0),
       pendingAmount: invoices
-        .filter((inv) => inv.status === "DRAFT" || inv.status === "SENT")
+        .filter((inv) => inv.status === 'DRAFT' || inv.status === 'SENT')
         .reduce((sum, inv) => sum + inv.totalAmount, 0),
       overdueAmount: invoices
-        .filter((inv) => inv.status === "OVERDUE")
+        .filter((inv) => inv.status === 'OVERDUE')
         .reduce((sum, inv) => sum + inv.totalAmount, 0),
     };
 
@@ -172,11 +172,11 @@ export const useInvoiceStore = create<InvoiceState>((set, get) => ({
         invoice.id === invoiceId
           ? {
               ...invoice,
-              status: "PAID" as InvoiceStatus,
+              status: 'PAID' as InvoiceStatus,
               paidDate: new Date().toISOString(),
               paymentMethod,
             }
-          : invoice
+          : invoice,
       ),
     }));
   },

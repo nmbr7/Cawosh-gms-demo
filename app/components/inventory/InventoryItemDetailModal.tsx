@@ -4,13 +4,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import type { InventoryItem } from "@/types/inventory";
-import { useInventory } from "@/store/inventory";
-import { Button } from "@/components/ui/button";
-import { useEffect, useMemo, useState } from "react";
-import { InventoryMovementsModal } from "@/app/components/inventory/InventoryMovementsModal";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dialog';
+import type { InventoryItem } from '@/types/inventory';
+import { useInventory } from '@/store/inventory';
+import { Button } from '@/components/ui/button';
+import { useEffect, useMemo, useState } from 'react';
+import { InventoryMovementsModal } from '@/app/components/inventory/InventoryMovementsModal';
+import { Input } from '@/components/ui/input';
 
 interface ItemDetailsModalProps {
   item: InventoryItem | null;
@@ -25,30 +25,30 @@ export function ItemDetailsModal({
 }: ItemDetailsModalProps) {
   const { getRecentMovementsByItem, adjustStock, updateItem } = useInventory();
   const [showMovements, setShowMovements] = useState(false);
-  const [mode, setMode] = useState<"ADD" | "NO_STOCK">("ADD");
-  const [qty, setQty] = useState<string>("");
-  const [reason, setReason] = useState<string>("");
+  const [mode, setMode] = useState<'ADD' | 'NO_STOCK'>('ADD');
+  const [qty, setQty] = useState<string>('');
+  const [reason, setReason] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
-  const [editedPrice, setEditedPrice] = useState<string>("");
-  const [editedCost, setEditedCost] = useState<string>("");
+  const [editedPrice, setEditedPrice] = useState<string>('');
+  const [editedCost, setEditedCost] = useState<string>('');
 
   useEffect(() => {
     if (item) {
-      setEditedPrice(String(item.price ?? ""));
-      setEditedCost(String(item.cost ?? ""));
+      setEditedPrice(String(item.price ?? ''));
+      setEditedCost(String(item.cost ?? ''));
       setIsEditing(false);
     }
   }, [item]);
 
   // Currency formatter for GBP
-  const gbp = new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
+  const gbp = new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
     minimumFractionDigits: 2,
   });
   const recent = useMemo(
     () => (item ? getRecentMovementsByItem(item.id, 5) : []),
-    [item, getRecentMovementsByItem]
+    [item, getRecentMovementsByItem],
   );
 
   if (!item) return null;
@@ -80,8 +80,8 @@ export function ItemDetailsModal({
                     size="sm"
                     onClick={() => {
                       if (!item) return;
-                      const newPrice = parseFloat(editedPrice || "0");
-                      const newCost = parseFloat(editedCost || "0");
+                      const newPrice = parseFloat(editedPrice || '0');
+                      const newCost = parseFloat(editedCost || '0');
                       updateItem({ ...item, price: newPrice, cost: newCost });
                       setIsEditing(false);
                     }}
@@ -111,11 +111,11 @@ export function ItemDetailsModal({
                 </div>
                 <div>
                   <dt className="text-gray-500">Supplier</dt>
-                  <dd className="text-gray-900">{item.supplier ?? "-"}</dd>
+                  <dd className="text-gray-900">{item.supplier ?? '-'}</dd>
                 </div>
                 <div>
                   <dt className="text-gray-500">Location</dt>
-                  <dd className="text-gray-900">{item.location ?? "-"}</dd>
+                  <dd className="text-gray-900">{item.location ?? '-'}</dd>
                 </div>
               </dl>
             </div>
@@ -186,16 +186,16 @@ export function ItemDetailsModal({
                   </h3>
                   <div className="flex gap-2 flex-wrap">
                     <Button
-                      variant={mode === "ADD" ? "default" : "outline"}
+                      variant={mode === 'ADD' ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => setMode("ADD")}
+                      onClick={() => setMode('ADD')}
                     >
                       Add Mode
                     </Button>
                     <Button
-                      variant={mode === "NO_STOCK" ? "default" : "outline"}
+                      variant={mode === 'NO_STOCK' ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => setMode("NO_STOCK")}
+                      onClick={() => setMode('NO_STOCK')}
                     >
                       No‑Stock Mode
                     </Button>
@@ -208,8 +208,8 @@ export function ItemDetailsModal({
                       placeholder="Quantity"
                       value={qty}
                       onChange={(e) => setQty(e.target.value)}
-                      min={"0"}
-                      disabled={mode === "NO_STOCK"}
+                      min={'0'}
+                      disabled={mode === 'NO_STOCK'}
                       className="h-10 px-3"
                     />
                   </div>
@@ -224,20 +224,20 @@ export function ItemDetailsModal({
                   <div className="flex gap-2 md:col-span-1 justify-end flex-wrap">
                     <Button
                       size="sm"
-                      disabled={mode !== "ADD" || !qty || Number(qty) <= 0}
+                      disabled={mode !== 'ADD' || !qty || Number(qty) <= 0}
                       onClick={() => {
                         if (!item || !qty) return;
                         adjustStock({
                           itemId: item.id,
-                          mode: "INCREASE",
+                          mode: 'INCREASE',
                           quantity: Number(qty),
-                          reason: reason || "Manual increase",
+                          reason: reason || 'Manual increase',
                           reference: undefined,
-                          performedBy: "manual",
+                          performedBy: 'manual',
                           notes: reason || undefined,
                         });
-                        setQty("");
-                        setReason("");
+                        setQty('');
+                        setReason('');
                       }}
                       className="h-10"
                     >
@@ -246,17 +246,17 @@ export function ItemDetailsModal({
                     <Button
                       size="sm"
                       variant="destructive"
-                      disabled={mode !== "NO_STOCK"}
+                      disabled={mode !== 'NO_STOCK'}
                       onClick={() => {
                         if (!item) return;
                         adjustStock({
                           itemId: item.id,
-                          mode: "SET",
+                          mode: 'SET',
                           quantity: 0,
-                          reason: "No stock",
+                          reason: 'No stock',
                           reference: undefined,
-                          performedBy: "manual",
-                          notes: "Marked as no stock",
+                          performedBy: 'manual',
+                          notes: 'Marked as no stock',
                         });
                       }}
                       className="h-10"
@@ -290,15 +290,15 @@ export function ItemDetailsModal({
                       className="text-sm flex items-center justify-between bg-gray-50 rounded-md px-3 py-2"
                     >
                       <span>
-                        {m.type} {m.quantity} •{" "}
+                        {m.type} {m.quantity} •{' '}
                         {new Date(m.createdAt).toLocaleString()}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {m.referenceType === "JOB_SHEET" && m.jobSheetId
+                        {m.referenceType === 'JOB_SHEET' && m.jobSheetId
                           ? `Job #${m.jobSheetId}`
-                          : m.referenceType === "BOOKING" && m.bookingId
-                          ? `Booking #${m.bookingId}`
-                          : m.referenceType || "MANUAL"}
+                          : m.referenceType === 'BOOKING' && m.bookingId
+                            ? `Booking #${m.bookingId}`
+                            : m.referenceType || 'MANUAL'}
                       </span>
                     </div>
                   ))

@@ -7,10 +7,10 @@ export async function GET(request: Request) {
 
   if (bay) {
     // Return break time for specific bay
-    const bayBreak = bayBreaks.find(breakTime => breakTime.bay === bay);
+    const bayBreak = bayBreaks.find((breakTime) => breakTime.bay === bay);
     return NextResponse.json(bayBreak || null);
   }
 
   // Return all bay breaks if no specific bay is requested
   return NextResponse.json(bayBreaks);
-} 
+}

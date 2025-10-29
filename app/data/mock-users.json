@@ -20,7 +20,11 @@
         "end": "17:00",
         "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
       },
-      "skills": ["System Administration", "Network Security", "Database Management"],
+      "skills": [
+        "System Administration",
+        "Network Security",
+        "Database Management"
+      ],
       "certifications": [
         {
           "name": "AWS Certified Solutions Architect",
@@ -141,7 +145,11 @@
       "joiningDate": "2023-04-05",
       "employmentType": "full-time",
       "assignedBay": 2,
-      "specialization": ["Engine Diagnostics", "Electrical Systems", "AC Service"],
+      "specialization": [
+        "Engine Diagnostics",
+        "Electrical Systems",
+        "AC Service"
+      ],
       "toolsAssigned": ["Multimeter", "OBD Scanner", "AC Machine"],
       "workingHours": {
         "start": "09:00",
@@ -233,4 +241,4 @@
       "updatedAt": "2024-01-10T16:45:00Z"
     }
   ]
-} 
+}

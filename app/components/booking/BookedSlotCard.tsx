@@ -1,5 +1,5 @@
-import React from "react";
-import type { Booking } from "@/types/booking";
+import React from 'react';
+import type { Booking } from '@/types/booking';
 
 interface BookedSlotCardProps {
   booking: Booking;
@@ -12,7 +12,7 @@ export const BookedSlotCard: React.FC<BookedSlotCardProps> = ({ booking }) => {
         {booking.customer.name}
       </div>
       <div className="text-xs text-blue-700 truncate">
-        {booking.services.map((s) => s.name).join(", ")}
+        {booking.services.map((s) => s.name).join(', ')}
       </div>
     </div>
   );

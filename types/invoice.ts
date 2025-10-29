@@ -25,7 +25,7 @@ export interface Invoice {
   serviceCharge: number;
   vat: number; // 20%
   totalAmount: number;
-  status: "DRAFT" | "SENT" | "PAID" | "OVERDUE" | "CANCELLED";
+  status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED';
   issuedDate: string;
   dueDate: string;
   paidDate?: string;
@@ -35,10 +35,10 @@ export interface Invoice {
   createdAt: string;
 }
 
-export type InvoiceStatus = "DRAFT" | "SENT" | "PAID" | "OVERDUE" | "CANCELLED";
+export type InvoiceStatus = 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED';
 
 export interface InvoiceFilters {
-  status?: InvoiceStatus | "ALL";
+  status?: InvoiceStatus | 'ALL';
   customerName?: string;
   dateFrom?: string;
   dateTo?: string;

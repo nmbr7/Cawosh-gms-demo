@@ -1,11 +1,11 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type {
   Invoice,
   InvoiceStatus,
   InvoiceFilters,
   InvoiceSummary,
-} from "@/types/invoice";
+} from '@/types/invoice';
 
 interface BillingState {
   // Invoice data
@@ -15,7 +15,7 @@ interface BillingState {
 
   // Actions
   createInvoice: (
-    invoice: Omit<Invoice, "id" | "invoiceNumber" | "issuedDate" | "dueDate">
+    invoice: Omit<Invoice, 'id' | 'invoiceNumber' | 'issuedDate' | 'dueDate'>,
   ) => Invoice;
   updateInvoiceStatus: (invoiceId: string, status: InvoiceStatus) => void;
   updateInvoice: (invoiceId: string, updates: Partial<Invoice>) => void;
@@ -46,10 +46,10 @@ export const useBillingStore = create<BillingState>()(
       // Initial state
       invoices: [],
       filters: {
-        status: "ALL" as const,
-        customerName: "",
-        dateFrom: "",
-        dateTo: "",
+        status: 'ALL' as const,
+        customerName: '',
+        dateFrom: '',
+        dateTo: '',
       },
       summary: {
         totalInvoices: 0,
@@ -62,7 +62,7 @@ export const useBillingStore = create<BillingState>()(
       // Invoice CRUD operations
       createInvoice: (invoiceData) => {
         const { generateInvoiceNumber, calculateDueDate } = get();
-        const issuedDate = new Date().toISOString().split("T")[0];
+        const issuedDate = new Date().toISOString().split('T')[0];
 
         const newInvoice: Invoice = {
           ...invoiceData,
@@ -88,11 +88,11 @@ export const useBillingStore = create<BillingState>()(
                   ...invoice,
                   status,
                   paidDate:
-                    status === "PAID"
-                      ? new Date().toISOString().split("T")[0]
+                    status === 'PAID'
+                      ? new Date().toISOString().split('T')[0]
                       : undefined,
                 }
-              : invoice
+              : invoice,
           ),
           summary: get().getInvoiceSummary(),
         }));
@@ -101,7 +101,7 @@ export const useBillingStore = create<BillingState>()(
       updateInvoice: (invoiceId, updates) => {
         set((state) => ({
           invoices: state.invoices.map((invoice) =>
-            invoice.id === invoiceId ? { ...invoice, ...updates } : invoice
+            invoice.id === invoiceId ? { ...invoice, ...updates } : invoice,
           ),
           summary: get().getInvoiceSummary(),
         }));
@@ -110,7 +110,7 @@ export const useBillingStore = create<BillingState>()(
       deleteInvoice: (invoiceId) => {
         set((state) => ({
           invoices: state.invoices.filter(
-            (invoice) => invoice.id !== invoiceId
+            (invoice) => invoice.id !== invoiceId,
           ),
           summary: get().getInvoiceSummary(),
         }));
@@ -122,13 +122,13 @@ export const useBillingStore = create<BillingState>()(
 
       getInvoicesByJobSheet: (jobSheetId) => {
         return get().invoices.filter(
-          (invoice) => invoice.jobSheetId === jobSheetId
+          (invoice) => invoice.jobSheetId === jobSheetId,
         );
       },
 
       getInvoicesByBooking: (bookingId) => {
         return get().invoices.filter(
-          (invoice) => invoice.bookingId === bookingId
+          (invoice) => invoice.bookingId === bookingId,
         );
       },
 
@@ -145,7 +145,7 @@ export const useBillingStore = create<BillingState>()(
         return invoices.filter((invoice) => {
           if (
             filters.status &&
-            filters.status !== "ALL" &&
+            filters.status !== 'ALL' &&
             invoice.status !== filters.status
           ) {
             return false;
@@ -184,7 +184,7 @@ export const useBillingStore = create<BillingState>()(
             invoice.customer.name.toLowerCase().includes(lowercaseQuery) ||
             invoice.vehicle.make.toLowerCase().includes(lowercaseQuery) ||
             invoice.vehicle.model.toLowerCase().includes(lowercaseQuery) ||
-            invoice.vehicle.license.toLowerCase().includes(lowercaseQuery)
+            invoice.vehicle.license.toLowerCase().includes(lowercaseQuery),
         );
       },
 
@@ -196,10 +196,10 @@ export const useBillingStore = create<BillingState>()(
           totalInvoices: invoices.length,
           totalAmount: invoices.reduce((sum, inv) => sum + inv.totalAmount, 0),
           paidAmount: invoices
-            .filter((inv) => inv.status === "PAID")
+            .filter((inv) => inv.status === 'PAID')
             .reduce((sum, inv) => sum + inv.totalAmount, 0),
           pendingAmount: invoices
-            .filter((inv) => inv.status === "DRAFT" || inv.status === "SENT")
+            .filter((inv) => inv.status === 'DRAFT' || inv.status === 'SENT')
             .reduce((sum, inv) => sum + inv.totalAmount, 0),
           overdueAmount: invoices
             .filter((inv) => get().isInvoiceOverdue(inv))
@@ -220,7 +220,7 @@ export const useBillingStore = create<BillingState>()(
             return (
               invoiceDate >= start &&
               invoiceDate <= end &&
-              invoice.status === "PAID"
+              invoice.status === 'PAID'
             );
           })
           .reduce((sum, invoice) => sum + invoice.totalAmount, 0);
@@ -232,11 +232,11 @@ export const useBillingStore = create<BillingState>()(
 
       // Utility functions
       generateInvoiceNumber: () => {
-        const prefix = "INV";
+        const prefix = 'INV';
         const date = new Date();
         const year = date.getFullYear().toString().slice(-2);
-        const month = (date.getMonth() + 1).toString().padStart(2, "0");
-        const day = date.getDate().toString().padStart(2, "0");
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
         const randomNum = Math.floor(1000 + Math.random() * 9000);
         return `${prefix}-${year}${month}${day}-${randomNum}`;
       },
@@ -244,11 +244,11 @@ export const useBillingStore = create<BillingState>()(
       calculateDueDate: (issuedDate, days = 30) => {
         const date = new Date(issuedDate);
         date.setDate(date.getDate() + days);
-        return date.toISOString().split("T")[0];
+        return date.toISOString().split('T')[0];
       },
 
       isInvoiceOverdue: (invoice) => {
-        if (invoice.status === "PAID" || invoice.status === "CANCELLED") {
+        if (invoice.status === 'PAID' || invoice.status === 'CANCELLED') {
           return false;
         }
         const today = new Date();
@@ -257,11 +257,11 @@ export const useBillingStore = create<BillingState>()(
       },
     }),
     {
-      name: "billing-storage",
+      name: 'billing-storage',
       partialize: (state) => ({
         invoices: state.invoices,
         filters: state.filters,
       }),
-    }
-  )
+    },
+  ),
 );

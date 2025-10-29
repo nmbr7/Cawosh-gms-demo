@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 // New Slot types
 export type SlotService = {
@@ -50,29 +50,29 @@ export const SlotList: React.FC<SlotListProps> = ({
       {slots.map((slot, idx) => {
         if (!slot.services.length) return null;
         const sortedSvcs = [...slot.services].sort((a, b) =>
-          a.startTime.localeCompare(b.startTime)
+          a.startTime.localeCompare(b.startTime),
         );
         const startTime = sortedSvcs[0].startTime;
         const endTime = sortedSvcs[sortedSvcs.length - 1].endTime;
         const serviceNames = slot.services
           .map((s) => s.service.name)
-          .join(", ");
+          .join(', ');
         const techs = Array.from(
           new Map(
             slot.services.map((s) => [
               s.technician.id,
               `${s.technician.firstName} ${s.technician.lastName}`,
-            ])
-          ).values()
-        ).join(", ");
+            ]),
+          ).values(),
+        ).join(', ');
         // Format times
         const start = new Date(startTime).toLocaleTimeString([], {
-          hour: "numeric",
-          minute: "2-digit",
+          hour: 'numeric',
+          minute: '2-digit',
         });
         const end = new Date(endTime).toLocaleTimeString([], {
-          hour: "numeric",
-          minute: "2-digit",
+          hour: 'numeric',
+          minute: '2-digit',
         });
         return (
           <div key={slot.bay.id + slot.date} className="flex flex-col gap-1">
@@ -81,8 +81,8 @@ export const SlotList: React.FC<SlotListProps> = ({
               key={slot.bay.id + slot.date}
               className={`cursor-pointer px-3 py-2 border rounded-md text-xs min-w-[220px] ${
                 selectedSlotIndex === idx
-                  ? "bg-blue-500 text-white border-blue-500"
-                  : "bg-white text-gray-700 border-gray-300"
+                  ? 'bg-blue-500 text-white border-blue-500'
+                  : 'bg-white text-gray-700 border-gray-300'
               }`}
             >
               <input

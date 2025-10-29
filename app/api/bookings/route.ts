@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { BookingStatus } from "@/app/models/booking";
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { BookingStatus } from '@/app/models/booking';
 
 interface BackendBooking {
   _id: string;
@@ -115,77 +115,77 @@ export async function GET(request: Request): Promise<NextResponse> {
     const { searchParams }: URL = new URL(request.url);
 
     // Get garage ID from query params
-    const garageId = searchParams.get("garageId");
+    const garageId = searchParams.get('garageId');
     if (!garageId) {
       return NextResponse.json(
-        { error: "Garage ID is required" },
-        { status: 400 }
+        { error: 'Garage ID is required' },
+        { status: 400 },
       );
     }
 
     // Pagination parameters
-    const page: number = parseInt(searchParams.get("page") || "1");
-    const limit: number = parseInt(searchParams.get("limit") || "10");
+    const page: number = parseInt(searchParams.get('page') || '1');
+    const limit: number = parseInt(searchParams.get('limit') || '10');
 
     // Filter parameters
     const bay: string | null =
-      searchParams.get("bay") || searchParams.get("bayId") || null;
+      searchParams.get('bay') || searchParams.get('bayId') || null;
     const technicianId: string | null =
-      searchParams.get("technicianId") || null;
-    const status: string | null = searchParams.get("status") || null;
+      searchParams.get('technicianId') || null;
+    const status: string | null = searchParams.get('status') || null;
     const serviceStatus: string | null =
-      searchParams.get("serviceStatus") || null;
-    const minPrice: string | null = searchParams.get("minPrice") || null;
-    const maxPrice: string | null = searchParams.get("maxPrice") || null;
+      searchParams.get('serviceStatus') || null;
+    const minPrice: string | null = searchParams.get('minPrice') || null;
+    const maxPrice: string | null = searchParams.get('maxPrice') || null;
 
     // Date range parameters
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
 
     // Sort parameters
-    const sortBy: string = searchParams.get("sortBy") || "bookingDate";
-    const sortOrder: "asc" | "desc" = (searchParams.get("sortOrder") ||
-      "desc") as "asc" | "desc";
+    const sortBy: string = searchParams.get('sortBy') || 'bookingDate';
+    const sortOrder: 'asc' | 'desc' = (searchParams.get('sortOrder') ||
+      'desc') as 'asc' | 'desc';
 
     // Get auth token
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
+    const accessToken = cookieStore.get('access_token')?.value;
 
     if (!accessToken) {
       return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
+        { error: 'Authentication required' },
+        { status: 401 },
       );
     }
 
     // Build backend API URL with the correct endpoint structure
     const backendUrl = new URL(
       `${process.env.BACKEND_URL}/api/bookings` ||
-        "http://localhost:3000/api/bookings"
+        'http://localhost:3000/api/bookings',
     );
-    backendUrl.searchParams.set("page", page.toString());
-    backendUrl.searchParams.set("limit", limit.toString());
-    backendUrl.searchParams.set("garage_id", garageId);
-    backendUrl.searchParams.set("sortBy", sortBy);
-    backendUrl.searchParams.set("sortOrder", sortOrder);
+    backendUrl.searchParams.set('page', page.toString());
+    backendUrl.searchParams.set('limit', limit.toString());
+    backendUrl.searchParams.set('garage_id', garageId);
+    backendUrl.searchParams.set('sortBy', sortBy);
+    backendUrl.searchParams.set('sortOrder', sortOrder);
 
     // Add optional filters
-    if (bay) backendUrl.searchParams.set("bay", bay);
-    if (technicianId) backendUrl.searchParams.set("technicianId", technicianId);
-    if (status) backendUrl.searchParams.set("status", status);
+    if (bay) backendUrl.searchParams.set('bay', bay);
+    if (technicianId) backendUrl.searchParams.set('technicianId', technicianId);
+    if (status) backendUrl.searchParams.set('status', status);
     if (serviceStatus)
-      backendUrl.searchParams.set("serviceStatus", serviceStatus);
-    if (startDate) backendUrl.searchParams.set("startDate", startDate);
-    if (endDate) backendUrl.searchParams.set("endDate", endDate);
-    if (minPrice) backendUrl.searchParams.set("minPrice", minPrice);
-    if (maxPrice) backendUrl.searchParams.set("maxPrice", maxPrice);
+      backendUrl.searchParams.set('serviceStatus', serviceStatus);
+    if (startDate) backendUrl.searchParams.set('startDate', startDate);
+    if (endDate) backendUrl.searchParams.set('endDate', endDate);
+    if (minPrice) backendUrl.searchParams.set('minPrice', minPrice);
+    if (maxPrice) backendUrl.searchParams.set('maxPrice', maxPrice);
 
     // Call backend API
     const response = await fetch(backendUrl.toString(), {
-      method: "GET",
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
@@ -196,7 +196,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const backendData: BackendResponse = await response.json();
 
     if (!backendData.success) {
-      throw new Error(backendData.message || "Failed to fetch bookings");
+      throw new Error(backendData.message || 'Failed to fetch bookings');
     }
 
     // Transform the data to match our frontend expectations
@@ -236,10 +236,10 @@ export async function GET(request: Request): Promise<NextResponse> {
       sorting: backendData.data.sorting,
     });
   } catch (error) {
-    console.error("Error fetching bookings:", error);
+    console.error('Error fetching bookings:', error);
     return NextResponse.json(
-      { error: "Failed to fetch bookings" },
-      { status: 500 }
+      { error: 'Failed to fetch bookings' },
+      { status: 500 },
     );
   }
 }
@@ -247,57 +247,57 @@ export async function GET(request: Request): Promise<NextResponse> {
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const body = await request.json();
-    console.log("Creating booking with data:", body);
+    console.log('Creating booking with data:', body);
 
     // Get auth token
     const cookieStore = await cookies();
-    const accessToken = cookieStore.get("access_token")?.value;
+    const accessToken = cookieStore.get('access_token')?.value;
 
     if (!accessToken) {
       return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
+        { error: 'Authentication required' },
+        { status: 401 },
       );
     }
 
     // Call backend API to create booking
     const backendUrl =
       `${process.env.BACKEND_URL}/api/bookings` ||
-      "http://localhost:3000/api/bookings";
+      'http://localhost:3000/api/bookings';
 
-    console.log("Sending request to backend:", backendUrl);
+    console.log('Sending request to backend:', backendUrl);
 
     const response = await fetch(backendUrl, {
-      method: "POST",
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
     });
 
-    console.log("Backend response status:", response.status);
+    console.log('Backend response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Backend error:", errorData);
+      console.error('Backend error:', errorData);
       return NextResponse.json(
         {
           error:
-            errorData.error || errorData.message || "Failed to create booking",
+            errorData.error || errorData.message || 'Failed to create booking',
         },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
     const data = await response.json();
-    console.log("Backend success response:", data);
+    console.log('Backend success response:', data);
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
-    console.error("Error creating booking:", error);
+    console.error('Error creating booking:', error);
     return NextResponse.json(
-      { error: "Failed to create booking" },
-      { status: 500 }
+      { error: 'Failed to create booking' },
+      { status: 500 },
     );
   }
 }

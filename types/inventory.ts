@@ -1,6 +1,6 @@
 // types/inventory.ts
-export type StockStatus = "IN_STOCK" | "LOW" | "OUT";
-export type MovementType = "INCREASE" | "DECREASE" | "SET";
+export type StockStatus = 'IN_STOCK' | 'LOW' | 'OUT';
+export type MovementType = 'INCREASE' | 'DECREASE' | 'SET';
 
 export interface StockMovement {
   id: string;
@@ -14,7 +14,7 @@ export interface StockMovement {
   resultingQuantity: number;
 
   // Traceability (NEW)
-  referenceType?: "JOB_SHEET" | "BOOKING" | "MANUAL" | "SYSTEM";
+  referenceType?: 'JOB_SHEET' | 'BOOKING' | 'MANUAL' | 'SYSTEM';
   jobSheetId?: string;
   bookingId?: string;
   serviceId?: string;
@@ -26,7 +26,7 @@ export interface InventoryItem {
   name: string;
   sku: string;
   category: string;
-  unit: "pc" | "pair" | "bottle" | "litre" | "kg" | "box";
+  unit: 'pc' | 'pair' | 'bottle' | 'litre' | 'kg' | 'box';
   quantity: number;
   reorderLevel: number; // threshold
   cost: number; // per unit

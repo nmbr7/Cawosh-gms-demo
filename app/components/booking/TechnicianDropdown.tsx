@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { Technician } from "@/store/booking";
+} from '@/components/ui/select';
+import type { Technician } from '@/store/booking';
 
 interface TechnicianDropdownProps {
   value: string;

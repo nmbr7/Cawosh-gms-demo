@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   ChevronLeft,
   ChevronRight,
@@ -11,23 +11,23 @@ import {
   Search,
   X,
   Plus,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { DataTable } from "@/components/ui/data-table";
+} from '@/components/ui/select';
+import { DataTable } from '@/components/ui/data-table';
 
 // import { ItemDetailsModal } from "@/components/modals/item-details-modal";
 // import { ItemCreateModal } from "@/components/modals/item-create-modal";
-import { useInventory } from "@/store/inventory";
-import type { InventoryItem } from "@/types/inventory";
-import { InventoryAlerts } from "@/app/components/inventory/InventoryAlerts";
-import { ItemDetailsModal } from "@/app/components/inventory/InventoryItemDetailModal";
+import { useInventory } from '@/store/inventory';
+import type { InventoryItem } from '@/types/inventory';
+import { InventoryAlerts } from '@/app/components/inventory/InventoryAlerts';
+import { ItemDetailsModal } from '@/app/components/inventory/InventoryItemDetailModal';
 
 export default function InventoryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,38 +42,38 @@ export default function InventoryPage() {
 
   const columns = [
     {
-      header: "Item Name",
-      accessorKey: "name" as keyof InventoryItem,
-      width: "w-32",
+      header: 'Item Name',
+      accessorKey: 'name' as keyof InventoryItem,
+      width: 'w-32',
     },
     {
-      header: "SKU",
-      accessorKey: "sku" as keyof InventoryItem,
-      width: "w-24",
+      header: 'SKU',
+      accessorKey: 'sku' as keyof InventoryItem,
+      width: 'w-24',
     },
     {
-      header: "Category",
-      accessorKey: "category" as keyof InventoryItem,
-      width: "w-20",
+      header: 'Category',
+      accessorKey: 'category' as keyof InventoryItem,
+      width: 'w-20',
     },
     {
-      header: "Quantity",
-      accessorKey: "quantity" as keyof InventoryItem,
+      header: 'Quantity',
+      accessorKey: 'quantity' as keyof InventoryItem,
       cell: (item: InventoryItem) => (
         <div>
           <div className="font-medium">{item.quantity}</div>
           <div className="text-xs text-gray-400">{item.unit}</div>
         </div>
       ),
-      width: "w-16",
+      width: 'w-16',
     },
     {
-      header: "Price",
-      accessorKey: "price" as keyof InventoryItem,
+      header: 'Price',
+      accessorKey: 'price' as keyof InventoryItem,
       cell: (item: InventoryItem) => {
-        const gbp = new Intl.NumberFormat("en-GB", {
-          style: "currency",
-          currency: "GBP",
+        const gbp = new Intl.NumberFormat('en-GB', {
+          style: 'currency',
+          currency: 'GBP',
           minimumFractionDigits: 2,
         });
         return (
@@ -85,25 +85,25 @@ export default function InventoryPage() {
           </div>
         );
       },
-      width: "w-20",
+      width: 'w-20',
     },
     {
-      header: "Status",
-      accessorKey: "quantity" as keyof InventoryItem,
+      header: 'Status',
+      accessorKey: 'quantity' as keyof InventoryItem,
       cell: (item: InventoryItem) => {
         const isLow = item.quantity <= item.reorderLevel;
         return (
           <span
             className={cn(
-              "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-              isLow ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+              'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+              isLow ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800',
             )}
           >
-            {isLow ? "Low Stock" : "In Stock"}
+            {isLow ? 'Low Stock' : 'In Stock'}
           </span>
         );
       },
-      width: "w-16",
+      width: 'w-16',
     },
   ];
 
@@ -124,7 +124,7 @@ export default function InventoryPage() {
               type="text"
               placeholder="Search inventory..."
               className="w-[300px] pl-9 pr-8 bg-white"
-              value={filters.q || ""}
+              value={filters.q || ''}
               onChange={(e) => setFilters({ q: e.target.value || undefined })}
             />
             {filters.q && (
@@ -142,8 +142,8 @@ export default function InventoryPage() {
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "flex items-center gap-2",
-              showFilters && "bg-blue-100"
+              'flex items-center gap-2',
+              showFilters && 'bg-blue-100',
             )}
           >
             <Filter className="w-4 h-4 mr-2" />
@@ -164,10 +164,10 @@ export default function InventoryPage() {
                 Category
               </label>
               <Select
-                value={filters.category ?? "all"}
+                value={filters.category ?? 'all'}
                 onValueChange={(value) =>
                   setFilters({
-                    category: value === "all" ? undefined : value,
+                    category: value === 'all' ? undefined : value,
                   })
                 }
               >
@@ -189,10 +189,10 @@ export default function InventoryPage() {
                 Stock Status
               </label>
               <Select
-                value={(filters.status ?? "ALL") as string}
+                value={(filters.status ?? 'ALL') as string}
                 onValueChange={(value) =>
                   setFilters({
-                    status: value as "ALL" | "IN_STOCK" | "LOW" | "OUT",
+                    status: value as 'ALL' | 'IN_STOCK' | 'LOW' | 'OUT',
                   })
                 }
               >
@@ -203,11 +203,11 @@ export default function InventoryPage() {
                   <SelectItem value="ALL">All Statuses</SelectItem>
                   {filterOptions.statuses.map((s) => (
                     <SelectItem key={s} value={s}>
-                      {s === "IN_STOCK"
-                        ? "In Stock"
-                        : s === "LOW"
-                        ? "Low Stock"
-                        : "Out of Stock"}
+                      {s === 'IN_STOCK'
+                        ? 'In Stock'
+                        : s === 'LOW'
+                          ? 'Low Stock'
+                          : 'Out of Stock'}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -228,32 +228,32 @@ export default function InventoryPage() {
         }}
         emptyMessage={
           filters.category !== undefined || filters.q
-            ? "No items match your filters"
-            : "No inventory items found"
+            ? 'No items match your filters'
+            : 'No inventory items found'
         }
         emptySubMessage={
           filters.category !== undefined || filters.q
-            ? "Try adjusting your filters or search criteria"
-            : "Get started by adding a new inventory item"
+            ? 'Try adjusting your filters or search criteria'
+            : 'Get started by adding a new inventory item'
         }
         emptyAction={
           filters.category !== undefined || filters.q
             ? {
-                label: "Clear filters",
+                label: 'Clear filters',
                 onClick: () => {
                   setFilters({
                     category: undefined,
                     q: undefined,
-                    sortBy: "name",
-                    sortOrder: "asc",
+                    sortBy: 'name',
+                    sortOrder: 'asc',
                   });
                 },
               }
             : {
-                label: "Add Item",
+                label: 'Add Item',
                 // onClick: () => setIsCreateModalOpen(true),
                 onClick: () => {
-                  console.log("Add Item");
+                  console.log('Add Item');
                 },
               }
         }
@@ -261,12 +261,12 @@ export default function InventoryPage() {
 
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-gray-700">
-          Showing {(pagination.currentPage - 1) * pagination.itemsPerPage + 1}{" "}
-          to{" "}
+          Showing {(pagination.currentPage - 1) * pagination.itemsPerPage + 1}{' '}
+          to{' '}
           {Math.min(
             pagination.currentPage * pagination.itemsPerPage,
-            pagination.totalItems
-          )}{" "}
+            pagination.totalItems,
+          )}{' '}
           of {pagination.totalItems} items
         </div>
         <div className="flex items-center gap-2">
@@ -284,18 +284,18 @@ export default function InventoryPage() {
                 <Button
                   key={page}
                   variant={
-                    pagination.currentPage === page ? "default" : "outline"
+                    pagination.currentPage === page ? 'default' : 'outline'
                   }
                   onClick={() => setFilters({ page: page })}
                   className={cn(
-                    "w-8 h-8 p-0",
+                    'w-8 h-8 p-0',
                     pagination.currentPage === page &&
-                      "bg-blue-500 text-white hover:bg-blue-600"
+                      'bg-blue-500 text-white hover:bg-blue-600',
                   )}
                 >
                   {page}
                 </Button>
-              )
+              ),
             )}
           </div>
 

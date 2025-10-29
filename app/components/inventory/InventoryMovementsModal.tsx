@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { useInventory } from "@/store/inventory";
-import type { InventoryItem } from "@/types/inventory";
-import { useEffect, useState } from "react";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { useInventory } from '@/store/inventory';
+import type { InventoryItem } from '@/types/inventory';
+import { useEffect, useState } from 'react';
 
 export function InventoryMovementsModal({
   item,
@@ -29,15 +29,15 @@ export function InventoryMovementsModal({
   onClose: () => void;
 }) {
   const { getMovementsByItem } = useInventory();
-  const [q, setQ] = useState("");
-  const [type, setType] = useState<"ALL" | "INCREASE" | "DECREASE" | "SET">(
-    "ALL"
+  const [q, setQ] = useState('');
+  const [type, setType] = useState<'ALL' | 'INCREASE' | 'DECREASE' | 'SET'>(
+    'ALL',
   );
   const [referenceType, setReferenceType] = useState<
-    "ALL" | "JOB_SHEET" | "BOOKING" | "MANUAL" | "SYSTEM"
-  >("ALL");
-  const [from, setFrom] = useState<string>("");
-  const [to, setTo] = useState<string>("");
+    'ALL' | 'JOB_SHEET' | 'BOOKING' | 'MANUAL' | 'SYSTEM'
+  >('ALL');
+  const [from, setFrom] = useState<string>('');
+  const [to, setTo] = useState<string>('');
   const [page, setPage] = useState<number>(1);
   const [limit] = useState<number>(20);
 
@@ -154,14 +154,14 @@ export function InventoryMovementsModal({
                     <td className="px-3 py-2 text-sm">{m.quantity}</td>
                     <td className="px-3 py-2 text-sm">{m.resultingQuantity}</td>
                     <td className="px-3 py-2 text-sm">
-                      {m.referenceType === "JOB_SHEET" && m.jobSheetId
+                      {m.referenceType === 'JOB_SHEET' && m.jobSheetId
                         ? `Job #${m.jobSheetId}`
-                        : m.referenceType === "BOOKING" && m.bookingId
-                        ? `Booking #${m.bookingId}`
-                        : m.referenceType || "—"}
+                        : m.referenceType === 'BOOKING' && m.bookingId
+                          ? `Booking #${m.bookingId}`
+                          : m.referenceType || '—'}
                     </td>
                     <td className="px-3 py-2 text-sm">
-                      <div className="text-gray-900">{m.reason || "—"}</div>
+                      <div className="text-gray-900">{m.reason || '—'}</div>
                       {m.notes && (
                         <div className="text-xs text-gray-500">{m.notes}</div>
                       )}

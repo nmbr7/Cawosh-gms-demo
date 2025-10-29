@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { VHC_VALUE_MAPPING } from "@/lib/vhc/answerMapping";
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { VHC_VALUE_MAPPING } from '@/lib/vhc/answerMapping';
 import {
   Download,
   Mail,
@@ -11,7 +11,7 @@ import {
   CheckCircle,
   AlertTriangle,
   XCircle,
-} from "lucide-react";
+} from 'lucide-react';
 
 interface VHCResponse {
   id: string;
@@ -71,22 +71,22 @@ export default function VHCReportPage() {
         // Fetch VHC response
         const resp = await fetchWithAuth(`/api/vhc/responses/${params.id}`);
         if (!resp.ok) {
-          throw new Error("Failed to fetch VHC response");
+          throw new Error('Failed to fetch VHC response');
         }
         const responseData = await resp.json();
         setResponse(responseData);
 
         // Fetch VHC template
         const tpl = await fetchWithAuth(
-          `/api/vhc/templates/${responseData.templateId}`
+          `/api/vhc/templates/${responseData.templateId}`,
         );
         if (!tpl.ok) {
-          throw new Error("Failed to fetch VHC template");
+          throw new Error('Failed to fetch VHC template');
         }
         const templateData = await tpl.json();
         setTemplate(templateData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+        setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
         setLoading(false);
       }
@@ -98,9 +98,9 @@ export default function VHCReportPage() {
   }, [params.id]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 0.8) return "text-green-600";
-    if (score >= 0.6) return "text-yellow-600";
-    return "text-red-600";
+    if (score >= 0.8) return 'text-green-600';
+    if (score >= 0.6) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   const getScoreIcon = (score: number) => {
@@ -111,19 +111,19 @@ export default function VHCReportPage() {
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 0.8) return "Good";
-    if (score >= 0.6) return "Fair";
-    return "Poor";
+    if (score >= 0.8) return 'Good';
+    if (score >= 0.6) return 'Fair';
+    return 'Poor';
   };
 
   const handleDownloadReport = () => {
     // TODO: Implement PDF generation and download
-    console.log("Download report functionality to be implemented");
+    console.log('Download report functionality to be implemented');
   };
 
   const handleEmailReport = () => {
     // TODO: Implement email functionality
-    console.log("Email report functionality to be implemented");
+    console.log('Email report functionality to be implemented');
   };
 
   if (loading) {
@@ -145,9 +145,9 @@ export default function VHCReportPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Error Loading Report
           </h2>
-          <p className="text-gray-600 mb-4">{error || "Report not found"}</p>
+          <p className="text-gray-600 mb-4">{error || 'Report not found'}</p>
           <button
-            onClick={() => router.push("/vehicle-health-checks")}
+            onClick={() => router.push('/vehicle-health-checks')}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Back to VHC List
@@ -164,7 +164,7 @@ export default function VHCReportPage() {
   const applicableSections = template.sections.filter(
     (section) =>
       !section.applicable_to ||
-      section.applicable_to.includes(response.powertrain)
+      section.applicable_to.includes(response.powertrain),
   );
 
   return (
@@ -174,7 +174,7 @@ export default function VHCReportPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={() => router.push("/vehicle-health-checks")}
+              onClick={() => router.push('/vehicle-health-checks')}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -230,10 +230,10 @@ export default function VHCReportPage() {
               <div
                 className={`h-3 rounded-full transition-all duration-500 ${
                   totalScore >= 0.8
-                    ? "bg-green-500"
+                    ? 'bg-green-500'
                     : totalScore >= 0.6
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500'
                 }`}
                 style={{ width: `${scorePercentage}%` }}
               ></div>
@@ -251,7 +251,7 @@ export default function VHCReportPage() {
               const sectionScore = response.scores.section[section.id] || 0;
               const sectionPercentage = Math.round(sectionScore * 100);
               const sectionAnswers = response.answers.filter((answer) =>
-                section.items.some((item) => item.id === answer.itemId)
+                section.items.some((item) => item.id === answer.itemId),
               );
 
               return (
@@ -267,7 +267,7 @@ export default function VHCReportPage() {
                       {getScoreIcon(sectionScore)}
                       <span
                         className={`font-semibold ${getScoreColor(
-                          sectionScore
+                          sectionScore,
                         )}`}
                       >
                         {sectionPercentage}%
@@ -278,10 +278,10 @@ export default function VHCReportPage() {
                     <div
                       className={`h-2 rounded-full transition-all duration-500 ${
                         sectionScore >= 0.8
-                          ? "bg-green-500"
+                          ? 'bg-green-500'
                           : sectionScore >= 0.6
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
+                            ? 'bg-yellow-500'
+                            : 'bg-red-500'
                       }`}
                       style={{ width: `${sectionPercentage}%` }}
                     ></div>
@@ -313,14 +313,14 @@ export default function VHCReportPage() {
                 <div className="space-y-2">
                   {section.items.map((item) => {
                     const answer = response.answers.find(
-                      (a) => a.itemId === item.id
+                      (a) => a.itemId === item.id,
                     );
                     const value = answer?.value;
                     const title = value
                       ? VHC_VALUE_MAPPING[
                           value as keyof typeof VHC_VALUE_MAPPING
                         ]
-                      : "Not assessed";
+                      : 'Not assessed';
 
                     return (
                       <div
@@ -334,11 +334,11 @@ export default function VHCReportPage() {
                           className={`text-sm font-medium ${
                             value
                               ? value >= 4
-                                ? "text-green-600"
+                                ? 'text-green-600'
                                 : value >= 3
-                                ? "text-yellow-600"
-                                : "text-red-600"
-                              : "text-gray-400"
+                                  ? 'text-yellow-600'
+                                  : 'text-red-600'
+                              : 'text-gray-400'
                           }`}
                         >
                           {title}

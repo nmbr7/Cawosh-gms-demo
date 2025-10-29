@@ -15,26 +15,14 @@
               "id": "mandatory_lights",
               "label": "Mandatory lights",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.09
             },
             {
               "id": "brake_pads",
               "label": "Brake pad/shoe wear",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.12
             }
           ]
@@ -42,23 +30,14 @@
         {
           "id": "hv_system",
           "title": "High Voltage System",
-          "applicable_to": [
-            "ev",
-            "hybrid"
-          ],
+          "applicable_to": ["ev", "hybrid"],
           "weight": 0.15,
           "items": [
             {
               "id": "charge_port_condition",
               "label": "Charge port condition",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             }
           ]
@@ -66,23 +45,14 @@
         {
           "id": "engine_oil",
           "title": "Engine Oil/Leaks",
-          "applicable_to": [
-            "ice",
-            "hybrid"
-          ],
+          "applicable_to": ["ice", "hybrid"],
           "weight": 0.08,
           "items": [
             {
               "id": "engine_oil_level",
               "label": "Oil level/condition",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.08
             }
           ]
@@ -104,26 +74,14 @@
               "id": "mandatory_lights",
               "label": "Mandatory lights",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.04
             },
             {
               "id": "horn_wipers_washers",
               "label": "Horn/wipers/washers",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.04
             }
           ]
@@ -137,52 +95,28 @@
               "id": "brake_noise_feel",
               "label": "Brake Noise/Feel",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             },
             {
               "id": "clutch_transmission",
               "label": "Clutch/Transmission Operation",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             },
             {
               "id": "engine_noise_smoke",
               "label": "Engine noise/Smoke",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             },
             {
               "id": "glass_mirrors_wiper_blades",
               "label": "Glass/Mirrors/Wiper Blades",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             }
           ]
@@ -196,52 +130,28 @@
               "id": "fluid_level_oil_water_coolant",
               "label": "Fluid Level - Oil/Water/Coolant",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.05
             },
             {
               "id": "fluid_leaks_oil_water",
               "label": "Fluid Leaks - Oil/Water",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.05
             },
             {
               "id": "battery_condition",
               "label": "Battery Condition",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             },
             {
               "id": "drive_belt",
               "label": "Drive Belt",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.02
             }
           ]
@@ -255,156 +165,84 @@
               "id": "brake_fluid_condition_temperature",
               "label": "Brake fluid condition/temperature",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             },
             {
               "id": "master_cylinder_servo",
               "label": "Master cylinder/servo",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             },
             {
               "id": "shoe_wear_percentage",
               "label": "Shoe Wear Percentage (%)",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.02
             },
             {
               "id": "brake_pad_offside_front_inner",
               "label": "Brake pad/shoe wear - Offside Front - Inner",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.025
             },
             {
               "id": "brake_pad_offside_front_outer",
               "label": "Brake pad/shoe wear - Offside Front - Outer",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.025
             },
             {
               "id": "brake_pad_nearside_front_inner",
               "label": "Brake pad/shoe wear - Nearside Front - Inner",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.025
             },
             {
               "id": "brake_pad_nearside_front_outer",
               "label": "Brake pad/shoe wear - Nearside Front - Outer",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.025
             },
             {
               "id": "brake_pad_offside_rear_inner",
               "label": "Brake pad/shoe wear - Offside Rear - Inner",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.025
             },
             {
               "id": "brake_pad_offside_rear_outer",
               "label": "Brake pad/shoe wear - Offside Rear - Outer",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.025
             },
             {
               "id": "brake_pad_nearside_rear_inner",
               "label": "Brake pad/shoe wear - Nearside Rear - Inner",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.025
             },
             {
               "id": "brake_pad_nearside_rear_outer",
               "label": "Brake pad/shoe wear - Nearside Rear - Outer",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.025
             },
             {
               "id": "hoses_pipes_cables_wheel_bearings",
               "label": "Hoses/Pipes/Cables/Wheel Bearings",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             }
           ]
@@ -418,52 +256,28 @@
               "id": "exhaust_system_catalyst",
               "label": "Exhaust system/catalyst",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.05
             },
             {
               "id": "steering_suspension",
               "label": "Steering/Suspension",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.05
             },
             {
               "id": "drive_shaft_gaitors",
               "label": "Drive shaft/gaitors",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.03
             },
             {
               "id": "oil_leaks",
               "label": "Oil leaks",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.02
             }
           ]
@@ -477,26 +291,14 @@
               "id": "dents_chips_scratches_rust",
               "label": "Dents-D, Chips-C, Scratches-S, Rust-R",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.08
             },
             {
               "id": "miscellaneous",
               "label": "Miscellaneous",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.02
             }
           ]
@@ -504,23 +306,14 @@
         {
           "id": "hv_system",
           "title": "High Voltage System",
-          "applicable_to": [
-            "ev",
-            "hybrid"
-          ],
+          "applicable_to": ["ev", "hybrid"],
           "weight": 0.15,
           "items": [
             {
               "id": "charge_port_condition",
               "label": "Charge port condition",
               "type": "radio",
-              "options": [
-                1,
-                2,
-                3,
-                4,
-                5
-              ],
+              "options": [1, 2, 3, 4, 5],
               "weight": 0.15
             }
           ]
@@ -1927,9 +1720,7 @@
       "status": "in_progress",
       "vehicleId": "veh_001",
       "bookingId": "book_001",
-      "serviceIds": [
-        "svc_oil_change"
-      ],
+      "serviceIds": ["svc_oil_change"],
       "assignedTo": "tech_001",
       "answers": [
         {

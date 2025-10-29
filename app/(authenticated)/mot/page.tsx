@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -8,20 +8,20 @@ import {
   TableHeader,
   TableRow,
   TableCell,
-} from "@/app/components/ui/table";
+} from '@/app/components/ui/table';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from '@/components/ui/popover';
 // import { Badge } from "@/components/ui/badge";
-import { HelpCircle, BellRing } from "lucide-react";
+import { HelpCircle, BellRing } from 'lucide-react';
 
 // MOT Test History Record Type
 type MotRecord = {
   TestDate: string;
   ExpiryDate: string;
-  TestResult: "PASSED" | "FAILED" | string;
+  TestResult: 'PASSED' | 'FAILED' | string;
   Odometer: string;
   TestNumber: string;
   AdvisoryNotice?: string[];
@@ -50,16 +50,16 @@ function daysTo(dateStr: string): number {
 
 function formatRelativeToNow(dateStr: string): string {
   const d = parseISO(dateStr);
-  if (!d) return "";
+  if (!d) return '';
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   d.setHours(0, 0, 0, 0);
   const diffDays = Math.round(
-    (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
   );
-  if (diffDays === 0) return "today";
-  if (diffDays === -1) return "yesterday";
-  if (diffDays === 1) return "tomorrow";
+  if (diffDays === 0) return 'today';
+  if (diffDays === -1) return 'yesterday';
+  if (diffDays === 1) return 'tomorrow';
   if (diffDays < 0) return `${Math.abs(diffDays)} days ago`;
   return `in ${diffDays} days`;
 }
@@ -68,18 +68,18 @@ function getMotStatus(record: {
   ExpiryDate: string;
   TestResult: string;
   TestDate: string;
-}): "Valid" | "Expiring Soon" | "Expired" {
+}): 'Valid' | 'Expiring Soon' | 'Expired' {
   const days = daysTo(record.ExpiryDate);
   const testDate = parseISO(record.TestDate);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const passed = String(record.TestResult).toUpperCase() === "PASSED";
+  const passed = String(record.TestResult).toUpperCase() === 'PASSED';
   const testNotInFuture = (testDate?.getTime() ?? Infinity) <= today.getTime();
 
-  if (days < 0) return "Expired";
-  if (!passed || !testNotInFuture) return "Expired";
-  if (days <= 30) return "Expiring Soon";
-  return "Valid";
+  if (days < 0) return 'Expired';
+  if (!passed || !testNotInFuture) return 'Expired';
+  if (days <= 30) return 'Expiring Soon';
+  return 'Valid';
 }
 
 function latestMotOf(vehicle: Vehicle): MotRecord | null {
@@ -112,7 +112,7 @@ export default function MotVehiclesOverview() {
 
   // Modal & advisory states
   const [selectedVehicleReg, setSelectedVehicleReg] = useState<string | null>(
-    null
+    null,
   );
   const [advisoryModal, setAdvisoryModal] = useState<{
     open: boolean;
@@ -127,11 +127,11 @@ export default function MotVehiclesOverview() {
       setLoading(true);
       setFetchError(null);
       try {
-        const url = "http://localhost:8090/api/auth/mot/all";
+        const url = 'http://localhost:8090/api/auth/mot/all';
         const res = await fetch(url, {
-          method: "GET",
+          method: 'GET',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           // No body, do not send the regs anymore
         });
@@ -145,7 +145,7 @@ export default function MotVehiclesOverview() {
         }
       } catch (e: unknown) {
         if (!cancelled) {
-          setFetchError((e as Error)?.message || "Failed to load vehicle MOTs");
+          setFetchError((e as Error)?.message || 'Failed to load vehicle MOTs');
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -251,54 +251,54 @@ export default function MotVehiclesOverview() {
             {!loading &&
               !fetchError &&
               vehicleSummaries.map(({ reg, latestMot, lastNotifiedAt }) => {
-                const expiryStatus = latestMot ? getMotStatus(latestMot) : "";
+                const expiryStatus = latestMot ? getMotStatus(latestMot) : '';
                 const rowAccentClass =
-                  expiryStatus === "Expiring Soon"
+                  expiryStatus === 'Expiring Soon'
                     ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-amber-400"
-                    : expiryStatus === "Expired"
-                    ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-red-400"
-                    : expiryStatus === "Valid"
-                    ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-green-500"
-                    : "";
+                    : expiryStatus === 'Expired'
+                      ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-red-400"
+                      : expiryStatus === 'Valid'
+                        ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-green-500"
+                        : '';
                 const resultStyle =
-                  latestMot?.TestResult?.toUpperCase() === "FAILED"
-                    ? "text-red-700 font-semibold"
-                    : latestMot?.TestResult?.toUpperCase() === "PASSED"
-                    ? "text-green-700 font-semibold"
-                    : "";
+                  latestMot?.TestResult?.toUpperCase() === 'FAILED'
+                    ? 'text-red-700 font-semibold'
+                    : latestMot?.TestResult?.toUpperCase() === 'PASSED'
+                      ? 'text-green-700 font-semibold'
+                      : '';
                 const statusStyle =
-                  expiryStatus === "Expired"
-                    ? "text-red-700 font-semibold"
-                    : expiryStatus === "Expiring Soon"
-                    ? "text-amber-700 font-semibold"
-                    : "text-green-700 font-semibold";
+                  expiryStatus === 'Expired'
+                    ? 'text-red-700 font-semibold'
+                    : expiryStatus === 'Expiring Soon'
+                      ? 'text-amber-700 font-semibold'
+                      : 'text-green-700 font-semibold';
                 const needsNotice =
-                  expiryStatus === "Expiring Soon" ||
-                  expiryStatus === "Expired";
+                  expiryStatus === 'Expiring Soon' ||
+                  expiryStatus === 'Expired';
                 const noticeIconClass =
-                  expiryStatus === "Expiring Soon"
-                    ? "text-amber-600"
-                    : "text-red-600";
+                  expiryStatus === 'Expiring Soon'
+                    ? 'text-amber-600'
+                    : 'text-red-600';
                 return (
                   <TableRow
                     key={reg}
                     className={`hover:bg-gray-50 cursor-pointer border-b-gray-200 ${rowAccentClass}`}
                     onClick={() => latestMot && setSelectedVehicleReg(reg)}
-                    title={latestMot ? "Click for details" : ""}
+                    title={latestMot ? 'Click for details' : ''}
                   >
                     <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                       {reg}
                     </TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {latestMot ? latestMot.TestDate : "-"}
+                      {latestMot ? latestMot.TestDate : '-'}
                     </TableCell>
                     <TableCell
                       className={`px-6 py-4 whitespace-nowrap text-sm ${resultStyle}`}
                     >
-                      {latestMot ? latestMot.TestResult : "-"}
+                      {latestMot ? latestMot.TestResult : '-'}
                     </TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {latestMot ? latestMot.ExpiryDate : "-"}
+                      {latestMot ? latestMot.ExpiryDate : '-'}
                     </TableCell>
                     <TableCell
                       className={`px-6 py-4 whitespace-nowrap text-sm ${statusStyle}`}
@@ -342,7 +342,7 @@ export default function MotVehiclesOverview() {
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
-                  {selectedVehicleReg}{" "}
+                  {selectedVehicleReg}{' '}
                   <span className="text-gray-500 font-normal">
                     • MOT History
                   </span>
@@ -358,7 +358,7 @@ export default function MotVehiclesOverview() {
                 const lastNotifiedAt = selectedVehicleData.lastNotifiedAt;
                 const shouldShow = !!(
                   latest &&
-                  (status === "Expiring Soon" || status === "Expired") &&
+                  (status === 'Expiring Soon' || status === 'Expired') &&
                   lastNotifiedAt
                 );
                 if (!shouldShow) return null;
@@ -372,7 +372,7 @@ export default function MotVehiclesOverview() {
                       aria-hidden="true"
                     />
                     <span>
-                      Notified the owner{" "}
+                      Notified the owner{' '}
                       {formatRelativeToNow(lastNotifiedAt as string)}
                     </span>
                   </div>
@@ -427,31 +427,31 @@ export default function MotVehiclesOverview() {
                       .sort(
                         (a, b) =>
                           (parseISO(b.TestDate)?.getTime() || 0) -
-                          (parseISO(a.TestDate)?.getTime() || 0)
+                          (parseISO(a.TestDate)?.getTime() || 0),
                       )
                       .map((rec, idx) => {
                         const expiryStatus = getMotStatus(rec);
-                        const isExpiringSoon = expiryStatus === "Expiring Soon";
-                        const isExpired = expiryStatus === "Expired";
+                        const isExpiringSoon = expiryStatus === 'Expiring Soon';
+                        const isExpired = expiryStatus === 'Expired';
                         const rowAccentClass = isExpiringSoon
                           ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-amber-400"
                           : isExpired
-                          ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-red-400"
-                          : "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-green-500";
+                            ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-red-400"
+                            : "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-green-500";
                         const resultStyle =
-                          rec.TestResult?.toUpperCase() === "FAILED"
-                            ? "text-red-700 font-semibold"
-                            : rec.TestResult?.toUpperCase() === "PASSED"
-                            ? "text-green-700 font-semibold"
-                            : "";
+                          rec.TestResult?.toUpperCase() === 'FAILED'
+                            ? 'text-red-700 font-semibold'
+                            : rec.TestResult?.toUpperCase() === 'PASSED'
+                              ? 'text-green-700 font-semibold'
+                              : '';
                         const statusStyle = isExpired
-                          ? "text-red-700 font-semibold"
+                          ? 'text-red-700 font-semibold'
                           : isExpiringSoon
-                          ? "text-amber-700 font-semibold"
-                          : "text-green-700 font-semibold";
+                            ? 'text-amber-700 font-semibold'
+                            : 'text-green-700 font-semibold';
                         return (
                           <TableRow
-                            key={rec.TestNumber + "-" + idx}
+                            key={rec.TestNumber + '-' + idx}
                             className={`${rowAccentClass}`}
                           >
                             <TableCell
@@ -468,7 +468,7 @@ export default function MotVehiclesOverview() {
                             <TableCell className="px-4 py-3 whitespace-nowrap">
                               {rec.Odometer
                                 ? Number(rec.Odometer).toLocaleString()
-                                : "-"}
+                                : '-'}
                             </TableCell>
                             <TableCell className="px-4 py-3 whitespace-nowrap">
                               {rec.TestNumber}
@@ -488,7 +488,7 @@ export default function MotVehiclesOverview() {
                                   onClick={() =>
                                     openAdvisoryModal(
                                       `Advisories • ${rec.TestDate}`,
-                                      rec.AdvisoryNotice || []
+                                      rec.AdvisoryNotice || [],
                                     )
                                   }
                                 >

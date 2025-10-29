@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { DataTable } from "@/components/ui/data-table";
-import { useRouter } from "next/navigation";
-import { Modal } from "@/components/ui/modal";
-import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { notify } from "@/lib/notify";
-import { Input } from "@/components/ui/input";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { DataTable } from '@/components/ui/data-table';
+import { useRouter } from 'next/navigation';
+import { Modal } from '@/components/ui/modal';
+import { fetchWithAuth } from '@/lib/fetchWithAuth';
+import { notify } from '@/lib/notify';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type VHCListItem = {
   id: string;
@@ -47,15 +47,15 @@ interface FilterState {
   startDate: string | null;
   endDate: string | null;
   sortBy: string;
-  sortOrder: "asc" | "desc";
+  sortOrder: 'asc' | 'desc';
 }
 
 export default function VehicleHealthChecksPage() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [reg, setReg] = useState("");
-  const [clientName, setClientName] = useState("");
-  const [powertrain, setPowertrain] = useState("ice");
+  const [reg, setReg] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [powertrain, setPowertrain] = useState('ice');
   const [data, setData] = useState<VHCListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,43 +68,43 @@ export default function VehicleHealthChecksPage() {
 
   // Filter and sort state
   const [filters, setFilters] = useState<FilterState>({
-    status: "all",
+    status: 'all',
     vehicleId: null,
-    powertrain: "all",
+    powertrain: 'all',
     createdBy: null,
     assignedTo: null,
     startDate: null,
     endDate: null,
-    sortBy: "createdAt",
-    sortOrder: "desc",
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
   });
   const [showFilters, setShowFilters] = useState(false);
 
   const columns = useMemo(
     () => [
       {
-        header: "VHC ID",
-        accessorKey: "id" as const,
-        width: "w-48",
+        header: 'VHC ID',
+        accessorKey: 'id' as const,
+        width: 'w-48',
       },
       {
-        header: "Vehicle",
-        accessorKey: "vehicleId" as const,
+        header: 'Vehicle',
+        accessorKey: 'vehicleId' as const,
       },
       {
-        header: "Status",
-        accessorKey: "status" as const,
+        header: 'Status',
+        accessorKey: 'status' as const,
         cell: (row: VHCListItem) => (
           <span
             className={cn(
-              "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-              row.status === "completed"
-                ? "bg-green-100 text-green-800"
-                : row.status === "in_progress"
-                ? "bg-yellow-100 text-yellow-800"
-                : row.status === "draft"
-                ? "bg-gray-100 text-gray-800"
-                : "bg-red-100 text-red-800"
+              'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+              row.status === 'completed'
+                ? 'bg-green-100 text-green-800'
+                : row.status === 'in_progress'
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : row.status === 'draft'
+                    ? 'bg-gray-100 text-gray-800'
+                    : 'bg-red-100 text-red-800',
             )}
           >
             {row.status}
@@ -112,37 +112,37 @@ export default function VehicleHealthChecksPage() {
         ),
       },
       {
-        header: "Powertrain",
-        accessorKey: "powertrain" as const,
+        header: 'Powertrain',
+        accessorKey: 'powertrain' as const,
       },
       {
-        header: "Score",
-        accessorKey: "scores" as const,
+        header: 'Score',
+        accessorKey: 'scores' as const,
         cell: (row: VHCListItem) =>
           row.scores?.total !== undefined
             ? `${Math.round(row.scores.total * 100)}%`
-            : "—",
+            : '—',
       },
       {
-        header: "Created By",
-        accessorKey: "createdBy" as const,
+        header: 'Created By',
+        accessorKey: 'createdBy' as const,
       },
       {
-        header: "Created",
-        accessorKey: "createdAt" as const,
+        header: 'Created',
+        accessorKey: 'createdAt' as const,
         cell: (row: VHCListItem) =>
           new Date(row.createdAt).toLocaleDateString(),
-        width: "w-32",
+        width: 'w-32',
       },
       {
-        header: "Updated",
-        accessorKey: "updatedAt" as const,
+        header: 'Updated',
+        accessorKey: 'updatedAt' as const,
         cell: (row: VHCListItem) =>
           new Date(row.updatedAt).toLocaleDateString(),
-        width: "w-32",
+        width: 'w-32',
       },
     ],
-    []
+    [],
   );
 
   const fetchList = useCallback(async () => {
@@ -151,37 +151,37 @@ export default function VehicleHealthChecksPage() {
       // Build query parameters
       const params = new URLSearchParams({
         page: currentPage.toString(),
-        limit: "10",
+        limit: '10',
         sortBy: filters.sortBy,
         sortOrder: filters.sortOrder,
       });
 
       // Add filters if they exist
-      if (filters.status !== "all") {
-        params.append("status", filters.status);
+      if (filters.status !== 'all') {
+        params.append('status', filters.status);
       }
       if (filters.vehicleId) {
-        params.append("vehicleId", filters.vehicleId);
+        params.append('vehicleId', filters.vehicleId);
       }
-      if (filters.powertrain !== "all") {
-        params.append("powertrain", filters.powertrain);
+      if (filters.powertrain !== 'all') {
+        params.append('powertrain', filters.powertrain);
       }
       if (filters.createdBy) {
-        params.append("createdBy", filters.createdBy);
+        params.append('createdBy', filters.createdBy);
       }
       if (filters.assignedTo) {
-        params.append("assignedTo", filters.assignedTo);
+        params.append('assignedTo', filters.assignedTo);
       }
       if (filters.startDate) {
-        params.append("startDate", filters.startDate);
+        params.append('startDate', filters.startDate);
       }
       if (filters.endDate) {
-        params.append("endDate", filters.endDate);
+        params.append('endDate', filters.endDate);
       }
 
       const res = await fetchWithAuth(
         `/api/vhc/responses?${params.toString()}`,
-        { method: "GET" }
+        { method: 'GET' },
       );
       const json = await res.json();
       setData(json.data || []);
@@ -191,10 +191,10 @@ export default function VehicleHealthChecksPage() {
           totalPages: 1,
           totalItems: 0,
           itemsPerPage: 10,
-        }
+        },
       );
     } catch {
-      notify("Failed to load vehicle health checks", "error");
+      notify('Failed to load vehicle health checks', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -214,15 +214,15 @@ export default function VehicleHealthChecksPage() {
 
   const clearFilters = () => {
     setFilters({
-      status: "all",
+      status: 'all',
       vehicleId: null,
-      powertrain: "all",
+      powertrain: 'all',
       createdBy: null,
       assignedTo: null,
       startDate: null,
       endDate: null,
-      sortBy: "createdAt",
-      sortOrder: "desc",
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
     });
     setCurrentPage(1);
   };
@@ -284,7 +284,7 @@ export default function VehicleHealthChecksPage() {
               </label>
               <Input
                 placeholder="Search vehicle..."
-                value={filters.vehicleId || ""}
+                value={filters.vehicleId || ''}
                 onChange={(e) =>
                   setFilters((prev) => ({
                     ...prev,
@@ -322,7 +322,7 @@ export default function VehicleHealthChecksPage() {
               </label>
               <Input
                 placeholder="Search creator..."
-                value={filters.createdBy || ""}
+                value={filters.createdBy || ''}
                 onChange={(e) =>
                   setFilters((prev) => ({
                     ...prev,
@@ -338,7 +338,7 @@ export default function VehicleHealthChecksPage() {
               </label>
               <Input
                 type="date"
-                value={filters.startDate || ""}
+                value={filters.startDate || ''}
                 onChange={(e) =>
                   setFilters((prev) => ({
                     ...prev,
@@ -354,7 +354,7 @@ export default function VehicleHealthChecksPage() {
               </label>
               <Input
                 type="date"
-                value={filters.endDate || ""}
+                value={filters.endDate || ''}
                 onChange={(e) =>
                   setFilters((prev) => ({
                     ...prev,
@@ -383,7 +383,7 @@ export default function VehicleHealthChecksPage() {
           isLoading={isLoading}
           emptyMessage="No health checks found"
           emptySubMessage="Start by creating a new vehicle health check"
-          emptyAction={{ label: "New Test", onClick: onCreate }}
+          emptyAction={{ label: 'New Test', onClick: onCreate }}
         />
       </div>
 
@@ -392,14 +392,14 @@ export default function VehicleHealthChecksPage() {
         <div className="flex items-center justify-between  ">
           <div className="flex items-center text-sm text-gray-700">
             <span>
-              Showing{" "}
+              Showing{' '}
               {(paginationInfo.currentPage - 1) * paginationInfo.itemsPerPage +
-                1}{" "}
-              to{" "}
+                1}{' '}
+              to{' '}
               {Math.min(
                 paginationInfo.currentPage * paginationInfo.itemsPerPage,
-                paginationInfo.totalItems
-              )}{" "}
+                paginationInfo.totalItems,
+              )}{' '}
               of {paginationInfo.totalItems} health checks
             </span>
           </div>
@@ -482,38 +482,38 @@ export default function VehicleHealthChecksPage() {
             <button
               onClick={async () => {
                 if (!reg.trim()) {
-                  return alert("Registration is required");
+                  return alert('Registration is required');
                 }
                 try {
                   const tRes = await fetchWithAuth(
-                    "/api/vhc/templates/active",
-                    { method: "GET" }
+                    '/api/vhc/templates/active',
+                    { method: 'GET' },
                   );
                   const template = await tRes.json();
-                  const cRes = await fetchWithAuth("/api/vhc/responses", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                  const cRes = await fetchWithAuth('/api/vhc/responses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       templateId: template.id,
                       powertrain,
                       vehicleId: reg.trim(),
-                      createdBy: clientName || "technician",
+                      createdBy: clientName || 'technician',
                     }),
                   });
                   if (!cRes.ok) {
                     const err = await cRes.json();
                     throw new Error(
-                      err?.error || "Failed to create health check"
+                      err?.error || 'Failed to create health check',
                     );
                   }
                   const created = await cRes.json();
                   setIsModalOpen(false);
-                  setReg("");
-                  setClientName("");
-                  setPowertrain("ice");
+                  setReg('');
+                  setClientName('');
+                  setPowertrain('ice');
                   router.push(`/vhc-fullscreen/${created.id}`);
                 } catch (e) {
-                  alert(e instanceof Error ? e.message : "Failed to create");
+                  alert(e instanceof Error ? e.message : 'Failed to create');
                 }
               }}
               className="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
