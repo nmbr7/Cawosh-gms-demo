@@ -43,7 +43,12 @@ export interface Service {
   price: number;
   currency: string;
   currencySymbol: string;
-  status: "pending" | "in_progress" | "completed" | "cancelled";
+  status:
+    | "pending"
+    | "in_progress"
+    | "completed"
+    | "cancelled"
+    | "awaiting_diagnosis";
   technicianId: TechnicianId;
   bayId: string;
   startTime: string;
@@ -85,6 +90,29 @@ export interface HistoryEntry {
   changedAt: string;
   notes: string;
   _id: string;
+  type?:
+    | "diagnosis_submitted"
+    | "diagnosis_approved"
+    | "diagnosis_rejected"
+    | "booking_created"
+    | "status_changed"
+    | "job_sheet_created"
+    | "job_started"
+    | "job_paused"
+    | "job_resumed"
+    | "job_halted"
+    | "job_completed"
+    | "inventory_used";
+}
+
+export interface InventoryUsageEntry {
+  id: string;
+  itemId: string;
+  itemName: string;
+  quantity: number;
+  unit?: string;
+  jobSheetId?: string;
+  createdAt: string;
 }
 
 export interface Booking {
@@ -103,4 +131,13 @@ export interface Booking {
   bookingId: string;
   garage_id: Garage;
   __v: number;
+  requiresDiagnosis?: boolean;
+  diagnosisNotes?: string;
+  assignedTechnicians?: Array<{
+    technicianId: string;
+    technicianName: string;
+    assignedAt: string;
+    role: string; // "primary" | "assistant"
+  }>;
+  inventoryUsage?: InventoryUsageEntry[];
 }

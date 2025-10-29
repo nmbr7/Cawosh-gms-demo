@@ -16,6 +16,7 @@ import {
   Filter,
   SortAsc,
   SortDesc,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React from "react";
@@ -28,6 +29,9 @@ import {
 import { useJobSheetStore, JobSheet as StoreJobSheet } from "@/store/jobSheet";
 import { useBookingStore } from "@/store/booking";
 import { format } from "date-fns";
+import { DiagnosisSubmissionModal } from "@/app/components/job-sheet/DiagnosisSubmissionModal";
+import { WorkTrackingModal } from "@/app/components/job-sheet/WorkTrackingModal";
+import { Stethoscope, AlertCircle, CheckCircle, Play } from "lucide-react";
 
 // Removed old JobSheet interface - using StoreJobSheet from store
 
@@ -43,6 +47,7 @@ interface FilterState {
   status: string | "all";
   bookingId: string | null;
   technicianId: string | null;
+  diagnosisStatus: string | null;
   sortBy: string;
   sortOrder: "asc" | "desc";
 }
@@ -76,6 +81,10 @@ export default function JobSheetPage() {
   const [jobSheets, setJobSheets] = useState<StoreJobSheet[]>([]);
   const [selectedJobSheet, setSelectedJobSheet] =
     useState<StoreJobSheet | null>(null);
+  const [showDiagnosisModal, setShowDiagnosisModal] = useState(false);
+  const [showWorkTrackingModal, setShowWorkTrackingModal] = useState(false);
+  const [workTrackingJobSheetId, setWorkTrackingJobSheetId] =
+    useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,6 +117,7 @@ export default function JobSheetPage() {
     status: "all",
     bookingId: null,
     technicianId: null,
+    diagnosisStatus: null,
     sortBy: "id",
     sortOrder: "desc",
   });
@@ -144,7 +154,31 @@ export default function JobSheetPage() {
         ) ??
           false);
 
-      return statusOk && bookingIdOk && technicianOk;
+      const diagnosisOk =
+        !filters.diagnosisStatus ||
+        (() => {
+          if (filters.diagnosisStatus === "standard") {
+            return !js.requiresDiagnosis;
+          }
+          if (filters.diagnosisStatus === "awaiting-diagnosis") {
+            return (
+              js.requiresDiagnosis &&
+              (!js.diagnosedServices || js.diagnosedServices.length === 0)
+            );
+          }
+          if (filters.diagnosisStatus === "pending-approval") {
+            return js.requiresDiagnosis && js.approvalStatus === "pending";
+          }
+          if (filters.diagnosisStatus === "approved") {
+            return js.requiresDiagnosis && js.approvalStatus === "approved";
+          }
+          if (filters.diagnosisStatus === "rejected") {
+            return js.requiresDiagnosis && js.approvalStatus === "rejected";
+          }
+          return true;
+        })();
+
+      return statusOk && bookingIdOk && technicianOk && diagnosisOk;
     });
 
     // Apply sorting
@@ -384,12 +418,18 @@ export default function JobSheetPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Work Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Diagnosis
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white">
               {/* Progress bar as divider */}
               <tr>
-                <td colSpan={6} className="p-0">
+                <td colSpan={8} className="p-0">
                   <div className="h-1 bg-blue-500 animate-pulse"></div>
                 </td>
               </tr>
@@ -424,10 +464,16 @@ export default function JobSheetPage() {
                     <td className="px-6 py-4">
                       <div className="h-4 bg-gray-200 rounded w-20"></div>
                     </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-24"></div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="h-4 bg-gray-200 rounded w-20"></div>
+                    </td>
                   </tr>
                   {row < 3 && (
                     <tr>
-                      <td colSpan={6} className="p-0">
+                      <td colSpan={8} className="p-0">
                         <div className="h-px bg-gray-200"></div>
                       </td>
                     </tr>
@@ -587,6 +633,41 @@ export default function JobSheetPage() {
               </Select>
             </div>
           </div>
+
+          {/* Additional filters row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {/* Diagnosis filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Diagnosis Status
+              </label>
+              <Select
+                value={filters.diagnosisStatus || "all"}
+                onValueChange={(value) =>
+                  handleFilterChange(
+                    "diagnosisStatus",
+                    value === "all" ? null : value
+                  )
+                }
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Select diagnosis status" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="standard">Standard Jobs</SelectItem>
+                  <SelectItem value="awaiting-diagnosis">
+                    Awaiting Diagnosis
+                  </SelectItem>
+                  <SelectItem value="pending-approval">
+                    Pending Approval
+                  </SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
       )}
 
@@ -618,6 +699,9 @@ export default function JobSheetPage() {
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Diagnosis
               </th>
             </tr>
           </thead>
@@ -668,6 +752,7 @@ export default function JobSheetPage() {
                             status: "all",
                             bookingId: null,
                             technicianId: null,
+                            diagnosisStatus: null,
                             sortBy: "id",
                             sortOrder: "desc",
                           });
@@ -765,9 +850,12 @@ export default function JobSheetPage() {
                       {jobSheet.booking?.services?.map((service) => (
                         <div
                           key={service._id}
-                          className="text-xs px-2 py-1 rounded-full inline-block mr-1 bg-blue-100 text-blue-800"
+                          className="text-xs px-2 py-1 rounded-full inline-block mr-1 bg-blue-100 text-blue-800 max-w-[120px] truncate"
+                          title={service.name}
                         >
-                          {service.name}
+                          {service.name.length > 15
+                            ? `${service.name.substring(0, 15)}...`
+                            : service.name}
                         </div>
                       )) || "No services"}
                     </div>
@@ -791,6 +879,61 @@ export default function JobSheetPage() {
                       )?.label || jobSheet.status}
                     </span>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={cn(
+                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
+                        jobSheet.status === "PENDING" &&
+                          "bg-blue-100 text-blue-800",
+                        jobSheet.status === "IN_PROGRESS" &&
+                          "bg-green-100 text-green-800",
+                        jobSheet.status === "PAUSED" &&
+                          "bg-yellow-100 text-yellow-800",
+                        jobSheet.status === "HALTED" &&
+                          "bg-red-100 text-red-800",
+                        jobSheet.status === "COMPLETED" &&
+                          "bg-green-100 text-green-800"
+                      )}
+                    >
+                      {jobSheet.status === "PENDING" && "Not Started"}
+                      {jobSheet.status === "IN_PROGRESS" && "In Progress"}
+                      {jobSheet.status === "PAUSED" && "Paused"}
+                      {jobSheet.status === "HALTED" && "Halted"}
+                      {jobSheet.status === "COMPLETED" && "Completed"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {jobSheet.requiresDiagnosis ? (
+                      <div className="flex flex-col gap-1">
+                        {jobSheet.approvalStatus === "approved" ? (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                            Approved
+                          </span>
+                        ) : jobSheet.approvalStatus === "rejected" ? (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                            Rejected
+                          </span>
+                        ) : jobSheet.diagnosedServices &&
+                          jobSheet.diagnosedServices.length > 0 ? (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800">
+                            Pending Approval
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                            Awaiting Diagnosis
+                          </span>
+                        )}
+                        {jobSheet.diagnosedServices &&
+                          jobSheet.diagnosedServices.length > 0 && (
+                            <span className="text-xs text-gray-500">
+                              {jobSheet.diagnosedServices.length} services
+                            </span>
+                          )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-400">Standard</span>
+                    )}
+                  </td>
                 </tr>
               ))
             )}
@@ -812,6 +955,43 @@ export default function JobSheetPage() {
 
           {selectedJobSheet && (
             <div className="space-y-6">
+              {/* Diagnosis Required Banner */}
+              {selectedJobSheet.requiresDiagnosis &&
+                selectedJobSheet.approvalStatus !== "approved" && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-amber-600" />
+                      <div>
+                        <h3 className="text-sm font-semibold text-amber-800">
+                          Diagnosis Required
+                        </h3>
+                        <p className="text-sm text-amber-700">
+                          This job requires diagnosis before work can begin.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              {/* Diagnosis Approved Banner */}
+              {selectedJobSheet.requiresDiagnosis &&
+                selectedJobSheet.approvalStatus === "approved" && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <div>
+                        <h3 className="text-sm font-semibold text-green-800">
+                          Diagnosis Approved
+                        </h3>
+                        <p className="text-sm text-green-700">
+                          Diagnosis has been completed and approved. Work can
+                          now begin.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
               {/* Basic Information */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -953,6 +1133,128 @@ export default function JobSheetPage() {
                   )?.label || selectedJobSheet.status}
                 </span>
               </div>
+
+              {/* Submit Diagnosis Button */}
+              {selectedJobSheet.requiresDiagnosis &&
+                selectedJobSheet.approvalStatus !== "pending" &&
+                selectedJobSheet.approvalStatus !== "approved" &&
+                selectedJobSheet.approvalStatus !== "rejected" && (
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      onClick={() => {
+                        setShowDiagnosisModal(true);
+                        setSelectedJobSheet(null); // Close the job sheet details modal
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Stethoscope className="w-4 h-4 mr-2" />
+                      Submit Diagnosis
+                    </Button>
+                  </div>
+                )}
+
+              {/* Work Action Buttons */}
+              {selectedJobSheet.status === "PENDING" &&
+                (!selectedJobSheet.requiresDiagnosis ||
+                  selectedJobSheet.approvalStatus === "approved") && (
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      onClick={() => {
+                        console.log(
+                          "Start Work clicked - selectedJobSheet:",
+                          selectedJobSheet
+                        );
+                        console.log(
+                          "Setting workTrackingJobSheetId to:",
+                          selectedJobSheet.id
+                        );
+                        setWorkTrackingJobSheetId(selectedJobSheet.id);
+                        console.log("Setting showWorkTrackingModal to true");
+                        setShowWorkTrackingModal(true);
+                        console.log("Setting selectedJobSheet to null");
+                        setSelectedJobSheet(null); // Close the job sheet details modal
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      Start Work
+                    </Button>
+                  </div>
+                )}
+
+              {/* Manage Work for in-progress jobs */}
+              {selectedJobSheet.status === "IN_PROGRESS" && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    onClick={() => {
+                      setWorkTrackingJobSheetId(selectedJobSheet.id);
+                      setShowWorkTrackingModal(true);
+                      setSelectedJobSheet(null);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Manage Work
+                  </Button>
+                </div>
+              )}
+
+              {/* Diagnosis Required Message */}
+              {selectedJobSheet.status === "PENDING" &&
+                selectedJobSheet.requiresDiagnosis &&
+                selectedJobSheet.approvalStatus !== "approved" && (
+                  <div className="flex justify-center pt-4">
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
+                      <div className="flex items-center justify-center gap-2 text-amber-800">
+                        <AlertTriangle className="w-5 h-5" />
+                        <span className="font-medium">Diagnosis Required</span>
+                      </div>
+                      <p className="text-sm text-amber-700 mt-1">
+                        This job requires diagnosis and approval before work can
+                        begin.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+              {selectedJobSheet.status === "HALTED" && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    onClick={() => {
+                      console.log(
+                        "Resume Work clicked - selectedJobSheet:",
+                        selectedJobSheet
+                      );
+                      setWorkTrackingJobSheetId(selectedJobSheet.id);
+                      setShowWorkTrackingModal(true);
+                      setSelectedJobSheet(null);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Resume Work
+                  </Button>
+                </div>
+              )}
+
+              {selectedJobSheet.status === "PAUSED" && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    onClick={() => {
+                      console.log(
+                        "Resume Work clicked - selectedJobSheet:",
+                        selectedJobSheet
+                      );
+                      setWorkTrackingJobSheetId(selectedJobSheet.id);
+                      setShowWorkTrackingModal(true);
+                      setSelectedJobSheet(null);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Resume Work
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
@@ -1007,6 +1309,32 @@ export default function JobSheetPage() {
           </Button>
         </div>
       </div>
+
+      {/* Diagnosis Submission Modal */}
+      {selectedJobSheet && (
+        <DiagnosisSubmissionModal
+          jobSheet={selectedJobSheet}
+          isOpen={showDiagnosisModal}
+          onClose={() => setShowDiagnosisModal(false)}
+          onDiagnosisSubmitted={() => {
+            setShowDiagnosisModal(false);
+            // Refresh the job sheets to show updated status
+            fetchJobSheets();
+          }}
+        />
+      )}
+
+      {/* Work Tracking Modal */}
+      <WorkTrackingModal
+        isOpen={showWorkTrackingModal}
+        onClose={() => setShowWorkTrackingModal(false)}
+        jobSheetId={workTrackingJobSheetId}
+        // onWorkCompleted={() => {
+        //   setShowWorkTrackingModal(false);
+        //   setWorkTrackingJobSheetId("");
+        //   fetchJobSheets();
+        // }}
+      />
     </div>
   );
 }

@@ -1,7 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useGarageStore } from "./garage";
-import type { Booking, Customer, Vehicle } from "@/types/booking";
+import type {
+  Booking,
+  Customer,
+  Vehicle,
+  HistoryEntry,
+  InventoryUsageEntry,
+} from "@/types/booking";
 
 export interface Bay {
   id: string;
@@ -64,6 +70,22 @@ interface BookingState {
     date: string; // YYYY-MM-DD
     notes?: string;
   }) => Booking;
+  updateBookingServices: (
+    bookingId: string,
+    services: Array<{
+      serviceId: string;
+      name: string;
+      description: string;
+      duration: number;
+      price: number;
+    }>
+  ) => void;
+  updateBooking: (bookingId: string, updates: Partial<Booking>) => void;
+  addBookingHistory: (
+    bookingId: string,
+    entry: Omit<HistoryEntry, "_id">
+  ) => void;
+  addInventoryUsage: (bookingId: string, usage: InventoryUsageEntry) => void;
 }
 
 // Static data
@@ -93,6 +115,13 @@ const staticTechnicians: Technician[] = [
 ];
 
 const staticServices = [
+  {
+    id: "service-undiagnosed",
+    name: "Undiagnosed - Requires Diagnosis",
+    duration: 60,
+    price: 0.0,
+  },
+  // Original services
   { id: "service-1", name: "Oil Change", duration: 30, price: 20.0 },
   { id: "service-2", name: "Tire Rotation", duration: 30, price: 12.0 },
   { id: "service-3", name: "Brake Inspection", duration: 30, price: 28.0 },
@@ -112,6 +141,129 @@ const staticServices = [
     name: "Air Filter Replacement",
     duration: 30,
     price: 24.0,
+  },
+  // Fluids & Filters
+  {
+    id: "service-11",
+    name: "Oil Change (Full Synthetic 5W-30)",
+    duration: 30,
+    price: 45.0,
+  },
+  {
+    id: "service-12",
+    name: "Oil Change (Conventional 10W-30)",
+    duration: 30,
+    price: 35.0,
+  },
+  {
+    id: "service-13",
+    name: "Oil Filter Replacement",
+    duration: 15,
+    price: 12.0,
+  },
+  {
+    id: "service-14",
+    name: "Cabin Air Filter Replacement",
+    duration: 15,
+    price: 20.0,
+  },
+  { id: "service-15", name: "Coolant Flush", duration: 45, price: 55.0 },
+  {
+    id: "service-16",
+    name: "Transmission Fluid Change",
+    duration: 60,
+    price: 85.0,
+  },
+  { id: "service-17", name: "Brake Fluid Flush", duration: 30, price: 45.0 },
+  // Parts Replacement
+  {
+    id: "service-18",
+    name: "Front Brake Pads Replacement",
+    duration: 60,
+    price: 120.0,
+  },
+  {
+    id: "service-19",
+    name: "Rear Brake Pads Replacement",
+    duration: 60,
+    price: 110.0,
+  },
+  {
+    id: "service-20",
+    name: "Front Brake Rotors Replacement",
+    duration: 90,
+    price: 180.0,
+  },
+  { id: "service-21", name: "Battery Replacement", duration: 20, price: 95.0 },
+  {
+    id: "service-22",
+    name: "Spark Plugs Replacement (4-cylinder)",
+    duration: 45,
+    price: 80.0,
+  },
+  {
+    id: "service-23",
+    name: "Spark Plugs Replacement (6-cylinder)",
+    duration: 60,
+    price: 110.0,
+  },
+  {
+    id: "service-24",
+    name: "Wiper Blades Replacement",
+    duration: 10,
+    price: 25.0,
+  },
+  {
+    id: "service-25",
+    name: "Headlight Bulb Replacement",
+    duration: 15,
+    price: 30.0,
+  },
+  {
+    id: "service-26",
+    name: "Serpentine Belt Replacement",
+    duration: 45,
+    price: 75.0,
+  },
+  // Cleaning & Maintenance
+  { id: "service-27", name: "Engine Bay Cleaning", duration: 30, price: 40.0 },
+  {
+    id: "service-28",
+    name: "Throttle Body Cleaning",
+    duration: 45,
+    price: 60.0,
+  },
+  {
+    id: "service-29",
+    name: "Fuel Injection System Cleaning",
+    duration: 60,
+    price: 85.0,
+  },
+  { id: "service-30", name: "AC System Cleaning", duration: 45, price: 65.0 },
+  // Inspection & Diagnostic
+  {
+    id: "service-31",
+    name: "Engine Diagnostic Scan",
+    duration: 30,
+    price: 40.0,
+  },
+  {
+    id: "service-32",
+    name: "Brake System Inspection",
+    duration: 30,
+    price: 28.0,
+  },
+  {
+    id: "service-33",
+    name: "Suspension Inspection",
+    duration: 30,
+    price: 35.0,
+  },
+  {
+    id: "service-34",
+    name: "Electrical System Diagnostic",
+    duration: 45,
+    price: 55.0,
   },
 ];
 
@@ -356,6 +508,26 @@ export const useBookingStore = create<BookingState>()(
         const endDate = new Date(startTime);
         endDate.setMinutes(endDate.getMinutes() + totalDuration);
 
+        // Check if this is an undiagnosed booking
+        const isUndiagnosed = services.some(
+          (s) => s.serviceId === "service-undiagnosed"
+        );
+
+        // Extract technician assignments
+        const technician = currentState.technicians.find(
+          (t) => t.id === technicianId
+        );
+        const assignedTechnicians = technician
+          ? [
+              {
+                technicianId: technicianId,
+                technicianName: `${technician.firstName} ${technician.lastName}`,
+                assignedAt: new Date().toISOString(),
+                role: "primary" as const,
+              },
+            ]
+          : [];
+
         const booking: Booking = {
           _id: crypto.randomUUID(),
           customer,
@@ -383,7 +555,9 @@ export const useBookingStore = create<BookingState>()(
               price: s.price,
               currency: "GBP",
               currencySymbol: "£",
-              status: "pending" as const,
+              status: isUndiagnosed
+                ? ("awaiting_diagnosis" as const)
+                : ("pending" as const),
               technicianId: {
                 _id: technicianId,
                 firstName:
@@ -403,7 +577,7 @@ export const useBookingStore = create<BookingState>()(
               pauses: [],
             };
           }),
-          bookingDate: `${date}T00:00:00.000Z`,
+          bookingDate: new Date(`${date}T00:00:00.000Z`).toISOString(),
           totalDuration,
           totalPrice,
           status: "pending",
@@ -446,9 +620,114 @@ export const useBookingStore = create<BookingState>()(
             ],
           },
           __v: 0,
+          requiresDiagnosis: isUndiagnosed,
+          diagnosisNotes: isUndiagnosed ? notes : undefined,
+          assignedTechnicians,
         };
         set((state) => ({ bookings: [...state.bookings, booking] }));
         return booking;
+      },
+      updateBookingServices: (bookingId, services) => {
+        set((state) => ({
+          bookings: state.bookings.map((booking) => {
+            if (booking._id === bookingId) {
+              const totalDuration = services.reduce(
+                (acc, s) => acc + s.duration,
+                0
+              );
+              const totalPrice = services.reduce((acc, s) => acc + s.price, 0);
+
+              return {
+                ...booking,
+                services: services.map((s, index) => {
+                  const serviceStartTime = new Date(booking.bookingDate);
+                  serviceStartTime.setMinutes(
+                    serviceStartTime.getMinutes() + index * 30
+                  );
+                  const serviceEndTime = new Date(serviceStartTime);
+                  serviceEndTime.setMinutes(
+                    serviceEndTime.getMinutes() + s.duration
+                  );
+
+                  return {
+                    serviceId: {
+                      _id: s.serviceId,
+                      name: s.name,
+                      description: s.description,
+                      category: "Maintenance",
+                    },
+                    name: s.name,
+                    description: s.description,
+                    duration: s.duration,
+                    price: s.price,
+                    currency: "GBP",
+                    currencySymbol: "£",
+                    status: "pending" as const,
+                    technicianId: booking.services[0]?.technicianId || {
+                      _id: "tech-1",
+                      firstName: "Tech",
+                      lastName: "Name",
+                      email: "tech@garage.com",
+                      phone: "1234567890",
+                      role: "technician",
+                    },
+                    bayId: booking.services[0]?.bayId || "bay-1",
+                    startTime: serviceStartTime.toISOString(),
+                    endTime: serviceEndTime.toISOString(),
+                    _id: crypto.randomUUID(),
+                    pauses: [],
+                  };
+                }),
+                totalDuration,
+                totalPrice,
+                updatedAt: new Date().toISOString(),
+                requiresDiagnosis: false, // Clear diagnosis flag after services are added
+              };
+            }
+            return booking;
+          }),
+        }));
+      },
+      updateBooking: (bookingId, updates) => {
+        set((state) => ({
+          bookings: state.bookings.map((booking) =>
+            booking._id === bookingId
+              ? { ...booking, ...updates, updatedAt: new Date().toISOString() }
+              : booking
+          ),
+        }));
+      },
+      addBookingHistory: (bookingId, entry) => {
+        set((state) => ({
+          bookings: state.bookings.map((b) =>
+            b._id === bookingId
+              ? {
+                  ...b,
+                  history: [
+                    ...(b.history || []),
+                    { ...entry, _id: crypto.randomUUID() },
+                  ],
+                  updatedAt: new Date().toISOString(),
+                }
+              : b
+          ),
+        }));
+      },
+      addInventoryUsage: (bookingId, usage) => {
+        set((state) => ({
+          bookings: state.bookings.map((b) =>
+            b._id === bookingId
+              ? {
+                  ...b,
+                  inventoryUsage: [
+                    ...(b.inventoryUsage || []),
+                    { ...usage, id: usage.id || crypto.randomUUID() },
+                  ],
+                  updatedAt: new Date().toISOString(),
+                }
+              : b
+          ),
+        }));
       },
     }),
     {

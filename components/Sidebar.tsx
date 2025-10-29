@@ -17,6 +17,11 @@ import {
   UsersIcon,
   Wrench,
   Award,
+  Package,
+  File,
+  CheckCircle,
+  ChevronLeft as LucideChevronLeft,
+  ChevronRight as LucideChevronRight,
 } from "lucide-react";
 import { useUIStore } from "@/store/ui";
 import { useAuthStore } from "@/store/auth";
@@ -28,6 +33,7 @@ const links = [
   { name: "Calendar", href: "/schedule", icon: Calendar },
   { name: "Bookings", href: "/bookings", icon: Handshake },
   { name: "Job Sheet", href: "/job-sheet", icon: ClipboardList },
+  { name: "Approvals", href: "/approvals", icon: CheckCircle },
   { name: "Billings", href: "/billings", icon: Receipt },
   { name: "Customer Support", href: "/customer-support", icon: HeadphonesIcon },
   { name: "Workshop", href: "/workshop", icon: Wrench },
@@ -49,7 +55,7 @@ function SidebarLink({
   active: boolean;
   expanded: boolean;
 }) {
-  return (
+  const linkContent = (
     <Link
       key={href}
       href={href}
@@ -64,6 +70,20 @@ function SidebarLink({
       {expanded && <span>{name}</span>}
     </Link>
   );
+
+  // Show tooltip only when sidebar is collapsed
+  if (!expanded) {
+    return (
+      <div className="relative group">
+        {linkContent}
+        <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-black text-white text-sm rounded-md px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+          {name}
+        </div>
+      </div>
+    );
+  }
+
+  return linkContent;
 }
 
 export default function Sidebar() {

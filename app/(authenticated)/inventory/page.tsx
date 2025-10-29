@@ -70,14 +70,21 @@ export default function InventoryPage() {
     {
       header: "Price",
       accessorKey: "price" as keyof InventoryItem,
-      cell: (item: InventoryItem) => (
-        <div>
-          <div className="font-medium">${item.price.toFixed(2)}</div>
-          <div className="text-xs text-gray-400">
-            Cost: ${item.cost.toFixed(2)}
+      cell: (item: InventoryItem) => {
+        const gbp = new Intl.NumberFormat("en-GB", {
+          style: "currency",
+          currency: "GBP",
+          minimumFractionDigits: 2,
+        });
+        return (
+          <div>
+            <div className="font-medium">{gbp.format(item.price)}</div>
+            <div className="text-xs text-gray-400">
+              Cost: {gbp.format(item.cost)}
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
       width: "w-20",
     },
     {

@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { HelpCircle, BellRing } from "lucide-react";
 
 // MOT Test History Record Type
@@ -91,19 +91,19 @@ function latestMotOf(vehicle: Vehicle): MotRecord | null {
   return sorted[0] || null;
 }
 
-function getStatusStyle(status: string): React.CSSProperties {
-  if (status === "Expired") return { color: "#b91c1c", fontWeight: "bold" };
-  if (status === "Expiring Soon")
-    return { color: "#b45309", fontWeight: "bold" };
-  return { color: "#15803d", fontWeight: "bold" };
-}
-function getTestResultStyle(result: string): React.CSSProperties {
-  if (String(result).toUpperCase() === "FAILED")
-    return { color: "#b91c1c", fontWeight: "bold" };
-  if (String(result).toUpperCase() === "PASSED")
-    return { color: "#15803d", fontWeight: "bold" };
-  return {};
-}
+// function getStatusStyle(status: string): React.CSSProperties {
+//   if (status === "Expired") return { color: "#b91c1c", fontWeight: "bold" };
+//   if (status === "Expiring Soon")
+//     return { color: "#b45309", fontWeight: "bold" };
+//   return { color: "#15803d", fontWeight: "bold" };
+// }
+// function getTestResultStyle(result: string): React.CSSProperties {
+//   if (String(result).toUpperCase() === "FAILED")
+//     return { color: "#b91c1c", fontWeight: "bold" };
+//   if (String(result).toUpperCase() === "PASSED")
+//     return { color: "#15803d", fontWeight: "bold" };
+//   return {};
+// }
 
 export default function MotVehiclesOverview() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -143,9 +143,9 @@ export default function MotVehiclesOverview() {
         if (!cancelled) {
           setVehicles(data as Vehicle[]);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (!cancelled) {
-          setFetchError(e?.message || "Failed to load vehicle MOTs");
+          setFetchError((e as Error)?.message || "Failed to load vehicle MOTs");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -250,74 +250,72 @@ export default function MotVehiclesOverview() {
             )}
             {!loading &&
               !fetchError &&
-              vehicleSummaries.map(
-                ({ reg, latestMot, lastNotifiedAt }, idx) => {
-                  const expiryStatus = latestMot ? getMotStatus(latestMot) : "";
-                  const rowAccentClass =
-                    expiryStatus === "Expiring Soon"
-                      ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-amber-400"
-                      : expiryStatus === "Expired"
-                      ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-red-400"
-                      : expiryStatus === "Valid"
-                      ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-green-500"
-                      : "";
-                  const resultStyle =
-                    latestMot?.TestResult?.toUpperCase() === "FAILED"
-                      ? "text-red-700 font-semibold"
-                      : latestMot?.TestResult?.toUpperCase() === "PASSED"
-                      ? "text-green-700 font-semibold"
-                      : "";
-                  const statusStyle =
-                    expiryStatus === "Expired"
-                      ? "text-red-700 font-semibold"
-                      : expiryStatus === "Expiring Soon"
-                      ? "text-amber-700 font-semibold"
-                      : "text-green-700 font-semibold";
-                  const needsNotice =
-                    expiryStatus === "Expiring Soon" ||
-                    expiryStatus === "Expired";
-                  const noticeIconClass =
-                    expiryStatus === "Expiring Soon"
-                      ? "text-amber-600"
-                      : "text-red-600";
-                  return (
-                    <TableRow
-                      key={reg}
-                      className={`hover:bg-gray-50 cursor-pointer border-b-gray-200 ${rowAccentClass}`}
-                      onClick={() => latestMot && setSelectedVehicleReg(reg)}
-                      title={latestMot ? "Click for details" : ""}
+              vehicleSummaries.map(({ reg, latestMot, lastNotifiedAt }) => {
+                const expiryStatus = latestMot ? getMotStatus(latestMot) : "";
+                const rowAccentClass =
+                  expiryStatus === "Expiring Soon"
+                    ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-amber-400"
+                    : expiryStatus === "Expired"
+                    ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-red-400"
+                    : expiryStatus === "Valid"
+                    ? "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-green-500"
+                    : "";
+                const resultStyle =
+                  latestMot?.TestResult?.toUpperCase() === "FAILED"
+                    ? "text-red-700 font-semibold"
+                    : latestMot?.TestResult?.toUpperCase() === "PASSED"
+                    ? "text-green-700 font-semibold"
+                    : "";
+                const statusStyle =
+                  expiryStatus === "Expired"
+                    ? "text-red-700 font-semibold"
+                    : expiryStatus === "Expiring Soon"
+                    ? "text-amber-700 font-semibold"
+                    : "text-green-700 font-semibold";
+                const needsNotice =
+                  expiryStatus === "Expiring Soon" ||
+                  expiryStatus === "Expired";
+                const noticeIconClass =
+                  expiryStatus === "Expiring Soon"
+                    ? "text-amber-600"
+                    : "text-red-600";
+                return (
+                  <TableRow
+                    key={reg}
+                    className={`hover:bg-gray-50 cursor-pointer border-b-gray-200 ${rowAccentClass}`}
+                    onClick={() => latestMot && setSelectedVehicleReg(reg)}
+                    title={latestMot ? "Click for details" : ""}
+                  >
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                      {reg}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {latestMot ? latestMot.TestDate : "-"}
+                    </TableCell>
+                    <TableCell
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${resultStyle}`}
                     >
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                        {reg}
-                      </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {latestMot ? latestMot.TestDate : "-"}
-                      </TableCell>
-                      <TableCell
-                        className={`px-6 py-4 whitespace-nowrap text-sm ${resultStyle}`}
-                      >
-                        {latestMot ? latestMot.TestResult : "-"}
-                      </TableCell>
-                      <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {latestMot ? latestMot.ExpiryDate : "-"}
-                      </TableCell>
-                      <TableCell
-                        className={`px-6 py-4 whitespace-nowrap text-sm ${statusStyle}`}
-                      >
-                        <span className="inline-flex items-center gap-2">
-                          {expiryStatus}
-                          {needsNotice && lastNotifiedAt ? (
-                            <BellRing
-                              className={`h-4 w-4 ${noticeIconClass}`}
-                              aria-label="Notification sent"
-                            />
-                          ) : null}
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  );
-                }
-              )}
+                      {latestMot ? latestMot.TestResult : "-"}
+                    </TableCell>
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {latestMot ? latestMot.ExpiryDate : "-"}
+                    </TableCell>
+                    <TableCell
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${statusStyle}`}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        {expiryStatus}
+                        {needsNotice && lastNotifiedAt ? (
+                          <BellRing
+                            className={`h-4 w-4 ${noticeIconClass}`}
+                            aria-label="Notification sent"
+                          />
+                        ) : null}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
           </TableBody>
         </Table>
       </div>

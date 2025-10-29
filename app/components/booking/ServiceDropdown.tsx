@@ -15,12 +15,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { Service } from "@/store/booking";
+import type { StoreService } from "@/store/booking";
 
 interface ServiceDropdownProps {
-  selectedServices: Service[];
-  onServicesChange: (services: Service[]) => void;
-  services: Service[];
+  selectedServices: StoreService[];
+  onServicesChange: (services: StoreService[]) => void;
+  services: StoreService[];
   placeholder?: string;
   disabled?: boolean;
 }
@@ -34,7 +34,7 @@ export const ServiceDropdown: React.FC<ServiceDropdownProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
 
-  const handleSelect = (service: Service) => {
+  const handleSelect = (service: StoreService) => {
     const isSelected = selectedServices.some((s) => s.id === service.id);
 
     if (isSelected) {
@@ -107,6 +107,7 @@ export const ServiceDropdown: React.FC<ServiceDropdownProps> = ({
                   const isSelected = selectedServices.some(
                     (s) => s.id === service.id
                   );
+                  const isUndiagnosed = service.id === "service-undiagnosed";
                   return (
                     <CommandItem
                       key={service.id}
@@ -122,9 +123,23 @@ export const ServiceDropdown: React.FC<ServiceDropdownProps> = ({
                           )}
                         />
                         <div>
-                          <div className="font-medium">{service.name}</div>
+                          <div
+                            className={cn(
+                              "font-medium",
+                              isUndiagnosed && "text-amber-600"
+                            )}
+                          >
+                            {service.name}
+                          </div>
                           <div className="text-xs text-gray-500">
-                            £{service.price} • {service.duration} min
+                            {isUndiagnosed ? (
+                              <span className="text-amber-600 font-medium">
+                                Diagnosis required • {service.duration} min
+                                estimate
+                              </span>
+                            ) : (
+                              `£${service.price} • ${service.duration} min`
+                            )}
                           </div>
                         </div>
                       </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import type { Booking } from "@/store/booking";
+import type { Booking } from "@/types/booking";
 
 interface BookedSlotCardProps {
   booking: Booking;

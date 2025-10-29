@@ -417,6 +417,39 @@ export function BookingDetailsModal({
                 </div>
               </div>
 
+              {/* Inventory Used */}
+              {booking.inventoryUsage && booking.inventoryUsage.length > 0 && (
+                <>
+                  <div className="border-t border-gray-100" />
+                  <div className="space-y-4">
+                    <h3 className="text-base font-semibold text-gray-900">
+                      Inventory Used
+                    </h3>
+                    <div className="space-y-2">
+                      {booking.inventoryUsage.map((u) => (
+                        <div
+                          key={u.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-md text-sm"
+                        >
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-900">
+                              {u.itemName}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {new Date(u.createdAt).toLocaleString()}{" "}
+                              {u.jobSheetId && `• Job ${u.jobSheetId}`}
+                            </div>
+                          </div>
+                          <div className="text-right text-gray-900 font-medium min-w-[120px]">
+                            {u.quantity} {u.unit || ""}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
               {/* History */}
               {booking.history && booking.history.length > 0 && (
                 <>
