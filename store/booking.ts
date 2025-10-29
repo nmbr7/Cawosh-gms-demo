@@ -1,7 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { useGarageStore } from "./garage";
-import type { Booking, Customer, Vehicle } from "@/types/booking";
+import type {
+  Booking,
+  Customer,
+  Vehicle,
+  HistoryEntry,
+  InventoryUsageEntry,
+} from "@/types/booking";
 
 export interface Bay {
   id: string;
@@ -75,6 +81,11 @@ interface BookingState {
     }>
   ) => void;
   updateBooking: (bookingId: string, updates: Partial<Booking>) => void;
+  addBookingHistory: (
+    bookingId: string,
+    entry: Omit<HistoryEntry, "_id">
+  ) => void;
+  addInventoryUsage: (bookingId: string, usage: InventoryUsageEntry) => void;
 }
 
 // Static data
@@ -683,6 +694,38 @@ export const useBookingStore = create<BookingState>()(
             booking._id === bookingId
               ? { ...booking, ...updates, updatedAt: new Date().toISOString() }
               : booking
+          ),
+        }));
+      },
+      addBookingHistory: (bookingId, entry) => {
+        set((state) => ({
+          bookings: state.bookings.map((b) =>
+            b._id === bookingId
+              ? {
+                  ...b,
+                  history: [
+                    ...(b.history || []),
+                    { ...entry, _id: crypto.randomUUID() },
+                  ],
+                  updatedAt: new Date().toISOString(),
+                }
+              : b
+          ),
+        }));
+      },
+      addInventoryUsage: (bookingId, usage) => {
+        set((state) => ({
+          bookings: state.bookings.map((b) =>
+            b._id === bookingId
+              ? {
+                  ...b,
+                  inventoryUsage: [
+                    ...(b.inventoryUsage || []),
+                    { ...usage, id: usage.id || crypto.randomUUID() },
+                  ],
+                  updatedAt: new Date().toISOString(),
+                }
+              : b
           ),
         }));
       },

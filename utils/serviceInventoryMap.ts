@@ -19,16 +19,18 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Oil Change",
     items: [
       {
-        itemId: "oil-filter-001",
-        itemName: "Oil Filter",
+        // matches inventory id for Oil Filter - Universal
+        itemId: "4",
+        itemName: "Oil Filter - Universal",
         quantity: 1,
         unit: "pc",
       },
       {
-        itemId: "engine-oil-5w30",
-        itemName: "Engine Oil 5W-30",
+        // matches inventory id for Engine Oil 5W-30 (1L)
+        itemId: "2",
+        itemName: "Engine Oil 5W-30 (1L)",
         quantity: 5,
-        unit: "litre",
+        unit: "bottle",
       },
     ],
   },
@@ -37,16 +39,17 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Oil Change (Full Synthetic 5W-30)",
     items: [
       {
-        itemId: "oil-filter-001",
-        itemName: "Oil Filter",
+        itemId: "4",
+        itemName: "Oil Filter - Universal",
         quantity: 1,
         unit: "pc",
       },
       {
-        itemId: "engine-oil-synthetic-5w30",
-        itemName: "Full Synthetic Oil 5W-30",
+        // still using same 5W-30 bottle for demo data
+        itemId: "2",
+        itemName: "Engine Oil 5W-30 (1L)",
         quantity: 5,
-        unit: "litre",
+        unit: "bottle",
       },
     ],
   },
@@ -55,16 +58,17 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Oil Change (Conventional 10W-30)",
     items: [
       {
-        itemId: "oil-filter-001",
-        itemName: "Oil Filter",
+        itemId: "4",
+        itemName: "Oil Filter - Universal",
         quantity: 1,
         unit: "pc",
       },
       {
-        itemId: "engine-oil-conventional-10w30",
-        itemName: "Conventional Oil 10W-30",
+        // demo inventory has only 5W-30; use same stock item
+        itemId: "2",
+        itemName: "Engine Oil 5W-30 (1L)",
         quantity: 5,
-        unit: "litre",
+        unit: "bottle",
       },
     ],
   },
@@ -73,8 +77,8 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Oil Filter Replacement",
     items: [
       {
-        itemId: "oil-filter-001",
-        itemName: "Oil Filter",
+        itemId: "4",
+        itemName: "Oil Filter - Universal",
         quantity: 1,
         unit: "pc",
       },
@@ -99,8 +103,9 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Air Filter Replacement",
     items: [
       {
-        itemId: "air-filter-001",
-        itemName: "Engine Air Filter",
+        // matches inventory id for Air Filter - Standard
+        itemId: "3",
+        itemName: "Air Filter - Standard",
         quantity: 1,
         unit: "pc",
       },
@@ -113,16 +118,10 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Front Brake Pads Replacement",
     items: [
       {
-        itemId: "brake-pads-front-001",
-        itemName: "Front Brake Pads",
+        itemId: "1",
+        itemName: "Brake Pads - Front",
         quantity: 1,
-        unit: "set",
-      },
-      {
-        itemId: "brake-fluid-001",
-        itemName: "Brake Fluid",
-        quantity: 0.5,
-        unit: "litre",
+        unit: "pair",
       },
     ],
   },
@@ -181,8 +180,8 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Battery Replacement",
     items: [
       {
-        itemId: "battery-001",
-        itemName: "Car Battery",
+        itemId: "5",
+        itemName: "Battery 12V 60Ah",
         quantity: 1,
         unit: "pc",
       },
@@ -195,10 +194,11 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Spark Plugs Replacement (4-cylinder)",
     items: [
       {
-        itemId: "spark-plugs-4cyl-001",
-        itemName: "Spark Plugs (4-cylinder)",
-        quantity: 4,
-        unit: "pc",
+        // matches inventory id for Spark Plug Set (4 pcs)
+        itemId: "8",
+        itemName: "Spark Plug Set (4 pcs)",
+        quantity: 1,
+        unit: "box",
       },
     ],
   },
@@ -221,10 +221,10 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Wiper Blades Replacement",
     items: [
       {
-        itemId: "wiper-blades-001",
-        itemName: "Wiper Blades Set",
+        itemId: "6",
+        itemName: "Wiper Blades (22 inch)",
         quantity: 1,
-        unit: "set",
+        unit: "pair",
       },
     ],
   },
@@ -235,8 +235,8 @@ export const serviceInventoryMappings: ServiceInventoryMap[] = [
     serviceName: "Headlight Bulb Replacement",
     items: [
       {
-        itemId: "headlight-bulb-001",
-        itemName: "Headlight Bulb",
+        itemId: "10",
+        itemName: "Headlight Bulb H7",
         quantity: 1,
         unit: "pc",
       },

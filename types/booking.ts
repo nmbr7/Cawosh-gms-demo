@@ -95,7 +95,24 @@ export interface HistoryEntry {
     | "diagnosis_approved"
     | "diagnosis_rejected"
     | "booking_created"
-    | "status_changed";
+    | "status_changed"
+    | "job_sheet_created"
+    | "job_started"
+    | "job_paused"
+    | "job_resumed"
+    | "job_halted"
+    | "job_completed"
+    | "inventory_used";
+}
+
+export interface InventoryUsageEntry {
+  id: string;
+  itemId: string;
+  itemName: string;
+  quantity: number;
+  unit?: string;
+  jobSheetId?: string;
+  createdAt: string;
 }
 
 export interface Booking {
@@ -122,4 +139,5 @@ export interface Booking {
     assignedAt: string;
     role: string; // "primary" | "assistant"
   }>;
+  inventoryUsage?: InventoryUsageEntry[];
 }

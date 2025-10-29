@@ -71,7 +71,8 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
     completeJob,
     calculateWorkDuration,
   } = useJobSheetStore();
-  const { bookings, updateBooking } = useBookingStore();
+  const { bookings, updateBooking, addBookingHistory, addInventoryUsage } =
+    useBookingStore();
   const { allItems, adjustStock } = useInventory();
   const { createInvoice } = useBillingStore();
 
@@ -131,6 +132,8 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
     ? calculateWorkDuration(jobSheet.timeLogs)
     : 0;
 
+  const canInteractWithChecklist = jobSheet?.status === "IN_PROGRESS";
+
   // Action handlers
   const handleStartWork = () => {
     if (jobSheet && !jobSheet.inventoryDeducted) {
@@ -150,16 +153,62 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
           reason: "Job started",
           reference: jobSheet.id,
           performedBy: "system",
+          jobSheetId: jobSheet.id,
+          bookingId: booking?._id,
+          notes: "Auto-deduct on job start",
         });
+
+        // Log inventory usage to booking
+        if (booking) {
+          addInventoryUsage(booking._id, {
+            id: crypto.randomUUID(),
+            itemId: item.itemId,
+            itemName: item.itemName,
+            quantity: Number(item.quantity),
+            unit: item.unit,
+            jobSheetId: jobSheet.id,
+            createdAt: new Date().toISOString(),
+          });
+        }
       });
     }
 
     startJob(jobSheetId, "Starting work on job");
+
+    // Booking history log
+    if (booking) {
+      addBookingHistory(booking._id, {
+        status: "in_progress",
+        changedBy: {
+          _id: "system",
+          firstName: "System",
+          lastName: "User",
+          email: "system@local",
+        },
+        changedAt: new Date().toISOString(),
+        notes: `Job ${jobSheetId} started`,
+        type: "job_started",
+      });
+    }
   };
 
   const handlePauseWork = () => {
     if (pauseReason.trim()) {
       pauseJob(jobSheetId, pauseReason);
+      if (booking) {
+        addBookingHistory(booking._id, {
+          status: "in_progress",
+          changedBy: {
+            _id: "system",
+            firstName: "System",
+            lastName: "User",
+            email: "system@local",
+          },
+          changedAt: new Date().toISOString(),
+          notes: `Job ${jobSheetId} paused: ${pauseReason}`,
+          type: "job_paused",
+        });
+      }
       setPauseReason("");
       setShowPauseDialog(false);
     }
@@ -167,12 +216,39 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
 
   const handleResumeWork = () => {
     resumeJob(jobSheetId, "Resuming work");
-    onClose(); // Close the modal after resuming
+    if (booking) {
+      addBookingHistory(booking._id, {
+        status: "in_progress",
+        changedBy: {
+          _id: "system",
+          firstName: "System",
+          lastName: "User",
+          email: "system@local",
+        },
+        changedAt: new Date().toISOString(),
+        notes: `Job ${jobSheetId} resumed`,
+        type: "job_resumed",
+      });
+    }
   };
 
   const handleHaltWork = () => {
     if (haltReason.trim()) {
       haltJob(jobSheetId, haltReason, "system");
+      if (booking) {
+        addBookingHistory(booking._id, {
+          status: "in_progress",
+          changedBy: {
+            _id: "system",
+            firstName: "System",
+            lastName: "User",
+            email: "system@local",
+          },
+          changedAt: new Date().toISOString(),
+          notes: `Job ${jobSheetId} halted: ${haltReason}`,
+          type: "job_halted",
+        });
+      }
       setHaltReason("");
       setShowHaltDialog(false);
     }
@@ -189,6 +265,18 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
       // Update booking status to completed
       if (booking) {
         updateBooking(booking._id, { status: "completed" });
+        addBookingHistory(booking._id, {
+          status: "completed",
+          changedBy: {
+            _id: "system",
+            firstName: "System",
+            lastName: "User",
+            email: "system@local",
+          },
+          changedAt: new Date().toISOString(),
+          notes: `Job ${jobSheetId} completed`,
+          type: "job_completed",
+        });
       }
 
       // Generate invoice
@@ -412,8 +500,16 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                       className="flex items-start gap-3 p-3 border rounded-lg"
                     >
                       <button
-                        onClick={() => toggleServiceCompleted(item.serviceId)}
-                        className="mt-1"
+                        onClick={() => {
+                          if (!canInteractWithChecklist) return;
+                          toggleServiceCompleted(item.serviceId);
+                        }}
+                        disabled={!canInteractWithChecklist}
+                        className={`mt-1 ${
+                          !canInteractWithChecklist
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
                       >
                         {item.completed ? (
                           <CheckSquare className="w-5 h-5 text-green-600" />
@@ -439,10 +535,14 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                         <textarea
                           placeholder="Add notes..."
                           value={item.notes}
-                          onChange={(e) =>
-                            updateServiceNotes(item.serviceId, e.target.value)
-                          }
-                          className="mt-2 w-full p-2 border rounded text-sm resize-none"
+                          onChange={(e) => {
+                            if (!canInteractWithChecklist) return;
+                            updateServiceNotes(item.serviceId, e.target.value);
+                          }}
+                          disabled={!canInteractWithChecklist}
+                          className={`mt-2 w-full p-2 border rounded text-sm resize-none ${
+                            !canInteractWithChecklist ? "bg-gray-50" : ""
+                          }`}
                           rows={2}
                         />
                       </div>
@@ -506,6 +606,15 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                     <Square className="w-4 h-4 mr-2" />
                     Halt Work
                   </Button>
+                  <Button
+                    onClick={() => setShowCompleteDialog(true)}
+                    disabled={true}
+                    title="Resume work to complete the job"
+                    className="opacity-60 cursor-not-allowed"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Complete Job
+                  </Button>
                 </>
               )}
 
@@ -517,6 +626,15 @@ export const WorkTrackingModal: React.FC<WorkTrackingModalProps> = ({
                   >
                     <Play className="w-4 h-4 mr-2" />
                     Resume Work
+                  </Button>
+                  <Button
+                    onClick={() => setShowCompleteDialog(true)}
+                    disabled={true}
+                    title="Resume work to complete the job"
+                    className="opacity-60 cursor-not-allowed"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Complete Job
                   </Button>
                 </>
               )}

@@ -131,6 +131,22 @@ export const useJobSheetStore = create<JobSheetState>()(
           inventoryDeducted: false,
         };
         set((s) => ({ jobSheets: [...s.jobSheets, js] }));
+
+        // Log into booking history that a job sheet was created
+        if (booking) {
+          useBookingStore.getState().addBookingHistory(bookingId, {
+            status: "pending",
+            changedBy: {
+              _id: "system",
+              firstName: "System",
+              lastName: "User",
+              email: "system@local",
+            },
+            changedAt: new Date().toISOString(),
+            notes: `Job sheet ${js.id} created`,
+            type: "job_sheet_created",
+          });
+        }
         return js;
       },
       setStatus: (id, status) =>

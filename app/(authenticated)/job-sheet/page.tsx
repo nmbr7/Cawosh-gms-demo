@@ -1182,6 +1182,22 @@ export default function JobSheetPage() {
                   </div>
                 )}
 
+              {/* Manage Work for in-progress jobs */}
+              {selectedJobSheet.status === "IN_PROGRESS" && (
+                <div className="flex justify-center pt-4">
+                  <Button
+                    onClick={() => {
+                      setWorkTrackingJobSheetId(selectedJobSheet.id);
+                      setShowWorkTrackingModal(true);
+                      setSelectedJobSheet(null);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Manage Work
+                  </Button>
+                </div>
+              )}
+
               {/* Diagnosis Required Message */}
               {selectedJobSheet.status === "PENDING" &&
                 selectedJobSheet.requiresDiagnosis &&

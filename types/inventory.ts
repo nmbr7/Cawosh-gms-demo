@@ -12,6 +12,13 @@ export interface StockMovement {
   performedBy: string; // user id/email
   createdAt: string; // ISO
   resultingQuantity: number;
+
+  // Traceability (NEW)
+  referenceType?: "JOB_SHEET" | "BOOKING" | "MANUAL" | "SYSTEM";
+  jobSheetId?: string;
+  bookingId?: string;
+  serviceId?: string;
+  notes?: string;
 }
 
 export interface InventoryItem {

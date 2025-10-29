@@ -117,7 +117,7 @@
     "sku": "SP-SET4-015",
     "category": "Ignition",
     "unit": "box",
-    "quantity": 0,
+    "quantity": 10,
     "reorderLevel": 10,
     "cost": 9.99,
     "price": 19.99,
