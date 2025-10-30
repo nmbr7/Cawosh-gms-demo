@@ -9,104 +9,77 @@ import {
   isToday,
   isSameDay,
 } from "date-fns";
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Booking } from "../models/booking";
+import type { Booking } from "@/types/booking";
+import { useScheduleStore } from "../(authenticated)/schedule/scheduleStore";
+import dayjs from "dayjs";
+import { BookingDetailsModal } from "./booking-details-modal";
 
 interface MonthViewProps {
-  selectedDate: Date;
-  selectedBay: number | "all";
-  bookings: Booking[];
   onDayClick: (date: Date) => void;
+  bookings?: Booking[];
 }
 
-export function MonthView({
-  selectedDate,
-  selectedBay,
-  bookings,
-  onDayClick,
-}: MonthViewProps): React.ReactElement {
-  console.log("bookings", bookings);
+export function MonthView({ onDayClick, bookings }: MonthViewProps): React.ReactElement {
+  const { selectedDate, selectedBay } = useScheduleStore();
 
-  // Get all days in the current month
-  const monthStart: Date = startOfMonth(selectedDate);
-  const monthEnd: Date = endOfMonth(selectedDate);
-  const daysInMonth: Date[] = eachDayOfInterval({
-    start: monthStart,
-    end: monthEnd,
-  });
+  
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
+    null
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Get the first day of the month to calculate offset
-  const firstDayOfMonth: number = monthStart.getDay();
-  const offsetDays: null[] = Array(firstDayOfMonth).fill(null);
-
-  // Calculate days needed to complete the last row
+  const monthStart = startOfMonth(selectedDate);
+  const monthEnd = endOfMonth(selectedDate);
+  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  const firstDayOffset = monthStart.getDay();
+  const offsetDays = Array(firstDayOffset).fill(null);
   const totalDays = offsetDays.length + daysInMonth.length;
-  const remainingDays = 7 - (totalDays % 7);
-  const endOffsetDays: null[] =
-    remainingDays === 7 ? [] : Array(remainingDays).fill(null);
+  const endOffsetDays = (7 - (totalDays % 7)) % 7;
+  const allDays: (Date | null)[] = [...offsetDays, ...daysInMonth, ...Array(endOffsetDays).fill(null)];
 
-  // Combine offset days with actual days and end offset days
-  const allDays: (Date | null)[] = [
-    ...offsetDays,
-    ...daysInMonth,
-    ...endOffsetDays,
-  ];
-
-  // Group days into weeks
   const weeks: (Date | null)[][] = [];
-  for (let i: number = 0; i < allDays.length; i += 7) {
+  for (let i = 0; i < allDays.length; i += 7) {
     weeks.push(allDays.slice(i, i + 7));
   }
 
-  // Get bookings for a specific day
   const getBookingsForDay = (day: Date | null): Booking[] => {
-    if (!day) return [];
-    console.log("selectedBay", selectedBay);
-    const dayStr = format(day, "yyyy-MM-dd");
+    if (!day || !bookings) return [];
+    const dayStr = dayjs(day).format("YYYY-MM-DD");
 
-    const dayBookings = bookings.filter((booking: Booking) => {
-      const matches =
-        booking.bookingDate.split("T")[0] === dayStr &&
-        (selectedBay === "all" ||
-          booking.services.some(
-            (service) => service.bayId === selectedBay.toString()
-          ));
-
-      console.log("matches", matches);
-      return matches;
-    });
-
-    return dayBookings;
+    return bookings.filter(
+      (booking) =>{
+        const dateObj = new Date(booking.bookingDate);
+        return (dayjs(dateObj).format("YYYY-MM-DD") === dayStr && selectedBay);
+      }
+    );
   };
 
-  return (
-    <div className="bg-white rounded-lg shadow h-[600px] overflow-hidden">
-      <div className="grid grid-cols-7 gap-px bg-gray-200">
-        {/* Weekday headers */}
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-          (day: string) => (
-            <div
-              key={day}
-              className="bg-white p-2 text-center text-sm font-medium text-gray-500"
-            >
-              {day}
-            </div>
-          )
-        )}
+  const onBookingClick = (id:string) => {
+    setSelectedBookingId(id);
+    setIsModalOpen(true);
+  }
 
-        {/* Calendar weeks */}
-        {weeks.map((week: (Date | null)[], weekIndex: number) => (
+  return (
+    <div className="bg-white rounded-lg shadow h-full overflow-hidden">
+      <div className="grid grid-cols-7 gap-px bg-gray-200 h-full">
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+          <div
+            key={day}
+            className="bg-white p-2 text-center text-sm font-medium text-gray-500"
+          >
+            {day}
+          </div>
+        ))}
+
+        {weeks.map((week, weekIndex) => (
           <React.Fragment key={weekIndex}>
-            {week.map((day: Date | null, dayIndex: number) => {
-              const dayBookings: Booking[] = getBookingsForDay(day);
-              const isCurrentMonth: boolean = day
-                ? isSameMonth(day, selectedDate)
-                : false;
-              const isCurrentDay: boolean = day ? isToday(day) : false;
-              const isSelectedDay: boolean = day
-                ? isSameDay(day, selectedDate)
-                : false;
+            {week.map((day, dayIndex) => {
+              const dayBookings = getBookingsForDay(day);
+              const isCurrentMonth = day ? isSameMonth(day, selectedDate) : false;
+              const isCurrentDay = day ? isToday(day) : false;
+              const isSelectedDay = day ? isSameDay(day, selectedDate) : false;
 
               return (
                 <div
@@ -116,38 +89,29 @@ export function MonthView({
                     "bg-white p-2 min-h-[100px]",
                     !isCurrentMonth && "text-gray-400",
                     isCurrentDay ? "border-blue-500" : "border-gray-200",
-                    isSelectedDay ? "bg-blue-50" : "",
-                    weekIndex === weeks.length - 1 &&
-                      "border-b border-gray-200",
+                    isSelectedDay && "bg-blue-50",
                     day && "cursor-pointer hover:bg-gray-50"
                   )}
                 >
                   {day && (
                     <>
-                      <div className="text-sm font-medium mb-1">
-                        {format(day, "d")}
-                      </div>
+                      <div className="text-sm font-medium mb-1">{format(day, "d")}</div>
                       <div className="space-y-1">
-                        {dayBookings.slice(0, 2).map((booking: Booking) => (
+                        {dayBookings.slice(0, 2).map((booking) => (
                           <div
                             key={booking._id}
                             className={cn(
-                              "text-xs p-1 mb-1 rounded truncate",
+                              "text-xs p-1 mb-1 rounded truncate hover:bg-blue-200 hover:scale-105 transition-all",
                               booking.status === "completed"
                                 ? "bg-green-100 text-green-700"
-                                : booking.status === "in-progress"
+                                : booking.status === "in_progress"
                                 ? "bg-amber-100 text-amber-700"
                                 : "bg-blue-100 text-blue-700"
                             )}
-                            title={`${booking.services
-                              .map((service) => service.name)
-                              .join(", ")} - ${
-                              booking.services[0]?.startTime || ""
-                            } to ${booking.services[0]?.endTime || ""}`}
+                            title={`${booking.services.map((s) => s.name).join(", ")} - ${booking.services[0]?.startTime} to ${booking.services[0]?.endTime}`}
+                            onClick={()=>onBookingClick(booking._id)}
                           >
-                            {booking.services
-                              .map((service) => service.name)
-                              .join(", ")}
+                            {`${(booking.customer?.name).toUpperCase() ?? "Unknown Customer"}`}
                           </div>
                         ))}
                         {dayBookings.length > 2 && (
@@ -164,6 +128,12 @@ export function MonthView({
           </React.Fragment>
         ))}
       </div>
+      {/* Booking Details Modal */}
+      <BookingDetailsModal
+        bookingId={selectedBookingId}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
