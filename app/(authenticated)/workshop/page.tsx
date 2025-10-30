@@ -1063,25 +1063,52 @@ export default function WorkshopPage() {
                 className="relative"
                 style={{ width: '480px', height: '360px' }}
               >
-                <Image
-                  src={
+                {(() => {
+                  // Pick the correct image URL
+                  const imageUrl =
                     (selectedVehicle
                       ? (selectedVehicle as VehicleInfo)
                           .modelPictureMimeDataName
                       : vehicleSearchResults && vehicleSearchResults.length > 0
                         ? (vehicleSearchResults[0] as VehicleInfo)
                             .modelPictureMimeDataName
-                        : vehicleInfo.modelPictureMimeDataName) || ''
-                  }
-                  alt="Workshop Example"
-                  width={480}
-                  height={360}
-                  className="object-contain rounded shadow cursor-pointer"
-                  onClick={() => setIsFullscreen(true)}
-                  style={{
-                    background: '#f9f9f9',
-                  }}
-                />
+                        : vehicleInfo.modelPictureMimeDataName) || '';
+
+                  const isExternal =
+                    imageUrl.startsWith('http://') ||
+                    imageUrl.startsWith('https://');
+
+                  return isExternal ? (
+                    // For external images, use <img> instead of next/image
+                    <img
+                      src={imageUrl}
+                      alt="Workshop Example"
+                      width={480}
+                      height={360}
+                      className="object-contain rounded shadow cursor-pointer"
+                      style={{
+                        background: '#f9f9f9',
+                        width: 480,
+                        height: 360,
+                        display: 'block',
+                      }}
+                      onClick={() => setIsFullscreen(true)}
+                    />
+                  ) : (
+                    // Local images: use <Image />
+                    <Image
+                      src={imageUrl}
+                      alt="Workshop Example"
+                      width={480}
+                      height={360}
+                      className="object-contain rounded shadow cursor-pointer"
+                      style={{
+                        background: '#f9f9f9',
+                      }}
+                      onClick={() => setIsFullscreen(true)}
+                    />
+                  );
+                })()}
                 <button
                   type="button"
                   aria-label="Maximize image"
@@ -2357,7 +2384,8 @@ function FullscreenSvgzModal({
           </svg>
         </button>
         <div className="flex items-center justify-center">
-          <Image
+          {/* Use <img> for external URLs to avoid next/image config errors */}
+          <img
             src={imageUrl}
             alt="Fullscreen view"
             width={800}

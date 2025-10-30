@@ -51,7 +51,7 @@ export default function AuthenticatedLayout({
         )}
       >
         <Header />
-        <div className="p-6">{children}</div>
+        <div className="p-3">{children}</div>
       </main>
     </div>
   );

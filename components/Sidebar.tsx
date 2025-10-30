@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 import {
   Calendar,
   ChevronLeft,
@@ -131,14 +132,28 @@ export default function Sidebar() {
       <div>
         <div
           className={cn(
-            'p-4 text-xl font-semibold border-b h-16 flex items-center transition-all',
+            'p-4 text-xl font-semibold border-b h-18 flex items-center transition-all bg-white border-gray-200',
             sidebarOpen ? 'justify-start' : 'justify-center',
           )}
         >
           {expandText ? (
-            <span aria-label="Cawosh Admin">Cawosh Dashboard</span>
+            <div className="w-full flex justify-center items-center">
+              <Image
+                src="/images/CawoshLogoBlack.png"
+                alt="Fullscreen view"
+                width={140}
+                height={100}
+                className="max-w-full max-h-[80vh] object-contain"
+              />
+            </div>
           ) : (
-            <span aria-label="Cawosh Logo">C</span>
+            <Image
+              src="/images/cawosh-logo.jpg"
+              alt="Fullscreen view"
+              width={110}
+              height={100}
+              className="max-w-full max-h-[80vh] object-contain"
+            />
           )}
         </div>
 

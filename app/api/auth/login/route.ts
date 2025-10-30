@@ -5,12 +5,12 @@ console.log(API_URL);
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const { email, password, tenantId } = await request.json();
 
     // Validate required fields
-    if (!email || !password) {
+    if (!email || !password || !tenantId) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Email, password, and tenant ID are required' },
         { status: 400 },
       );
     }
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const response = await fetch(`${backendUrl}/api/v1/auth/login`, {
       method: 'POST',
       headers: {
-        'X-Tenant-Slug': 'autocare-pro',
+        'X-Tenant-Slug': tenantId,
         'Content-Type': 'application/json',
         Accept: 'application/json',
         Origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:8000',
