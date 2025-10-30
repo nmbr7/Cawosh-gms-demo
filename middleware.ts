@@ -21,6 +21,7 @@ export function middleware(request: NextRequest) {
 
   // Allow all _next/static, _next/image, api, and favicon.ico through without redirect/auth checks
   if (
+    pathname.startsWith('/images') ||
     pathname.startsWith('_next/static') ||
     pathname.startsWith('_next/image') ||
     pathname.startsWith('/_next/static') ||
