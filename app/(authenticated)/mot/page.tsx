@@ -182,7 +182,7 @@ export default function MotVehiclesOverview() {
 
   // --- UI ---
   return (
-    <div className="p-6">
+    <div className="p-3">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold text-gray-900">
           Vehicles MOT Status

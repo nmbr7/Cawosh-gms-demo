@@ -249,7 +249,7 @@ export default function JobSheetPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6">
+      <div className="p-3">
         {/* Header with filters */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
@@ -496,7 +496,7 @@ export default function JobSheetPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-3">
       {/* Header with filters */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">

@@ -117,8 +117,10 @@ export const useJobSheetStore = create<JobSheetState>()(
         const nextId = jobSheets.length + 1;
 
         // Get booking to check if it requires diagnosis
+        console.log('Creating job sheet from booking. BookingId:', bookingId);
         const bookingStore = useBookingStore.getState();
         const booking = bookingStore.bookings.find((b) => b._id === bookingId);
+        console.log('Located booking:', booking);
 
         const js: JobSheet = {
           id: `JB-${nextId.toString().padStart(4, '0')}`,

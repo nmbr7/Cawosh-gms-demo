@@ -72,7 +72,7 @@ export const EmailModal: React.FC<EmailModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="p-6">
+      <div className="p-3">
         <h2 className="text-2xl font-bold mb-4">Reset Password</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

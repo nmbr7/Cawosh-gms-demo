@@ -281,10 +281,12 @@ export const useBookingStore = create<BookingState>()(
       setTechnicians: (technicians) => set({ technicians }),
       setServices: (services) => set({ services }),
 
-      addBooking: (booking) =>
+      addBooking: (booking) => {
+        console.log('New booking', booking);
         set((state) => ({
           bookings: [...state.bookings, booking],
-        })),
+        }));
+      },
 
       removeBooking: (bookingId) =>
         set((state) => ({
@@ -324,6 +326,7 @@ export const useBookingStore = create<BookingState>()(
         const state = get();
         const bays = state.bays.slice(0, bayCount);
         const today = new Date();
+        // today.setDate(today.getDate() - 7);
 
         const garage = useGarageStore.getState().garage;
         const getHoursForDate = (d: Date) => {
@@ -395,18 +398,77 @@ export const useBookingStore = create<BookingState>()(
 
             newBookings.push({
               _id: crypto.randomUUID(),
-              customer: {
-                name: 'Walk-in Customer',
-                phone: '+971501234567',
-                email: 'walkin@example.com',
-              },
-              vehicle: {
-                make: 'Toyota',
-                model: 'Camry',
-                year: 2022,
-                license: 'UAE12345',
-                vin: '1HGCM82633A004352',
-              },
+              // Randomize customer and vehicle fields for demo data
+              customer: (() => {
+                // Demo data pools
+                const customerNames = [
+                  'Ahmed Raza',
+                  'Fatima Noor',
+                  'James Lee',
+                  'Maria Petrova',
+                  'Wei Zhang',
+                  'Olivia Johnson',
+                  'Arjun Patel',
+                ];
+                const customerPhones = [
+                  '+97150' + Math.floor(1000000 + Math.random() * 8999999),
+                  '+97152' + Math.floor(1000000 + Math.random() * 8999999),
+                  '+97155' + Math.floor(1000000 + Math.random() * 8999999),
+                  '+97156' + Math.floor(1000000 + Math.random() * 8999999),
+                ];
+                const nameIdx = Math.floor(
+                  Math.random() * customerNames.length,
+                );
+                const emailBase = customerNames[nameIdx]
+                  .replace(/\s+/g, '.')
+                  .toLowerCase();
+                return {
+                  name: customerNames[nameIdx],
+                  phone:
+                    customerPhones[
+                      Math.floor(Math.random() * customerPhones.length)
+                    ],
+                  email: `${emailBase}@example.com`,
+                };
+              })(),
+              vehicle: (() => {
+                const makesModels = [
+                  { make: 'Toyota', models: ['Camry', 'Corolla', 'Hilux'] },
+                  { make: 'Nissan', models: ['Altima', 'Patrol', 'Sunny'] },
+                  { make: 'Ford', models: ['F-150', 'Explorer', 'Focus'] },
+                  { make: 'Honda', models: ['Civic', 'Accord', 'CR-V'] },
+                  { make: 'Hyundai', models: ['Sonata', 'Elantra', 'Tucson'] },
+                ];
+                const years = [2019, 2020, 2021, 2022, 2023];
+                const randomCar =
+                  makesModels[Math.floor(Math.random() * makesModels.length)];
+                const randomModel =
+                  randomCar.models[
+                    Math.floor(Math.random() * randomCar.models.length)
+                  ];
+                const randomYear =
+                  years[Math.floor(Math.random() * years.length)];
+                // UAE license plates: 1-7 chars, letters and/or numbers. We'll mock: ABC1234, D56789, Z4321, etc.
+                const randomLicense =
+                  String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
+                  Math.floor(1000 + Math.random() * 89999).toString();
+                // Random VIN-like string
+                const randomVin = Array(17)
+                  .fill(0)
+                  .map(() =>
+                    'ABCDEFGHJKLMNPRSTUVWXYZ0123456789'.charAt(
+                      Math.floor(Math.random() * 33),
+                    ),
+                  )
+                  .join('');
+                return {
+                  make: randomCar.make,
+                  model: randomModel,
+                  year: randomYear,
+                  license: randomLicense,
+                  vin: randomVin,
+                };
+              })(),
               services: [
                 {
                   serviceId: {
@@ -624,6 +686,7 @@ export const useBookingStore = create<BookingState>()(
           diagnosisNotes: isUndiagnosed ? notes : undefined,
           assignedTechnicians,
         };
+        console.log('Creating Booking', booking);
         set((state) => ({ bookings: [...state.bookings, booking] }));
         return booking;
       },

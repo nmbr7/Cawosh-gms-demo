@@ -31,12 +31,18 @@ interface BookingCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBookingCreated?: () => void;
+  selectedDate?: Date; // this is optional for prepopulation of the form
+  clickedTime?: string; //for prepopulation
+  bay?: number | 'all'; //for prepopulation
 }
 
 export const BookingCreateModal = ({
   isOpen,
   onClose,
   onBookingCreated,
+  selectedDate,
+  clickedTime,
+  bay,
 }: BookingCreateModalProps) => {
   // Get garage from store
   const garage = useGarageStore((state) => state.garage);
@@ -53,7 +59,7 @@ export const BookingCreateModal = ({
   const [carModel, setCarModel] = useState('');
   const [carYear, setCarYear] = useState('');
   const [carRegistration, setCarRegistration] = useState('');
-  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [date, setDate] = useState<Date | undefined>(selectedDate ?? undefined);
   const [notes, setNotes] = useState('');
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
@@ -65,16 +71,16 @@ export const BookingCreateModal = ({
   // New state for bay and technician
   const [selectedBay, setSelectedBay] = useState<string>('');
   const [selectedTechnician, setSelectedTechnician] = useState<string>('');
-  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [selectedTime, setSelectedTime] = useState<string>(clickedTime || '');
 
   // Set default date to today when modal opens
   useEffect(() => {
     if (isOpen) {
-      setDate(startOfDay(new Date()));
-      setSelectedBay('');
+      if (!selectedDate) setDate(startOfDay(new Date()));
+      if (!bay) setSelectedBay('');
       setSelectedTechnician('');
     }
-  }, [isOpen]);
+  }, [isOpen, bay, selectedDate]);
 
   // Get existing bookings for the selected bay/date
   const existingBookings =
@@ -200,6 +206,12 @@ export const BookingCreateModal = ({
       onClose();
     }
   };
+
+  useEffect(() => {
+    setDate(selectedDate);
+    setSelectedTime(clickedTime ?? '');
+    setSelectedBay(bay ? `bay-${bay}` : '');
+  }, [selectedDate, clickedTime, bay]);
 
   return (
     <>
@@ -395,6 +407,10 @@ export const BookingCreateModal = ({
                         className="w-full bg-white border rounded-md px-3 py-2 shadow-xs transition outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] min-h-[48px] text-sm"
                       >
                         <option value="">Select time</option>
+                        <option value="08:00">08:00 AM</option>
+                        <option value="08:30">08:30 AM</option>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="09:30">09:30 AM</option>
                         <option value="10:00">10:00 AM</option>
                         <option value="10:30">10:30 AM</option>
                         <option value="11:00">11:00 AM</option>
@@ -410,6 +426,10 @@ export const BookingCreateModal = ({
                         <option value="16:00">04:00 PM</option>
                         <option value="16:30">04:30 PM</option>
                         <option value="17:00">05:00 PM</option>
+                        <option value="17:30">05:30 PM</option>
+                        <option value="18:00">06:00 PM</option>
+                        <option value="18:30">06:30 PM</option>
+                        <option value="19:00">07:00 PM</option>
                       </select>
                     </div>
                   </div>

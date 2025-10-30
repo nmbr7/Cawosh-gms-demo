@@ -79,7 +79,7 @@ export const OTPModal: React.FC<OTPModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="p-6">
+      <div className="p-3">
         <h2 className="text-2xl font-bold mb-4">Enter OTP</h2>
         <p className="text-sm text-gray-600 mb-4">
           We&apos;ve sent a 6-digit code to {email}

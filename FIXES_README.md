@@ -191,7 +191,7 @@ export default function BookingsPage() {
 // BookingsPage.tsx (50 lines)
 export default function BookingsPage() {
   return (
-    <div className="p-6">
+    <div className="p-3">
       <BookingsHeader />
       <BookingsFilters />
       <BookingsTable />

@@ -114,7 +114,7 @@ export default function InventoryPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-3">
       <InventoryAlerts />
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">

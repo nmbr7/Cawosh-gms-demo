@@ -6,7 +6,6 @@ const publicRoutes = ['/login', '/forgot-password'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log("Middleware", pathname);
 
   // Normalize trailing slash (ensure route match works for e.g. /login/)
   const normalizedPath =
