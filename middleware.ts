@@ -18,6 +18,16 @@ export function middleware(request: NextRequest) {
   // Get the token from cookies
   const token = request.cookies.get('access_token')?.value;
 
+  // Allow all _next/static, _next/image, api, and favicon.ico through without redirect/auth checks
+  if (
+    pathname.startsWith('/_next/static') ||
+    pathname.startsWith('/_next/image') ||
+    pathname.startsWith('/api/') ||
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next();
+  }
+
   // If user is authenticated and trying to access a public route, redirect to dashboard
   if (token && isPublicRoute) {
     // Don't redirect if coming from password reset success
@@ -30,13 +40,7 @@ export function middleware(request: NextRequest) {
   }
 
   // If user is not authenticated and trying to access a protected route, redirect to login
-  if (
-    !token &&
-    !isPublicRoute &&
-    !pathname.startsWith('/api/') &&
-    !pathname.startsWith('/_next/') &&
-    pathname !== '/favicon.ico'
-  ) {
+  if (!token && !isPublicRoute) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
