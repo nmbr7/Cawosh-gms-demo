@@ -70,8 +70,7 @@ export default function SignInPage() {
               alt="Cawosh Logo"
               width={200}
               height={48}
-              className="mt-5 mb-10"
-              priority
+              className="max-w-full max-h-[80vh] object-contain mt-5 mb-10"
             />
             <h1 className="text-3xl mb-2">Sign In</h1>
           </div>
