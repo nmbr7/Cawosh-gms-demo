@@ -71,6 +71,7 @@ export default function SignInPage() {
               width={200}
               height={48}
               className="max-w-full max-h-[80vh] object-contain mt-5 mb-10"
+              priority
             />
             <h1 className="text-3xl mb-2">Sign In</h1>
           </div>
