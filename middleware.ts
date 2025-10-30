@@ -7,8 +7,13 @@ const publicRoutes = ['/login', '/forgot-password'];
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Check if the current path is a public route
-  const isPublicRoute = publicRoutes.includes(pathname);
+  // Normalize trailing slash (ensure route match works for e.g. /login/)
+  const normalizedPath =
+    pathname.endsWith('/') && pathname.length > 1
+      ? pathname.slice(0, -1)
+      : pathname;
+
+  const isPublicRoute = publicRoutes.includes(normalizedPath);
 
   // Get the token from cookies
   const token = request.cookies.get('access_token')?.value;
@@ -17,6 +22,7 @@ export function middleware(request: NextRequest) {
   if (token && isPublicRoute) {
     // Don't redirect if coming from password reset success
     const referer = request.headers.get('referer');
+    // If the referrer is from a password reset flow, allow access
     if (referer && referer.includes('/forgot-password')) {
       return NextResponse.next();
     }
@@ -24,7 +30,13 @@ export function middleware(request: NextRequest) {
   }
 
   // If user is not authenticated and trying to access a protected route, redirect to login
-  if (!token && !isPublicRoute && !pathname.startsWith('/api/')) {
+  if (
+    !token &&
+    !isPublicRoute &&
+    !pathname.startsWith('/api/') &&
+    !pathname.startsWith('/_next/') &&
+    pathname !== '/favicon.ico'
+  ) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
