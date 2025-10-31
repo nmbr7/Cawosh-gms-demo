@@ -566,7 +566,9 @@ export const useBookingStore = create<BookingState>()(
           0,
         );
         const totalPrice = services.reduce((acc, s) => acc + (s.price || 0), 0);
-        const startTime = `${date}T${startTimeHHMM}:00.000Z`;
+
+        // TODO: fix utc conversion logic
+        const startTime = `${date}T${startTimeHHMM}:00.000`;
         const endDate = new Date(startTime);
         endDate.setMinutes(endDate.getMinutes() + totalDuration);
 

@@ -95,7 +95,7 @@ export const WeekCalendar: React.FC<Props> = ({
         style={{ minHeight: `${MINUTES_IN_DAY}px` }}
       >
         {/* Header Row */}
-        <div className="bg-gray-100 border-b border-gray-300 h-[40px] sticky top-0 z-20" />
+        <div className="bg-gray-100 border-b border-gray-300 h-[40px] sticky top-0 z-30" />
         {daysOfWeek.map((day, idx) => (
           <div
             key={idx}
@@ -120,62 +120,9 @@ export const WeekCalendar: React.FC<Props> = ({
           </React.Fragment>
         ))}
 
-        {/* === CURRENT TIME INDICATOR (RED, VERTICAL BAR AT MIDDLE) === */}
-        {(() => {
-          // Check all 7 days if today, and render one indicator per column if so
-          const now = new Date();
-          return daysOfWeek.map((day, idx) => {
-            const dayDate = dayjs(day);
-            if (
-              now.getFullYear() === dayDate.year() &&
-              now.getMonth() === dayDate.month() &&
-              now.getDate() === dayDate.date()
-            ) {
-              const minutesFromMidnight =
-                now.getHours() * 60 + now.getMinutes();
-              // The width of one column (in px or %)
-              const colWidth = `calc((100% - 60px) / 7)`;
-              // Center the vertical dash in its column.
-              return (
-                <React.Fragment key={`now-line-${idx}`}>
-                  {/* The time line (horizontal) */}
-                  <div
-                    className="absolute left-[60px] z-30 pointer-events-none"
-                    style={{
-                      top: `${40 + minutesFromMidnight}px`,
-                      width: colWidth,
-                      height: '2px',
-                      background: '#ef4444', // Red (tailwind red-500)
-                      boxShadow: '0px 1px 6px 0px rgba(239, 68, 68, 0.13)',
-                      transform: `translateX(${idx * 100}%)`,
-                      borderRadius: 2,
-                    }}
-                  />
-                  {/* The vertical dash at the start of the day block (left edge of each day column) */}
-                  <div
-                    className="absolute z-40"
-                    style={{
-                      top: `${40 + minutesFromMidnight - 5}px`,
-                      left: `calc(60px + (${idx} * ((100% - 60px) / 7)))`,
-                      width: '2px',
-                      height: '12px',
-                      borderLeft: '2px dashedrgb(152, 42, 42)',
-                      background:
-                        'linear-gradient(180deg,#ef4444 0%,#fca5a5 100%)',
-                      borderRadius: '2px',
-                      pointerEvents: 'none',
-                    }}
-                  />
-                </React.Fragment>
-              );
-            }
-            return null;
-          });
-        })()}
-
         {/* Booking Columns */}
         {daysOfWeek.map((day, dayIndex) => {
-          // Precompute for efficiency: map bookings to startMin/endMin/bayId for this day
+          // Prepare booking data for the day
           const bookingsWithTimes = (bookingsByDay.get(day) ?? [])
             .filter((b) => b.services && b.services.length > 0)
             .map((b) => {
@@ -191,24 +138,79 @@ export const WeekCalendar: React.FC<Props> = ({
                 startMin: Math.min(...mins),
                 endMin: Math.min(...mins) + (b.totalDuration ?? 0),
                 bayId: dayServices[0]?.bayId ?? undefined,
-                _dayServices: dayServices, // attach for easier lookup
+                _dayServices: dayServices,
               };
             })
-            .filter(Boolean) // Remove nulls
+            .filter(Boolean)
             .sort((a, b) => a!.startMin - b!.startMin) as Array<
             Booking & {
               startMin: number;
               endMin: number;
               bayId?: string;
-              _dayServices: NonNullable<Booking['services']>; // actually array of services
+              _dayServices: NonNullable<Booking['services']>;
             }
           >;
 
-          // Map booking._id to index in array above
           const bookingIndexMap = new Map<string, number>();
           bookingsWithTimes.forEach((b, idx) =>
             bookingIndexMap.set(b._id, idx),
           );
+
+          // === NOW-LINE, INDICATOR FOR CURRENT TIME FOR THIS DAY ONLY ===
+          const now = new Date();
+          let nowLine = null;
+          const dayDate = dayjs(day);
+          if (
+            now.getFullYear() === dayDate.year() &&
+            now.getMonth() === dayDate.month() &&
+            now.getDate() === dayDate.date()
+          ) {
+            const minutesFromMidnight = now.getHours() * 60 + now.getMinutes();
+
+            // We want the red line to fit exactly inside this column, not overlap based on padding, calculation, etc.
+            // Width needs to use a real pixel calc, honoring border + width, take into account parent is absolute within left:60px; then transformX for column placement
+            // The parent <div> for the "day" is:
+            // className="absolute top-[40px] left-[60px] w-[calc((100%-60px)/7)] h-[1440px]"
+            // so the "container" is already for 1 column, at left:60px + start, width: (100%-60px)/7;
+
+            // So the correct style for the red line is left: 0px, width: 100% (relative to the column absolute parent)
+            // Place the red line and the vertical dash as children of the *day column* container (not outside) so they align
+
+            nowLine = (
+              <>
+                <div
+                  className={`absolute pointer-events-none current-time-indicator-${dayIndex}`}
+                  style={{
+                    zIndex: 30,
+                    top: `${minutesFromMidnight}px`,
+                    left: 0,
+                    width: '100%',
+                    height: '2px',
+                    background: '#ef4444',
+                    boxShadow: '0px 1px 6px 0px rgba(239, 68, 68, 0.13)',
+                    borderRadius: 2,
+                    transition: 'z-index 0.15s',
+                  }}
+                />
+                {/* The vertical dash at the left of the column */}
+                <div
+                  className="absolute"
+                  style={{
+                    zIndex: 30,
+                    top: `${minutesFromMidnight - 5}px`,
+                    left: 0,
+                    width: '2px',
+                    height: '12px',
+                    borderLeft: '2px dashed rgb(152, 42, 42)',
+                    background:
+                      'linear-gradient(180deg,#ef4444 0%,#fca5a5 100%)',
+                    borderRadius: '2px',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </>
+            );
+          }
 
           return (
             <div
@@ -217,6 +219,7 @@ export const WeekCalendar: React.FC<Props> = ({
               style={{ transform: `translateX(${dayIndex * 100}%)` }}
               onClick={(e) => onEmptySlotClick(e, day)}
             >
+              {nowLine}
               {bookingsWithTimes.map((booking) => {
                 const dayServices = booking._dayServices;
                 if (!dayServices || dayServices.length === 0) return null;
@@ -235,9 +238,9 @@ export const WeekCalendar: React.FC<Props> = ({
                 for (let j = 0; j < selfIdx; ++j) {
                   const prev = bookingsWithTimes[j];
                   if (
-                    prev.endMin > curr.startMin && // overlaps start
-                    prev.startMin < curr.endMin && // overlaps end
-                    prev.bayId !== curr.bayId // only count different bay
+                    prev.endMin > curr.startMin &&
+                    prev.startMin < curr.endMin &&
+                    prev.bayId !== curr.bayId
                   ) {
                     overlapCount++;
                   }
@@ -245,26 +248,30 @@ export const WeekCalendar: React.FC<Props> = ({
                 const overlapShiftPx = 10;
                 const leftShift = 5 + overlapCount * overlapShiftPx;
 
-                // Prefer totalDuration if available
-                const height =
-                  booking.totalDuration ??
-                  Math.max(
-                    ...dayServices.map((s) => getMinutesFromTime(s.endTime)),
-                  ) - startMin;
+                // Always use explicit difference for height
+                const blockEnd =
+                  booking.totalDuration !== undefined
+                    ? startMin + booking.totalDuration
+                    : Math.max(
+                        ...dayServices.map((s) =>
+                          getMinutesFromTime(s.endTime),
+                        ),
+                      );
+                const height = blockEnd - startMin;
 
                 return (
                   <div
                     key={booking._id + day}
                     className={cn(
-                      'absolute right-[10px] rounded text-xs z-10 shadow',
+                      'absolute right-[10px] rounded text-xs shadow',
                       'cursor-pointer flex flex-col justify-center items-center pl-2 pr-2 overflow-hidden',
                       'border bg-blue-50 text-blue-900 border-blue-100',
                       'transition-all duration-150',
                       'hover:border-[1.5px] hover:border-violet-400',
                       'focus:outline-none focus:ring-1 focus:ring-violet-400',
-                      'hover:z-30',
-                      'text-left', // center text
-                      'group', // for targeting hover
+                      'text-left',
+                      'group',
+                      'hover:z-60',
                     )}
                     style={{
                       top: `${startMin}px`,
@@ -292,10 +299,8 @@ export const WeekCalendar: React.FC<Props> = ({
                         }
                         return '#e0e7ef';
                       })(),
-                      // Add transition for height
                       transition: 'height 0.18s',
                     }}
-                    // Prevent clicking from triggering parent onEmptySlotClick
                     onClick={(e) => {
                       e.stopPropagation();
                       onBookingClick(e, booking);
@@ -303,9 +308,8 @@ export const WeekCalendar: React.FC<Props> = ({
                   >
                     <style jsx>{`
                       .group:hover {
-                        width: 125% !important;
+                        width: 120% !important;
                         right: 0px !important;
-                        z-index: 100 !important;
                         height: ${height + 14}px !important;
                       }
                     `}</style>
@@ -344,7 +348,6 @@ export const WeekCalendar: React.FC<Props> = ({
         })}
       </div>
 
-      {/* Booking Details Modal */}
       <BookingDetailsModal
         bookingId={selectedBookingId}
         isOpen={isModalOpen}

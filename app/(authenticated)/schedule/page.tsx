@@ -47,11 +47,12 @@ export default function SchedulePage() {
   const onEmptyBlockClick = (date: Date, time: string) => {
     setIsCreateModalOpen(true);
     // Strip 'Z' from the date string if present (to remove UTC designator)
+    // TODO: fix this
     const dateStr =
       date instanceof Date ? date.toISOString().replace(/Z$/, '') : date;
+
     setNewBookingDate(new Date(dateStr));
     setNewBookingTime(time);
-    console.log('time', time);
   };
 
   const filteredBookings = useCallback(() => {
