@@ -107,13 +107,13 @@ export const useBillingStore = create<BillingState>()(
           invoices: state.invoices.map((invoice) =>
             invoice.id === invoiceId
               ? {
-                ...invoice,
-                status,
-                paidDate:
-                  status === 'PAID'
-                    ? new Date().toISOString().split('T')[0]
-                    : undefined,
-              }
+                  ...invoice,
+                  status,
+                  paidDate:
+                    status === 'PAID'
+                      ? new Date().toISOString().split('T')[0]
+                      : undefined,
+                }
               : invoice,
           ),
           summary: get().getInvoiceSummary(),

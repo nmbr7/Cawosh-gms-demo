@@ -111,14 +111,21 @@ export default function MotVehiclesOverview() {
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   // Modal & advisory states
+  // Add a state to hold modal vehicle override (when viewing a searched vehicle not in list)
   const [selectedVehicleReg, setSelectedVehicleReg] = useState<string | null>(
     null,
   );
+  const [modalVehicle, setModalVehicle] = useState<Vehicle | null>(null);
   const [advisoryModal, setAdvisoryModal] = useState<{
     open: boolean;
     notices: string[];
     title: string;
   } | null>(null);
+
+  // MOT search state
+  const [searchReg, setSearchReg] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   // Fetch all vehicles using the new mot/all API WITHOUT supplying the reg list
   useEffect(() => {
@@ -127,7 +134,7 @@ export default function MotVehiclesOverview() {
       setLoading(true);
       setFetchError(null);
       try {
-        const url = 'http://localhost:8090/api/auth/mot/all';
+        const url = `/api/mot`;
         const res = await fetch(url, {
           method: 'GET',
           headers: {
@@ -172,35 +179,138 @@ export default function MotVehiclesOverview() {
     });
   }, [vehicles]);
 
-  const selectedVehicleData = useMemo(() => {
+  // If modalVehicle is set, use it, otherwise use current vehicle from vehicles[]
+  const selectedVehicleData = useMemo<Vehicle | null>(() => {
+    if (modalVehicle) return modalVehicle;
     return vehicles.find((v) => v.reg === selectedVehicleReg) || null;
-  }, [vehicles, selectedVehicleReg]);
+  }, [vehicles, selectedVehicleReg, modalVehicle]);
 
   function openAdvisoryModal(title: string, notices: string[]) {
     setAdvisoryModal({ open: true, notices, title });
   }
 
+  // MOT search handler
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    setSearching(true);
+    setSearchError(null);
+
+    try {
+      const reg = searchReg.trim().toUpperCase();
+      if (!reg) {
+        setSearchError('Please enter a registration.');
+        setSearching(false);
+        return;
+      }
+
+      // For debugging: log the fetch URL
+      // console.log(`[MOT Search] Fetching: /api/mot/${encodeURIComponent(reg)}`);
+
+      // NOTE: Always call the /api/mot/[reg] endpoint directly.
+      // If you get a 404 here, check that you have app/api/mot/[reg]/route.ts
+      // matching the Next.js route format.
+      const url = `/api/mot/${encodeURIComponent(reg)}`;
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // If you get a 404, the issue might be with your catch-all route:
+      //   - The file should be at app/api/mot/[reg]/route.ts
+      //   - The exported GET method should match (req: NextRequest) and return NextResponse
+      //   - Example URL: /api/mot/AB12ABC
+
+      if (res.status === 404) {
+        setSearchError('No MOT record found for this registration ');
+        setSearching(false);
+        return;
+      }
+      if (!res.ok) {
+        throw new Error('Error fetching MOT data.');
+      }
+      const data = await res.json();
+
+      if (!data || !data.reg) {
+        setSearchError('No MOT record found for this registration.');
+        setSearching(false);
+        return;
+      }
+
+      // Instead of AdvisoryModal, open the full MOT table modal with the loaded vehicle
+      setModalVehicle(data as Vehicle);
+      setSelectedVehicleReg(data.reg);
+    } catch (e: unknown) {
+      setSearchError((e as Error)?.message || 'Search failed.');
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  // When closing modal, clear modalVehicle if present so further clicks in vehicle list work correctly.
+  function handleCloseModal() {
+    setSelectedVehicleReg(null);
+    setModalVehicle(null);
+  }
+
   // --- UI ---
   return (
     <div className="p-3">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          Vehicles MOT Status
-        </h1>
-        <Popover>
-          <PopoverTrigger className="inline-flex items-center text-gray-600 hover:text-gray-800 focus:outline-none">
-            <HelpCircle className="w-5 h-5" />
-          </PopoverTrigger>
-          <PopoverContent className="bg-white w-96">
-            <p>Help text here</p>
-          </PopoverContent>
-        </Popover>
+      {/* MOT Search Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl  text-gray-900">Vehicles MOT Status</h1>
+        </div>
+        <div className="flex-1 flex flex-col sm:flex-row items-center justify-end gap-2">
+          {/* Show search error inline to the left of the search form */}
+          {searchError && (
+            <span className="text-red-600 text-sm font-medium">
+              {searchError}
+            </span>
+          )}
+          <form
+            onSubmit={handleSearch}
+            className="flex items-center gap-2 min-w-[220px]"
+            autoComplete="off"
+          >
+            <input
+              type="text"
+              placeholder="Reg number…"
+              className="border px-3 py-2 rounded mr-2 text-sm focus:outline-none focus:ring focus:border-blue-400"
+              value={searchReg}
+              onChange={(e) => {
+                setSearchReg(e.target.value);
+                setSearchError(null);
+              }}
+              maxLength={12}
+              id="mot-search"
+            />
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded disabled:opacity-60"
+              disabled={searching || !searchReg.trim()}
+            >
+              {searching ? 'Searching...' : 'Search MOT'}
+            </button>
+          </form>
+          <Popover>
+            <PopoverTrigger className="inline-flex items-center ml-3 text-gray-600 hover:text-gray-800 focus:outline-none">
+              <HelpCircle className="w-5 h-5" />
+            </PopoverTrigger>
+            <PopoverContent className="bg-white w-96">
+              <p>Help text here</p>
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
+
+      {/* List of all vehicles */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <Table className="min-w-full divide-y divide-gray-200">
           <TableHeader className="bg-gray-50">
             <TableRow>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <TableHead className="px-6 py-3 text-left text-xs font-medium  text-gray-500 uppercase tracking-wider">
                 Registration
               </TableHead>
               <TableHead className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -262,16 +372,16 @@ export default function MotVehiclesOverview() {
                         : '';
                 const resultStyle =
                   latestMot?.TestResult?.toUpperCase() === 'FAILED'
-                    ? 'text-red-700 font-semibold'
+                    ? 'text-red-700 '
                     : latestMot?.TestResult?.toUpperCase() === 'PASSED'
-                      ? 'text-green-700 font-semibold'
+                      ? 'text-green-700 '
                       : '';
                 const statusStyle =
                   expiryStatus === 'Expired'
-                    ? 'text-red-700 font-semibold'
+                    ? 'text-red-700'
                     : expiryStatus === 'Expiring Soon'
-                      ? 'text-amber-700 font-semibold'
-                      : 'text-green-700 font-semibold';
+                      ? 'text-amber-700 '
+                      : 'text-green-700 ';
                 const needsNotice =
                   expiryStatus === 'Expiring Soon' ||
                   expiryStatus === 'Expired';
@@ -283,10 +393,13 @@ export default function MotVehiclesOverview() {
                   <TableRow
                     key={reg}
                     className={`hover:bg-gray-50 cursor-pointer border-b-gray-200 ${rowAccentClass}`}
-                    onClick={() => latestMot && setSelectedVehicleReg(reg)}
+                    onClick={() => {
+                      setModalVehicle(null); // Reset override if choosing from vehicles list
+                      if (latestMot) setSelectedVehicleReg(reg);
+                    }}
                     title={latestMot ? 'Click for details' : ''}
                   >
-                    <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                    <TableCell className="px-6 py-4 whitespace-nowrap text-sm  font-semibold text-gray-900">
                       {reg}
                     </TableCell>
                     <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -321,10 +434,10 @@ export default function MotVehiclesOverview() {
       </div>
 
       {/* MODAL POPUP WITH FULL MOT TABLE */}
-      {selectedVehicleReg && (
+      {selectedVehicleReg && selectedVehicleData && (
         <div
           className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/20"
-          onClick={() => setSelectedVehicleReg(null)}
+          onClick={handleCloseModal}
           aria-modal="true"
           role="dialog"
         >
@@ -333,7 +446,7 @@ export default function MotVehiclesOverview() {
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              onClick={() => setSelectedVehicleReg(null)}
+              onClick={handleCloseModal}
               className="absolute top-3 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold"
               aria-label="Close"
             >
@@ -341,7 +454,7 @@ export default function MotVehiclesOverview() {
             </button>
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-gray-900">
+                <h3 className="text-xl  text-gray-900">
                   {selectedVehicleReg}{' '}
                   <span className="text-gray-500 font-normal">
                     • MOT History
@@ -440,15 +553,15 @@ export default function MotVehiclesOverview() {
                             : "relative after:content-[''] after:absolute after:top-0 after:right-0 after:h-full after:w-1 after:bg-green-500";
                         const resultStyle =
                           rec.TestResult?.toUpperCase() === 'FAILED'
-                            ? 'text-red-700 font-semibold'
+                            ? 'text-red-700 '
                             : rec.TestResult?.toUpperCase() === 'PASSED'
-                              ? 'text-green-700 font-semibold'
+                              ? 'text-green-700 '
                               : '';
                         const statusStyle = isExpired
-                          ? 'text-red-700 font-semibold'
+                          ? 'text-red-700 '
                           : isExpiringSoon
-                            ? 'text-amber-700 font-semibold'
-                            : 'text-green-700 font-semibold';
+                            ? 'text-amber-700 '
+                            : 'text-green-700 ';
                         return (
                           <TableRow
                             key={rec.TestNumber + '-' + idx}
@@ -460,7 +573,19 @@ export default function MotVehiclesOverview() {
                               {rec.TestResult}
                             </TableCell>
                             <TableCell className="px-4 py-3 whitespace-nowrap">
-                              {rec.TestDate}
+                              {rec.TestDate
+                                ? new Date(rec.TestDate).toLocaleString(
+                                    undefined,
+                                    {
+                                      year: 'numeric',
+                                      month: '2-digit',
+                                      day: '2-digit',
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                      second: '2-digit',
+                                    },
+                                  )
+                                : ''}
                             </TableCell>
                             <TableCell className="px-4 py-3 whitespace-nowrap">
                               {rec.ExpiryDate}
@@ -528,7 +653,7 @@ export default function MotVehiclesOverview() {
             >
               ×
             </button>
-            <h4 className="text-lg font-semibold text-gray-900 mb-3">
+            <h4 className="text-lg  text-gray-900 mb-3">
               {advisoryModal.title}
             </h4>
             <ul className="list-disc pl-5 space-y-2">

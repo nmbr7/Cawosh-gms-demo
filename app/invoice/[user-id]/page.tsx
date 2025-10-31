@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 // import { useInvoiceStore } from '@/store/invoice';
 import { useBillingStore } from '@/store/billing';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 
 // Theme/colors remain the same
 const colors = {
@@ -201,21 +201,21 @@ function FeedbackSectionNPS({ garageName }: { garageName: string }) {
 
     // Simulate a save to backend API (fake with timeout)
     // Construct feedback object
-    const feedback = {
-      nps,
-      timeliness,
-      workQuality,
-      value,
-      detailAnswer,
-      recommend,
-      shareConsent,
-      additional,
-      garageName,
-      submittedAt: new Date().toISOString(),
-    };
+    // const feedback = {
+    //   nps,
+    //   timeliness,
+    //   workQuality,
+    //   value,
+    //   detailAnswer,
+    //   recommend,
+    //   shareConsent,
+    //   additional,
+    //   garageName,
+    //   submittedAt: new Date().toISOString(),
+    // };
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    // // Simulate API call
+    // await new Promise((resolve) => setTimeout(resolve, 800));
     // You could show a toast or set a "success" message here if desired
     // For now we do nothing (just .setSubmitted)
   }
@@ -501,7 +501,7 @@ function SectionDivider() {
 }
 
 // Helper: clone main invoice node and restyle for PDF output
-function generateInvoiceHTMLForPDF(invoice: any) {
+function generateInvoiceHTMLForPDF() {
   // Either clone rendered DOM or build an HTML string with inlined styling for PDF snapshot
   // We'll clone the relevant section by ID (set below)
   const el = document.getElementById('invoice-for-pdf');
@@ -531,7 +531,7 @@ function InvoiceDownloadButton({ invoice }: { invoice: any }) {
   async function handleDownload() {
     // Render the PDF off a DOM snapshot of the invoice
     // Locate the main invoice block
-    const div = generateInvoiceHTMLForPDF(invoice);
+    const div = generateInvoiceHTMLForPDF();
     if (!div) return;
 
     // Temporarily add to body (hidden) to layout for html2canvas-pro
