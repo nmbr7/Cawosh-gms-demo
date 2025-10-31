@@ -113,7 +113,7 @@ function InvoiceAttachment({
   );
 }
 
-const DEMO_OTP = '123456';
+const DEMO_OTP = '903412';
 
 function OtpForm({ onSuccess }: { onSuccess: () => void }) {
   const [otp, setOtp] = useState('');
