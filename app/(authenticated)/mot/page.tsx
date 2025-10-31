@@ -260,7 +260,7 @@ export default function MotVehiclesOverview() {
       {/* MOT Search Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-4">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl  text-gray-900">Vehicles MOT Status</h1>
+          <h1 className="text-2xl  text-gray-900">MOT Check & Status</h1>
         </div>
         <div className="flex-1 flex flex-col sm:flex-row items-center justify-end gap-2">
           {/* Show search error inline to the left of the search form */}
@@ -291,7 +291,7 @@ export default function MotVehiclesOverview() {
               className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded disabled:opacity-60"
               disabled={searching || !searchReg.trim()}
             >
-              {searching ? 'Searching...' : 'Search MOT'}
+              {searching ? 'Checking...' : 'Check MOT Details'}
             </button>
           </form>
           <Popover>

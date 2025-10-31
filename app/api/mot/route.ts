@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Backend call to /api/auth/mot/all for current user MOT data
-    const backendUrl = `${process.env.BACKEND_URL}/api/v1/auth/mot/all`;
+    const backendUrl = `${process.env.BACKEND_URL}/api/v1/mot/all`;
 
     const response = await fetch(backendUrl, {
       method: 'GET',

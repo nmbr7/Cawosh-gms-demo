@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Call backend endpoint for this vehicle MOT history
-    const backendUrl = `${process.env.BACKEND_URL}/api/v1/auth/mot/reg/${encodeURIComponent(reg)}`;
+    const backendUrl = `${process.env.BACKEND_URL}/api/v1/mot/reg/${encodeURIComponent(reg)}`;
 
     const response = await fetchWithAuth(backendUrl, {
       headers: {
