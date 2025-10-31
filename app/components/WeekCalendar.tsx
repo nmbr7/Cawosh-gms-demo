@@ -120,6 +120,59 @@ export const WeekCalendar: React.FC<Props> = ({
           </React.Fragment>
         ))}
 
+        {/* === CURRENT TIME INDICATOR (RED, VERTICAL BAR AT MIDDLE) === */}
+        {(() => {
+          // Check all 7 days if today, and render one indicator per column if so
+          const now = new Date();
+          return daysOfWeek.map((day, idx) => {
+            const dayDate = dayjs(day);
+            if (
+              now.getFullYear() === dayDate.year() &&
+              now.getMonth() === dayDate.month() &&
+              now.getDate() === dayDate.date()
+            ) {
+              const minutesFromMidnight =
+                now.getHours() * 60 + now.getMinutes();
+              // The width of one column (in px or %)
+              const colWidth = `calc((100% - 60px) / 7)`;
+              // Center the vertical dash in its column.
+              return (
+                <React.Fragment key={`now-line-${idx}`}>
+                  {/* The time line (horizontal) */}
+                  <div
+                    className="absolute left-[60px] z-30 pointer-events-none"
+                    style={{
+                      top: `${40 + minutesFromMidnight}px`,
+                      width: colWidth,
+                      height: '2px',
+                      background: '#ef4444', // Red (tailwind red-500)
+                      boxShadow: '0px 1px 6px 0px rgba(239, 68, 68, 0.13)',
+                      transform: `translateX(${idx * 100}%)`,
+                      borderRadius: 2,
+                    }}
+                  />
+                  {/* The vertical dash at the start of the day block (left edge of each day column) */}
+                  <div
+                    className="absolute z-40"
+                    style={{
+                      top: `${40 + minutesFromMidnight - 5}px`,
+                      left: `calc(60px + (${idx} * ((100% - 60px) / 7)))`,
+                      width: '2px',
+                      height: '12px',
+                      borderLeft: '2px dashedrgb(152, 42, 42)',
+                      background:
+                        'linear-gradient(180deg,#ef4444 0%,#fca5a5 100%)',
+                      borderRadius: '2px',
+                      pointerEvents: 'none',
+                    }}
+                  />
+                </React.Fragment>
+              );
+            }
+            return null;
+          });
+        })()}
+
         {/* Booking Columns */}
         {daysOfWeek.map((day, dayIndex) => {
           // Precompute for efficiency: map bookings to startMin/endMin/bayId for this day
@@ -209,7 +262,7 @@ export const WeekCalendar: React.FC<Props> = ({
                       'transition-all duration-150',
                       'hover:border-[1.5px] hover:border-violet-400',
                       'focus:outline-none focus:ring-1 focus:ring-violet-400',
-                      'hover:z-50',
+                      'hover:z-30',
                       'text-left', // center text
                       'group', // for targeting hover
                     )}

@@ -25,6 +25,8 @@
     "dayjs": "^1.11.18",
     "framer-motion": "^12.23.24",
     "fuse.js": "^7.1.0",
+    "html2canvas-pro": "^1.5.12",
+    "jspdf": "^3.0.3",
     "lucide-react": "^0.487.0",
     "next": "15.2.4",
     "node-fetch": "^3.3.2",

@@ -77,6 +77,28 @@ export const useBillingStore = create<BillingState>()(
           summary: get().getInvoiceSummary(),
         }));
 
+        // Call backend API to send SMS notification when a job is completed, sending only the jobSheetId as invoice number.
+        // Fix: pass the correct jobSheetId from invoiceData or newInvoice
+        // try {
+        //   fetch('/api/send-sms', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({
+        //       invoiceNumber: newInvoice.invoiceNumber,
+        //     }),
+        //   })
+        //     .then(response => {
+        //       if (!response.ok) {
+        //         console.error('Failed to send SMS notification');
+        //       }
+        //     })
+        //     .catch((error) => {
+        //       console.error('Error calling SMS API', error);
+        //     });
+        // } catch (error) {
+        //   console.error('SMS API call failed', error);
+        // }
+
         return newInvoice;
       },
 
@@ -85,13 +107,13 @@ export const useBillingStore = create<BillingState>()(
           invoices: state.invoices.map((invoice) =>
             invoice.id === invoiceId
               ? {
-                  ...invoice,
-                  status,
-                  paidDate:
-                    status === 'PAID'
-                      ? new Date().toISOString().split('T')[0]
-                      : undefined,
-                }
+                ...invoice,
+                status,
+                paidDate:
+                  status === 'PAID'
+                    ? new Date().toISOString().split('T')[0]
+                    : undefined,
+              }
               : invoice,
           ),
           summary: get().getInvoiceSummary(),

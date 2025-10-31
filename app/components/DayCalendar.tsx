@@ -78,6 +78,53 @@ export const DayCalendar: React.FC<Props> = ({
             {Array.from({ length: 24 }, (_, i) => (
               <div key={i} className="h-[60px] border-b border-gray-200" />
             ))}
+            {/* Current time red line */}
+            {(() => {
+              const now = new Date();
+              // If selectedDate is set, use its date, otherwise use today.
+              const dayDate = selectedDate ?? new Date();
+              // Check if we're rendering today (dates match on Y/M/D)
+              if (
+                now.getFullYear() === dayDate.getFullYear() &&
+                now.getMonth() === dayDate.getMonth() &&
+                now.getDate() === dayDate.getDate()
+              ) {
+                const minutesFromMidnight =
+                  now.getHours() * 60 + now.getMinutes();
+                return (
+                  <>
+                    {/* Horizontal current time line (red) */}
+                    <div
+                      className="absolute left-0 right-0 z-30 pointer-events-none"
+                      style={{
+                        top: `${minutesFromMidnight}px`,
+                        width: '100%',
+                        height: '2px',
+                        background: '#ef4444', // WeekCalendar uses red-500 here
+                        boxShadow: '0px 1px 6px 0px rgba(239, 68, 68, 0.13)',
+                        borderRadius: 2,
+                      }}
+                    />
+                    {/* Vertical dash at the start of the day block */}
+                    <div
+                      className="absolute z-40"
+                      style={{
+                        top: `${minutesFromMidnight - 5}px`,
+                        left: 0,
+                        width: '2px',
+                        height: '12px',
+                        borderLeft: '2px dashed rgb(231, 46, 46)',
+                        background:
+                          'linear-gradient(180deg,#ef4444 0%,#fca5a5 100%)',
+                        borderRadius: '2px',
+                        pointerEvents: 'none',
+                      }}
+                    />
+                  </>
+                );
+              }
+              return null;
+            })()}
           </div>
 
           {/* Booking blocks */}
@@ -142,7 +189,7 @@ export const DayCalendar: React.FC<Props> = ({
                     'transition-all duration-150',
                     'hover:border-[1.5px] hover:border-violet-400',
                     'focus:outline-none focus:ring-1 focus:ring-violet-400',
-                    'hover:z-50',
+                    'hover:z-30',
                     'text-left', // left-aligned text at rest and on hover
                   )}
                   style={{
