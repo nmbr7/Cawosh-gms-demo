@@ -594,13 +594,6 @@ export default function Header() {
           {showProfileMenu && (
             <div className="absolute right-0 mt-3 w-60 bg-white border border-gray-100 text-black px-0 py-2 shadow-2xl rounded-xl z-50 animate-fade-in">
               <div className="px-4 pb-3 pt-2 border-b border-gray-100 flex gap-2 items-center">
-                <Image
-                  src="/images/avatar.png"
-                  alt="User Avatar"
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 rounded-full object-cover"
-                />
                 <div className="flex flex-col">
                   <span className="font-medium text-[14px] truncate">
                     {user?.firstName} {user?.lastName}

@@ -228,7 +228,7 @@ export default function VehicleHealthChecksPage() {
   };
 
   return (
-    <div className="h-full flex flex-col space-y-4">
+    <div className="h-full flex flex-col space-y-4 p-3">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Vehicle Health Checks</h1>
         <div className="flex items-center gap-2">

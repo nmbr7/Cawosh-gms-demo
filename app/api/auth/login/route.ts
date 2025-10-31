@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const API_URL = 'http://localhost:8090';
-console.log(API_URL);
+const API_URL = 'http://localhost:8000';
 
 export async function POST(request: Request) {
   try {
@@ -28,13 +27,13 @@ export async function POST(request: Request) {
         'X-Tenant-Slug': tenantId,
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        Origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:8000',
+        Origin: process.env.NEXT_PUBLIC_APP_URL || API_URL,
       },
       body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
-    console.log(data);
+
 
     if (!response.ok) {
       return NextResponse.json(

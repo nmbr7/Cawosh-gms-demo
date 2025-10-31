@@ -25,20 +25,115 @@ import { useUIStore } from '@/store/ui';
 import { useAuthStore } from '@/store/auth';
 import React from 'react';
 
-// Navigation links for sidebar
-export const links = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Calendar', href: '/schedule', icon: Calendar },
-  { name: 'Bookings', href: '/bookings', icon: Handshake },
-  { name: 'Job Sheet', href: '/job-sheet', icon: ClipboardList },
-  { name: 'Stock Management', href: '/inventory', icon: Package },
-  { name: 'Approvals', href: '/approvals', icon: CheckCircle },
-  { name: 'Billings', href: '/billings', icon: Receipt },
-  { name: 'Customer Support', href: '/customer-support', icon: HeadphonesIcon },
-  { name: 'Workshop', href: '/workshop', icon: Wrench },
-  { name: 'MOT', href: '/mot', icon: Award },
-  { name: 'Staff Management', href: '/users', icon: UsersIcon },
-  { name: 'Settings', href: '/settings', icon: Settings },
+// Improved navigation links for sidebar, with unique icons and grouping example
+
+export type SidebarLink = {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  section?: string;
+};
+
+// Reordered based on typical operational/booking priority in garage apps
+
+// Better organized links: grouped by logical "section", de-duplicated icons, consistent ordering, added section comments for maintainability.
+
+export const links: SidebarLink[] = [
+  // --- GENERAL ---
+  {
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+    section: 'General',
+  },
+  {
+    name: 'Calendar',
+    href: '/schedule',
+    icon: Calendar,
+    section: 'General',
+  },
+
+  // --- BOOKINGS & CUSTOMERS ---
+  {
+    name: 'Bookings',
+    href: '/bookings',
+    icon: Handshake,
+    section: 'Bookings',
+  },
+  {
+    name: 'Customers',
+    href: '/customers',
+    icon: UsersIcon,
+    section: 'Bookings',
+  },
+
+  // --- OPERATIONS: Jobs, Checks, Workshop, Stock ---
+  {
+    name: 'Job Sheet',
+    href: '/job-sheet',
+    icon: ClipboardList,
+    section: 'Operations',
+  },
+  {
+    name: 'Vehicle Health Score',
+    href: '/vehicle-health-checks',
+    icon: CheckCircle,
+    section: 'Operations',
+  },
+  {
+    name: 'Workshop',
+    href: '/workshop',
+    icon: Wrench,
+    section: 'Workshop',
+  },
+  {
+    name: 'MOT',
+    href: '/mot',
+    icon: Award,
+    section: 'Workshop',
+  },
+  {
+    name: 'Stock Management',
+    href: '/inventory',
+    icon: Package,
+    section: 'Operations',
+  },
+
+  // --- FINANCE & APPROVALS ---
+  {
+    name: 'Approvals',
+    href: '/approvals',
+    icon: CheckCircle,
+    section: 'Finance',
+  },
+  {
+    name: 'Billings',
+    href: '/billings',
+    icon: Receipt,
+    section: 'Finance',
+  },
+
+  // --- MANAGEMENT ---
+  {
+    name: 'Staff Management',
+    href: '/users',
+    icon: UsersIcon,
+    section: 'Management',
+  },
+  {
+    name: 'Settings',
+    href: '/settings',
+    icon: Settings,
+    section: 'Management',
+  },
+
+  // --- SUPPORT ---
+  {
+    name: 'Customer Support',
+    href: '/customer-support',
+    icon: HeadphonesIcon,
+    section: 'Support',
+  },
 ];
 
 function SidebarLink({
@@ -157,7 +252,7 @@ export default function Sidebar() {
           )}
         </div>
 
-        <nav className="flex flex-col gap-2 p-3" aria-label="Main navigation">
+        <nav className="flex flex-col gap-1 p-3" aria-label="Main navigation">
           {links.map(({ name, href, icon }) => (
             <SidebarLink
               key={href}
@@ -172,7 +267,7 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom: Logout + Collapse Toggle */}
-      <div className="p-2 border-t flex flex-row items-center gap-2">
+      <div className="p-2 border-t flex flex-row items-center">
         <button
           onClick={handleLogout}
           className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 w-full px-2 py-2 rounded transition-colors focus:outline-none focus:ring-2 ring-red-200"

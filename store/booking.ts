@@ -326,7 +326,6 @@ export const useBookingStore = create<BookingState>()(
         const state = get();
         const bays = state.bays.slice(0, bayCount);
         const today = new Date();
-        // today.setDate(today.getDate() - 7);
 
         const garage = useGarageStore.getState().garage;
         const getHoursForDate = (d: Date) => {
@@ -350,6 +349,96 @@ export const useBookingStore = create<BookingState>()(
           }
           return slots;
         };
+
+        // We'll manage a pool of customers, each with up to 5 vehicles (cache by customer name)
+        const customerNames = [
+          'Ahmed Raza',
+          'Fatima Noor',
+          'James Lee',
+          'Maria Petrova',
+          'Wei Zhang',
+          'Olivia Johnson',
+          'Arjun Patel',
+        ];
+        const customerPhones = [
+          '+97150' + Math.floor(1000000 + Math.random() * 8999999),
+          '+97152' + Math.floor(1000000 + Math.random() * 8999999),
+          '+97155' + Math.floor(1000000 + Math.random() * 8999999),
+          '+97156' + Math.floor(1000000 + Math.random() * 8999999),
+        ];
+
+        // Create customer pool
+        const customerPool: {
+          [customerName: string]: {
+            info: {
+              name: string;
+              email: string;
+              phone: string;
+            };
+            vehicles: {
+              make: string;
+              model: string;
+              year: number;
+              license: string;
+              vin: string;
+            }[];
+          };
+        } = {};
+
+        // Seed customer pool with up to 5 vehicles each
+        for (let idx = 0; idx < customerNames.length; idx++) {
+          const name = customerNames[idx];
+          const emailBase = name.replace(/\s+/g, '.').toLowerCase();
+          customerPool[name] = {
+            info: {
+              name,
+              phone:
+                customerPhones[
+                  Math.floor(Math.random() * customerPhones.length)
+                ],
+              email: `${emailBase}@example.com`,
+            },
+            vehicles: [],
+          };
+          // Generate 1-5 vehicles
+          const numVehicles = Math.floor(Math.random() * 5) + 1;
+          const makesModels = [
+            { make: 'Toyota', models: ['Camry', 'Corolla', 'Hilux'] },
+            { make: 'Nissan', models: ['Altima', 'Patrol', 'Sunny'] },
+            { make: 'Ford', models: ['F-150', 'Explorer', 'Focus'] },
+            { make: 'Honda', models: ['Civic', 'Accord', 'CR-V'] },
+            { make: 'Hyundai', models: ['Sonata', 'Elantra', 'Tucson'] },
+          ];
+          const years = [2019, 2020, 2021, 2022, 2023];
+
+          for (let v = 0; v < numVehicles; v++) {
+            const randomCar =
+              makesModels[Math.floor(Math.random() * makesModels.length)];
+            const randomModel =
+              randomCar.models[
+                Math.floor(Math.random() * randomCar.models.length)
+              ];
+            const randomYear = years[Math.floor(Math.random() * years.length)];
+            const randomLicense =
+              String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
+              Math.floor(1000 + Math.random() * 89999).toString();
+            const randomVin = Array(17)
+              .fill(0)
+              .map(() =>
+                'ABCDEFGHJKLMNPRSTUVWXYZ0123456789'.charAt(
+                  Math.floor(Math.random() * 33),
+                ),
+              )
+              .join('');
+            customerPool[name].vehicles.push({
+              make: randomCar.make,
+              model: randomModel,
+              year: randomYear,
+              license: randomLicense,
+              vin: randomVin,
+            });
+          }
+        }
 
         const newBookings: Booking[] = [];
         for (let d = 0; d < days; d++) {
@@ -391,6 +480,18 @@ export const useBookingStore = create<BookingState>()(
             const svc =
               state.services[Math.floor(Math.random() * state.services.length)];
 
+            // Choose a customer
+            const custName =
+              customerNames[Math.floor(Math.random() * customerNames.length)];
+            const custObj = customerPool[custName];
+
+            // Pick a vehicle from that customer (max 5 per customer)
+            if (!custObj.vehicles.length) continue;
+            const vehicleIdx = Math.floor(
+              Math.random() * custObj.vehicles.length,
+            );
+            const vehicleObj = custObj.vehicles[vehicleIdx];
+
             const startTime = `${dateStr}T${time}:00`;
             const endDate = new Date(startTime);
             endDate.setMinutes(endDate.getMinutes() + (svc?.duration || 30));
@@ -398,77 +499,8 @@ export const useBookingStore = create<BookingState>()(
 
             newBookings.push({
               _id: crypto.randomUUID(),
-              // Randomize customer and vehicle fields for demo data
-              customer: (() => {
-                // Demo data pools
-                const customerNames = [
-                  'Ahmed Raza',
-                  'Fatima Noor',
-                  'James Lee',
-                  'Maria Petrova',
-                  'Wei Zhang',
-                  'Olivia Johnson',
-                  'Arjun Patel',
-                ];
-                const customerPhones = [
-                  '+97150' + Math.floor(1000000 + Math.random() * 8999999),
-                  '+97152' + Math.floor(1000000 + Math.random() * 8999999),
-                  '+97155' + Math.floor(1000000 + Math.random() * 8999999),
-                  '+97156' + Math.floor(1000000 + Math.random() * 8999999),
-                ];
-                const nameIdx = Math.floor(
-                  Math.random() * customerNames.length,
-                );
-                const emailBase = customerNames[nameIdx]
-                  .replace(/\s+/g, '.')
-                  .toLowerCase();
-                return {
-                  name: customerNames[nameIdx],
-                  phone:
-                    customerPhones[
-                      Math.floor(Math.random() * customerPhones.length)
-                    ],
-                  email: `${emailBase}@example.com`,
-                };
-              })(),
-              vehicle: (() => {
-                const makesModels = [
-                  { make: 'Toyota', models: ['Camry', 'Corolla', 'Hilux'] },
-                  { make: 'Nissan', models: ['Altima', 'Patrol', 'Sunny'] },
-                  { make: 'Ford', models: ['F-150', 'Explorer', 'Focus'] },
-                  { make: 'Honda', models: ['Civic', 'Accord', 'CR-V'] },
-                  { make: 'Hyundai', models: ['Sonata', 'Elantra', 'Tucson'] },
-                ];
-                const years = [2019, 2020, 2021, 2022, 2023];
-                const randomCar =
-                  makesModels[Math.floor(Math.random() * makesModels.length)];
-                const randomModel =
-                  randomCar.models[
-                    Math.floor(Math.random() * randomCar.models.length)
-                  ];
-                const randomYear =
-                  years[Math.floor(Math.random() * years.length)];
-                // UAE license plates: 1-7 chars, letters and/or numbers. We'll mock: ABC1234, D56789, Z4321, etc.
-                const randomLicense =
-                  String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
-                  Math.floor(1000 + Math.random() * 89999).toString();
-                // Random VIN-like string
-                const randomVin = Array(17)
-                  .fill(0)
-                  .map(() =>
-                    'ABCDEFGHJKLMNPRSTUVWXYZ0123456789'.charAt(
-                      Math.floor(Math.random() * 33),
-                    ),
-                  )
-                  .join('');
-                return {
-                  make: randomCar.make,
-                  model: randomModel,
-                  year: randomYear,
-                  license: randomLicense,
-                  vin: randomVin,
-                };
-              })(),
+              customer: { ...custObj.info },
+              vehicle: { ...vehicleObj },
               services: [
                 {
                   serviceId: {
