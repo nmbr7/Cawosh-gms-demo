@@ -77,27 +77,22 @@ export const useBillingStore = create<BillingState>()(
           summary: get().getInvoiceSummary(),
         }));
 
-        // Call backend API to send SMS notification when a job is completed, sending only the jobSheetId as invoice number.
-        // Fix: pass the correct jobSheetId from invoiceData or newInvoice
-        // try {
-        //   fetch('/api/send-sms', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({
-        //       invoiceNumber: newInvoice.invoiceNumber,
-        //     }),
-        //   })
-        //     .then(response => {
-        //       if (!response.ok) {
-        //         console.error('Failed to send SMS notification');
-        //       }
-        //     })
-        //     .catch((error) => {
-        //       console.error('Error calling SMS API', error);
-        //     });
-        // } catch (error) {
-        //   console.error('SMS API call failed', error);
-        // }
+        // Call Next.js (App Router) API route to send a notification when a job is completed, sending only invoice_id.
+        fetch('/api/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            invoice_id: newInvoice.invoiceNumber,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              console.error('Failed to send notification');
+            }
+          })
+          .catch((error) => {
+            console.error('Notification API call failed', error);
+          });
 
         return newInvoice;
       },

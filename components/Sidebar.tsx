@@ -219,7 +219,7 @@ export default function Sidebar() {
     <aside
       className={cn(
         'h-screen bg-white shadow-md flex flex-col justify-between transition-all duration-300 ease-in-out',
-        sidebarOpen ? 'w-64' : 'w-20',
+        sidebarOpen ? 'w-64' : 'w-16',
       )}
       aria-label="Sidebar navigation"
     >
@@ -227,8 +227,8 @@ export default function Sidebar() {
       <div>
         <div
           className={cn(
-            'p-4 text-xl font-semibold border-b h-18 flex items-center transition-all bg-white border-gray-200',
-            sidebarOpen ? 'justify-start' : 'justify-center',
+            'p-0 text-xl font-semibold border-b h-18 flex items-center transition-all bg-white border-gray-200',
+            'justify-center',
           )}
         >
           {expandText ? (
@@ -252,7 +252,7 @@ export default function Sidebar() {
           )}
         </div>
 
-        <nav className="flex flex-col gap-1 p-3" aria-label="Main navigation">
+        <nav className="flex flex-col gap-1 p-1" aria-label="Main navigation">
           {links.map(({ name, href, icon }) => (
             <SidebarLink
               key={href}
@@ -267,7 +267,7 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom: Logout + Collapse Toggle */}
-      <div className="p-2 border-t flex flex-row items-center">
+      <div className="p-1 border-t flex flex-row items-center">
         <button
           onClick={handleLogout}
           className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 w-full px-2 py-2 rounded transition-colors focus:outline-none focus:ring-2 ring-red-200"
@@ -279,8 +279,7 @@ export default function Sidebar() {
         <button
           onClick={toggleSidebar}
           aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-          className="p-2 rounded hover:bg-gray-100 transition focus:outline-none focus:ring-2 ring-blue-200"
-          style={{ minWidth: 36, minHeight: 36 }}
+          className="p-1 mr-2 rounded hover:bg-gray-100 transition focus:outline-none focus:ring-2 ring-blue-200"
         >
           {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
         </button>
